@@ -100,8 +100,7 @@ def generate_training_data_with_rules(
     include_reasoning=True,
     use_rules=True
 ):
-    """
-    Generate training data with chain-of-thought reasoning.
+    """ Generate training data with chain-of-thought reasoning.
 
     Args:
         graph: Knowledge graph dictionary
@@ -114,7 +113,7 @@ def generate_training_data_with_rules(
         use_rules: Whether to include symbolic rule context
 
     Returns:
-        DataFrame with training examples
+        DataFrame with training examples.
     """
     # TODO: Implementar patrón de Objetos de Configuración en los argumentos de la función
     data = []
