@@ -23,8 +23,8 @@ def _save_json_results(
             "timestamp": datetime.now(timezone.utc).isoformat(),
             "model": config.model.name,
             "model_alias": config.model.alias,
-            "train_samples": config.training.train_samples,
-            "num_training_steps": config.training.training_steps,
+            "train_samples": config.train.train_samples,
+            "num_training_steps": config.train.training_steps,
         },
         "results": {},
     }

@@ -27,7 +27,6 @@ class TrainingConfig:
     Attributes:
         train_samples: Number of samples for training.
         eval_samples: Number of samples for evaluation.
-        test_samples: Number of samples for testing.
         training_steps: Number of training steps.
         batch_size: Batch size.
         gradient_accumulation_steps: Steps to accumulate gradients before updating.
@@ -41,7 +40,6 @@ class TrainingConfig:
 
     train_samples: int = 2000
     eval_samples: int = 2000
-    test_samples: int = 1000
     training_steps: int = 500
     batch_size: int = 1
     gradient_accumulation_steps: int = 4
@@ -52,6 +50,19 @@ class TrainingConfig:
 
     # TODO: Asegurarse de que va aquí
     pca_threshold: float = 0.3
+
+
+@dataclass
+class TestConfig:
+    """Configuration for the testing loop and hyperparameters.
+
+    Attributes:
+        samples: Number of samples for testing.
+        batch_size: Batch size.
+    """
+
+    samples: int = 1000
+    batch_size = 1
 
 
 @dataclass
@@ -121,12 +132,14 @@ class RunConfig:
     """Toggable settings for the specific run configuration.
 
     Attributes:
+        generate_datasets: If True, dataset files will be generated.
         skip_base_eval: If True, skips evaluating the base model before fine-tuning.
         skip_baseline: If True, skips the standard baseline comparisons.
         save_predictions: Whether to save model predictions to disk.
         generate_plots: Whether to generate and save evaluation plots.
     """
 
+    generate_datasets: bool = False
     skip_base_eval: bool = False
     skip_baseline: bool = False
     save_predictions: bool = True
@@ -150,7 +163,8 @@ class ExperimentConfig:
     # for each ExperimentConfig, preventig shared state bugs.
     data: DataConfig = field(default_factory=DataConfig)
     model: ModelConfig = field(default_factory=ModelConfig)
-    training: TrainingConfig = field(default_factory=TrainingConfig)
+    train: TrainingConfig = field(default_factory=TrainingConfig)
+    test: TestConfig = field(default_factory=TestConfig)
     lora: LoRAConfig = field(default_factory=LoRAConfig)
     hardware: GPUConfig = field(default_factory=GPUConfig)
     run_settings: RunConfig = field(default_factory=RunConfig)

@@ -12,6 +12,7 @@ from transformers import (
 )
 
 from configuration import ExperimentConfig
+from evaluation import EvaluationMetrics
 
 
 def load_model(
@@ -71,8 +72,7 @@ def evaluate_model(
     model: PreTrainedModel,
     tokenizer: PreTrainedTokenizerBase,
     data: pd.DataFrame,
-    max_samples: int = 200,  # TODO: pasar a conf
-):
+) -> EvaluationMetrics:
     """
     Evaluate model with comprehensive metrics.
 
@@ -94,59 +94,61 @@ def evaluate_model(
     y_true = []
     y_pred = []
 
-    samples = min(len(data), max_samples)
+    samples = min(len(data), config.test.samples)
+    data_subset = data.head(samples)
 
-    # Start timing
+    original_padding_side = tokenizer.padding_side
+    tokenizer.padding_side = "left"
+
     start_time = time.time()
 
-    for idx, row in data.head(samples).iterrows():
-        input_text = "###Input:\n" + row["input_text"]
-        expected_has_yes = "yes" in row["output_text"].lower()
+    for i in range(0, samples, config.test.batch_size):
+        batch_df = data_subset.iloc[i : i + config.test.batch_size]
 
-        inputs = tokenizer(input_text, return_tensors="pt").to(device)
+        # Inputs and ground truths for the whole batch
+        input_texts = ["###Input:\n" + text for text in batch_df["input_text"]]
+        expected_has_yes = ["yes" in text.lower() for text in batch_df["output_text"]]
+        # TODO: Asegurarme de que esta búsqueda de "yes" no tiene en cuenta el prompt.
+
+        # Tokenize the batch (padding=True is required for batches)
+        inputs = tokenizer(input_texts, return_tensors="pt", padding=True).to(device)
+
+        # Get the length of the padded prompts to slice them out later
+        prompt_length = inputs["input_ids"].shape[1]
 
         with torch.no_grad():
             outputs = model.generate(  # type: ignore
-                input_ids=inputs["input_ids"],
-                attention_mask=inputs["attention_mask"],
+                **inputs,  # Passes both input_ids and attention_mask automatically
                 max_new_tokens=150,
                 pad_token_id=tokenizer.eos_token_id,
-                do_sam+ple=False,
+                do_sample=False,
             )
 
-        model_answer = tokenizer.decode(outputs[0], skip_special_tokens=True)
-        model_has_yes = "yes" in model_answer.lower()
+        # Slice out the prompt (take only the newly generated tokens)
+        generated_tokens = outputs[:, prompt_length:]
 
-        y_true.append(expected_has_yes)
-        y_pred.append(model_has_yes)
+        # Decode the entire batch at once
+        model_answers = tokenizer.batch_decode(
+            generated_tokens, skip_special_tokens=True
+        )
 
-        if (idx + 1) % 50 == 0:
+        # Extract metrics for the batch
+        for expected, answer in zip(expected_has_yes, model_answers):
+            y_true.append(expected)
+            y_pred.append("yes" in answer.lower())
+
+        # Progress tracking
+        processed = min(i + config.test.batch_size, samples)
+        if processed % (config.test.batch_size * 5) == 0 or processed == samples:
             elapsed = time.time() - start_time
             print(
-                f"Processed {idx + 1}/{num_samples} samples... ({elapsed:.1f}s elapsed)"
+                f"Processed {processed}/{samples} samples... ({elapsed:.1f}s elapsed)"
             )
+
+    # Restore the original padding side (in case you train/evaluate sequentially)
+    tokenizer.padding_side = original_padding_side
 
     # End timing
     eval_time = time.time() - start_time
 
-    # Calculate metrics
-    accuracy = accuracy_score(y_true, y_pred)
-    precision = precision_score(y_true, y_pred, pos_label=True, zero_division=0)
-    recall = recall_score(y_true, y_pred, pos_label=True, zero_division=0)
-    f1 = f1_score(y_true, y_pred, pos_label=True, zero_division=0)
-
-    metrics = EvaluationMetrics(
-        accuracy=accuracy,
-        precision=precision,
-        recall=recall,
-        f1_score=f1,
-        eval_size=num_samples,
-        eval_time_seconds=eval_time,
-        y_true=y_true,
-        y_pred=y_pred,
-    )
-
-    return metrics
-
-
-print("Enhanced evaluation function defined!")
+    return EvaluationMetrics.from_predictions(y_true, y_pred, eval_time=eval_time)
