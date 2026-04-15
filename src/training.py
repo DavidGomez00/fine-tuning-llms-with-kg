@@ -222,7 +222,6 @@ def evaluate_model(
         # Inputs and ground truths for the whole batch
         input_texts = ["###Input:\n" + text for text in batch_df["input_text"]]
         expected_has_yes = ["yes" in text.lower() for text in batch_df["output_text"]]
-        # TODO: Asegurarme de que esta búsqueda de "yes" no tiene en cuenta el prompt.
 
         # Tokenize the batch (padding=True is required for batches)
         inputs = tokenizer(input_texts, return_tensors="pt", padding=True).to(device)
