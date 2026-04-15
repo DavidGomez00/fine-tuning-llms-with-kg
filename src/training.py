@@ -25,7 +25,7 @@ from configuration import ExperimentConfig
 from evaluation import EvaluationMetrics
 
 
-def load_model(
+def _load_model(
     config: ExperimentConfig,
 ) -> Tuple[PreTrainedModel, PreTrainedTokenizerBase]:
     """Loads a causal language model and its tokenizer with 4-bit quantization.
@@ -115,9 +115,9 @@ def fine_tune(
         Tuple containing the fine-tuned model and training time in seconds.
     """
     if model is None:
-        model, tokenizer = load_model(config)
+        model, tokenizer = _load_model(config)
     elif tokenizer is None:
-        _, tokenizer = load_model(config)  # TODO: custom models and tokenizers?
+        _, tokenizer = _load_model(config)  # TODO: custom models and tokenizers?
 
     # Prepare model for LoRA
     model.gradient_checkpointing_enable()
@@ -198,9 +198,9 @@ def evaluate_model(
 
     """
     if model is None:
-        model, tokenizer = load_model(config)
+        model, tokenizer = _load_model(config)
     elif tokenizer is None:
-        _, tokenizer = load_model(config)  # TODO: custom models and tokenizers?
+        _, tokenizer = _load_model(config)  # TODO: custom models and tokenizers?
 
     device = config.hardware.device
     model.eval()
