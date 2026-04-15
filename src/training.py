@@ -1,163 +1,268 @@
-import json
-from datetime import datetime, timezone
-from pathlib import Path
-from typing import Any, Dict
+import time
+from typing import List, Tuple
 
-import matplotlib.pyplot as plt
+import bitsandbytes as bnb
 import pandas as pd
+import torch
+from peft import (
+    LoraConfig,
+    PeftModel,
+    get_peft_model,
+    prepare_model_for_kbit_training,
+)
+from transformers import (
+    AutoModelForCausalLM,
+    AutoTokenizer,
+    BitsAndBytesConfig,
+    DataCollatorForLanguageModeling,
+    PreTrainedModel,
+    PreTrainedTokenizerBase,
+    Trainer,
+    TrainingArguments,
+)
 
 from configuration import ExperimentConfig
+from evaluation import EvaluationMetrics
 
 
-def _save_json_results(
-    output_dir: Path,
+def load_model(
     config: ExperimentConfig,
-    results: Dict[str, Any],
-    training_times: Dict[str, float],
-) -> None:
-    """Helper method to generate and save the JSON payload."""
-    json_path = output_dir / config.data.results_file
+) -> Tuple[PreTrainedModel, PreTrainedTokenizerBase]:
+    """Loads a causal language model and its tokenizer with 4-bit quantization.
 
-    results_dict: Dict[str, Any] = {
-        "experiment_info": {
-            "timestamp": datetime.now(timezone.utc).isoformat(),
-            "model": config.model.name,
-            "model_alias": config.model.alias,
-            "train_samples": config.train.train_samples,
-            "num_training_steps": config.train.training_steps,
-        },
-        "results": {},
-    }
+    This function initializes a BitsAndBytes configuration to load the model in 4-bit
+    precision, optimizing memory usage. It automatically maps the model across available
+    GPUs based on the memory limits defined in the configuration. It also ensures the
+    tokenizer uses the EOS token for padding.
 
-    for model_name, metrics in results.items():
-        model_metrics_dict = metrics.to_dict()
-        model_metrics_dict["training_time_seconds"] = training_times.get(
-            model_name, 0.0
-        )
-        results_dict["results"][model_name] = model_metrics_dict
+    Args:
+        config (ExperimentConfig): Experiment configuration dataclass.
 
-    with open(json_path, "w", encoding="utf-8") as f:
-        json.dump(results_dict, f, indent=2)
+    Returns:
+        Tuple[PreTrainedModel, PreTrainedTokenizerBase]: A tuple containing:
+            - model: The quantized language model loaded for causal LM.
+            - tokenizer: The configured tokenizer.
 
-    # TODO: implement logger
-    print(f"JSON results saved to {json_path}")
+    Raises:
+        OSError: If the model name/path cannot be found on the Hugging Face Hub or locally.
+        ValueError: If the specified precision in the hardware config is invalid for bitsandbytes.
+    """
 
-
-def _save_summary_csv(
-    output_dir: Path,
-    config: ExperimentConfig,
-    results: Dict[str, Any],
-    training_times: Dict[str, float],
-) -> None:
-    """Helper method to generate and save the summary CSV dataframe."""
-    csv_path = output_dir / config.data.summary_csv
-    rows = [
-        {
-            "Model": model_name,
-            "Precision": metrics.precision,
-            "Recall": metrics.recall,
-            "F1": metrics.f1_score,
-            "Size": metrics.eval_size,
-            "Time (s)": metrics.eval_time_seconds,
-            "Train Time (s)": training_times.get(model_name, 0.0),
-        }
-        for model_name, metrics in results.items()
-    ]
-
-    df = pd.DataFrame(rows)
-    df = df.round(
-        {
-            "Precision": 4,
-            "Recall": 4,
-            "F1": 4,
-            "Time (s)": 2,
-            "Train Time (s)": 2,
-        }
+    # Create bits and bytes configuration # TODO: Pasar esto a configuración
+    bnb_config = BitsAndBytesConfig(
+        load_in_4bit=True,
+        bnb_4bit_use_double_quant=True,
+        bnb_4bit_quant_type="nf4",
+        bnb_4bit_compute_dtype=config.hardware.precision,
     )
 
-    df.to_csv(csv_path, index=False)
-    # TODO: implement logging
-    print(f"Summary CSV saved to {csv_path}")
+    # Determine maximum memmory per GPU
+    n_gpus = config.hardware.n_gpus
+    if n_gpus > 0:
+        max_memory = {i: f"{config.hardware.max_memory_mb}MB" for i in range(n_gpus)}
+    else:
+        max_memory = None
+
+    # Load model and tokenizer
+    model = AutoModelForCausalLM.from_pretrained(
+        pretrained_model_name_or_path=config.model.name,
+        quantization_config=bnb_config,
+        device_map="auto",
+        max_memory=max_memory,
+    )
+
+    tokenizer = AutoTokenizer.from_pretrained(config.model.name)
+    tokenizer.pad_token = tokenizer.eos_token
+
+    return model, tokenizer
 
 
-def save_results(
-    config: ExperimentConfig, results: Dict[str, Any], training_times: Dict[str, float]
-) -> None:
-    """Saves comprehensive results to multiple formats.
-
-    Args:
-        config: Dataclass with the experiment settings.
-        results: Dictionary containing model names mapped to metric objects.
-        training_times: Maps model names to training times in seconds.
-
-    Raises:
-        NotADirectoryError: If the output dir specified in `config` does not exist.
-    """
-    output_dir = Path(config.data.output_dir)
-    if not output_dir.is_dir():
-        raise NotADirectoryError(f"The directory does not exist: {output_dir}")
-
-    _save_json_results(output_dir, config, results, training_times)
-    _save_summary_csv(output_dir, config, results, training_times)
-
-
-def create_comparison_plot(config: ExperimentConfig, results: Dict[str, Any]) -> None:
-    """Creates a bar chart comparing model performances.
+def _get_linear_names(model: PreTrainedModel | torch.nn.Module) -> List[str]:
+    """Find all linear layer names for LoRA targeting.
 
     Args:
-        config: Dataclass with the experiment settings.
-        results: Dictionary containing model names mapped to metric objects.
+        model: Model from which retrieve the linear names.
 
-    Raises:
-        NotADirectoryError: If the output dir specified in `config` does not exist.
+    Returns:
+        The list of all the linear modules in the model.
     """
-    output_dir = Path(config.data.output_dir)
-    if not output_dir.is_dir():
-        raise NotADirectoryError(f"The directory does not exist: {output_dir}")
+    lora_module_names = set()
+    for name, module in model.named_modules():
+        if isinstance(module, bnb.nn.Linear4bit):
+            names = name.split(".")
+            lora_module_names.add(names[0] if len(names) == 1 else names[-1])
+    if "lm_head" in lora_module_names:
+        lora_module_names.remove("lm_head")
+    return list(lora_module_names)
 
-    output_file = output_dir / "comparison_plot.png"  # TODO: Maybe move to config.data
 
-    models = list(results.keys())
-    if not models:
-        # TODO: logging
-        print("Warning: No results found to plot.")
-        return
+def fine_tune(
+    config: ExperimentConfig,
+    train_dataset: pd.DataFrame,
+    model: PreTrainedModel | None = None,
+    tokenizer: PreTrainedTokenizerBase | None = None,
+) -> Tuple[PeftModel, float]:
+    """
+    Fine-tune a large language model using LoRA.
 
-    fig, axes = plt.subplots(2, 2, figsize=(14, 10))
+    Args:
+        config: The experiment configuration object.
+        train_dataset: Dataset over which the model will be fine-tuned.
+        model: Model to be fine-tuned. If not specifyied, will use the one in config.
+        tokenizer: Tokenizer for the model.
 
-    metrics_data = [
-        (axes[0, 0], [results[m].accuracy for m in models], "Accuracy"),
-        (axes[0, 1], [results[m].precision for m in models], "Precision"),
-        (axes[1, 0], [results[m].recall for m in models], "Recall"),
-        (axes[1, 1], [results[m].f1_score for m in models], "F1 Score"),
-    ]
+    Returns:
+        Tuple containing the fine-tuned model and training time in seconds.
+    """
+    if model is None:
+        model, tokenizer = load_model(config)
+    elif tokenizer is None:
+        _, tokenizer = load_model(config)  # TODO: custom models and tokenizers?
 
-    for ax, data, title in metrics_data:
-        bars = ax.bar(models, data, alpha=0.8)
+    # Prepare model for LoRA
+    model.gradient_checkpointing_enable()
+    peft_prepared_model = prepare_model_for_kbit_training(model)
 
-        ax.set_ylabel(title, fontsize=12)
-        ax.set_title(f"{title} Comparison", fontsize=14, fontweight="bold")
+    peft_config = LoraConfig(
+        r=config.lora.r,
+        lora_alpha=config.lora.lora_alpha,
+        target_modules=_get_linear_names(peft_prepared_model),
+        lora_dropout=config.lora.lora_dropout,
+        bias=config.lora.bias,
+        task_type=config.lora.task_type,
+    )
 
-        ax.set_ylim([0, 1.05])
-        ax.grid(axis="y", alpha=0.3)
+    peft_model = get_peft_model(peft_prepared_model, peft_config)
+    assert isinstance(peft_model, PeftModel), "Failed to initialize PEFT model."
+    peft_model.config.use_cache = False
 
-        for bar in bars:
-            height = bar.get_height()
-            ax.text(
-                bar.get_x() + bar.get_width() / 2.0,
-                height,
-                f"{height:.2f}",
-                ha="center",
-                va="bottom",
-                fontsize=10,
-                fontweight="bold",
+    # Configure training
+    training_args = TrainingArguments(
+        output_dir=str(config.data.output_dir),
+        per_device_train_batch_size=config.train.per_device_batch_size,
+        gradient_accumulation_steps=config.train.gradient_accumulation_steps,
+        max_steps=config.train.max_steps,
+        learning_rate=config.train.learning_rate,
+        warmup_steps=config.train.warmup_steps,
+        optim=config.train.optim,
+        logging_steps=config.train.logging_steps,
+        save_steps=config.train.save_steps,
+        fp16=(config.hardware.precision == torch.float16),
+        bf16=(config.hardware.precision == torch.bfloat16),
+    )
+
+    trainer = Trainer(
+        model=peft_model,
+        train_dataset=train_dataset,
+        args=training_args,
+        data_collator=DataCollatorForLanguageModeling(tokenizer, mlm=False),
+    )
+
+    # Execute training
+    start_time = time.time()
+    trainer.train()
+    training_time = time.time() - start_time
+
+    # Save and Return
+    config.data.output_dir.mkdir(parents=True, exist_ok=True)
+
+    if trainer.model is not None:
+        assert isinstance(trainer.model, PeftModel), (
+            "Model is not a PeftModel, this might cause a crash."
+        )
+        trainer.model.save_pretrained(str(config.data.output_dir))
+    else:
+        print("Model is None type, something went wrong during fine-tuning.")
+
+    return peft_model, training_time
+
+
+def evaluate_model(
+    config: ExperimentConfig,
+    data: pd.DataFrame,
+    model: PreTrainedModel | PeftModel | None = None,
+    tokenizer: PreTrainedTokenizerBase | None = None,
+) -> EvaluationMetrics:
+    """
+    Evaluate model with comprehensive metrics.
+
+    Args:
+        config: Experiment configuration
+        data: Data over which evaluate the model.
+        model: Base model. Defaults to whatever is defined in config
+
+    Returns:
+        EvaluationMetrics object with:
+        - Precision, Recall, F1, Accuracy
+        - Evaluation time in seconds
+
+    """
+    if model is None:
+        model, tokenizer = load_model(config)
+    elif tokenizer is None:
+        _, tokenizer = load_model(config)  # TODO: custom models and tokenizers?
+
+    device = config.hardware.device
+    model.eval()
+
+    y_true = []
+    y_pred = []
+
+    samples = min(len(data), config.test.samples)
+    data_subset = data.head(samples)
+
+    original_padding_side = tokenizer.padding_side
+    tokenizer.padding_side = "left"
+
+    start_time = time.time()
+
+    for i in range(0, samples, config.test.batch_size):
+        batch_df = data_subset.iloc[i : i + config.test.batch_size]
+
+        # Inputs and ground truths for the whole batch
+        input_texts = ["###Input:\n" + text for text in batch_df["input_text"]]
+        expected_has_yes = ["yes" in text.lower() for text in batch_df["output_text"]]
+        # TODO: Asegurarme de que esta búsqueda de "yes" no tiene en cuenta el prompt.
+
+        # Tokenize the batch (padding=True is required for batches)
+        inputs = tokenizer(input_texts, return_tensors="pt", padding=True).to(device)
+
+        # Get the length of the padded prompts to slice them out later
+        prompt_length = inputs["input_ids"].shape[1]
+
+        with torch.no_grad():
+            outputs = model.generate(  # type: ignore
+                **inputs,  # Passes both input_ids and attention_mask automatically
+                max_new_tokens=150,
+                pad_token_id=tokenizer.eos_token_id,
+                do_sample=False,
             )
 
-    plt.tight_layout()
+        # Slice out the prompt (take only the newly generated tokens)
+        generated_tokens = outputs[:, prompt_length:]
 
-    plt.savefig(output_file, dpi=300, bbox_inches="tight")
+        # Decode the entire batch at once
+        model_answers = tokenizer.batch_decode(
+            generated_tokens, skip_special_tokens=True
+        )
 
-    plt.close(fig)
+        # Extract metrics for the batch
+        for expected, answer in zip(expected_has_yes, model_answers):
+            y_true.append(expected)
+            y_pred.append("yes" in answer.lower())
 
-    # TODO: Implement logging
-    print(f"Comparison plot saved to {output_file}")
+        # Progress tracking
+        processed = min(i + config.test.batch_size, samples)
+        if processed % (config.test.batch_size * 5) == 0 or processed == samples:
+            elapsed = time.time() - start_time
+            print(
+                f"Processed {processed}/{samples} samples... ({elapsed:.1f}s elapsed)"
+            )
+
+    # Restore the original padding side (in case you train/evaluate sequentially)
+    tokenizer.padding_side = original_padding_side
+
+    # End timing
+    eval_time = time.time() - start_time
+
+    return EvaluationMetrics.from_predictions(y_true, y_pred, eval_time=eval_time)

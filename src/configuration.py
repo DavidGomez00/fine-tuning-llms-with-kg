@@ -1,8 +1,10 @@
 import os
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Literal
 
 import torch
+import transformers
 
 
 @dataclass
@@ -25,26 +27,35 @@ class TrainingConfig:
     """Configuration for the training loop and hyperparameters.
 
     Attributes:
+        --- Dataset settings ---
         train_samples: Number of samples for training.
         eval_samples: Number of samples for evaluation.
-        training_steps: Number of training steps.
-        batch_size: Batch size.
-        gradient_accumulation_steps: Steps to accumulate gradients before updating.
+        --- TrainingArguments settings ---
+        per_device_batch_size: Batch size per computing device.
+        num_train_epochs: Total number of epochs to perform.
+        max_steps: Max number of training steps, overrides `num_train_epochs`.
         learning_rate: Peak learning rate for the optimizer.
         warmup_steps: Steps to increment the learning rate from 0 to learning_rate.
+        optim: The optimizer to use.
+        gradient_accumulation_steps: Steps to accumulate gradients before updating.
         logging_steps: Frequency of logging training metrics.
         save_steps: Frequency of saving model checkpoints.
         max_path_length: Maximum length of knowledge graph paths.
         pca_threshold: Confidence threshold for PCA (PCA-Confidence).
     """
 
+    # Training dataset config
     train_samples: int = 2000
     eval_samples: int = 2000
-    training_steps: int = 500
-    batch_size: int = 1
-    gradient_accumulation_steps: int = 4
+
+    # TrainingArguments config
+    per_device_batch_size: int = 1
+    num_train_epochs: float = 1.0
+    max_steps: int = 500
     learning_rate: float = 2e-3
     warmup_steps: int = 10
+    optim: str | transformers.training_args.OptimizerNames = "paged_adamw_8bit"
+    gradient_accumulation_steps: int = 4
     logging_steps: int = 50
     save_steps: int = 100
 
@@ -70,14 +81,18 @@ class LoRAConfig:
     """Configuration for Low-Rank Adaptation (LoRA) fine-tuning.
 
     Attributes:
-        lora_r: The rank of the LoRA update matrices.
-        lora_alpha: LoRA scaling factor.
-        lora_dropout: Dropout probability for LoRA layers.
+        r: The "rank" of the LoRA update matrices (attention dimension).
+        lora_alpha: The alpha parameter for Lora scaling.
+        lora_dropout: The dropout probability for Lora layers.
+        bias: If `all` or `lora_only`, the corresponding biases will be updated during training.
+        task_type: Type of task to be performed. Helps PEFT determine how to handle the head of the model.
     """
 
-    lora_r: int = 16
+    r: int = 16
     lora_alpha: int = 64
     lora_dropout: float = 0.1
+    bias: Literal["none", "lora_only", "all"] = "none"
+    task_type: str = "CAUSAL_LM"
 
 
 @dataclass
@@ -92,7 +107,7 @@ class GPUConfig:
     """
 
     n_gpus: int = torch.cuda.device_count()
-    device: str = "gpu" if torch.cuda.is_available() else "cpu"
+    device: Literal["gpu", "cpu"] = "gpu" if torch.cuda.is_available() else "cpu"
     precision: torch.dtype = torch.float16
     max_memory_mb: int = 40960
 
@@ -112,7 +127,8 @@ class DataConfig:
         relation_file: Filename of the mapping for relation IDs to relation names.
         results_file: Filename for the main JSON results.
         summary_csv: Filename for the CSV summary table.
-        plot_file: Filename of the plotting comparison (if generated).
+        experiment_plot: Filename of the plotting comparison.
+        experiment_table: Filename of the plotted experiment results table.
     """
 
     data_dir: Path = Path("/content/drive/MyDrive/KG-LLM/KG/LDM")
@@ -123,8 +139,9 @@ class DataConfig:
     relation_file: str = "/content/drive/MyDrive/KG-LLM/LDM/newoutput"
     results_file: str = "results.json"
     summary_csv: str = "results_summary.csv"
-    plot_file: str = "plotting_result.png"
+    experiment_plot: str = "experiment_plot.png"
     max_path_length: int = 10
+    experiment_table: str = "experiment_table.png"
 
 
 @dataclass

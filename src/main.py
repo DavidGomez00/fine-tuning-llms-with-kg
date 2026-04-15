@@ -1,20 +1,25 @@
-from typing import Dict
+from collections import defaultdict
+from typing import Any, Dict
 
 import pandas as pd
 
 from configuration import CoTGenerationConfig, ExperimentConfig
-from evaluation import EvaluationMetrics
+from evaluation import (
+    create_comparison_plot,
+    save_results,
+    save_results_table_png,
+)
 from KG import (
     create_relation_mapping,
     load_id2relation_mapping,
     load_knowledge_graph,
     parse_kg,
 )
-from model import evaluate_model, load_model
 from rules import (
     generate_CoTs,
     load_rules_from_path,
 )
+from training import evaluate_model, fine_tune
 
 
 def set_up(config: ExperimentConfig) -> None:
@@ -104,55 +109,64 @@ def main() -> None:
     """Main method to execute an experiment."""
 
     config = ExperimentConfig()
+    experiment_results: Dict[str, Any] = defaultdict(dict)
 
     # Maybe set up
     set_up(config)
 
-    # Get datasets
     datasets = load_datasets(config)
 
-    # Base model evaluation
+    # Base model
     if config.run_settings.skip_base_eval:
         print("Skipping base model evaluation.")
     else:
-        base_model, base_tokenizer = load_model(config)
-        base_results = evaluate_model(
+        # Evaluation
+        experiment_results["Base Model"] = evaluate_model(
             config=config,
-            model=base_model,
-            tokenizer=base_tokenizer,
             data=datasets["test_data_with_rules"],
         )
 
-    # Baseline model: Fine-tune without rules (KG-LLM)
+    # Baseline fine-tuning without rules (KG-LLM)
     if config.run_settings.skip_baseline:
         print("Skipping baseline evaluation.")
     else:
-        baseline_model, baseline_tokenizer = train_model()  # TODO
-        baseline_results = evaluate_model(
+        # Training
+        baseline_model, training_time = fine_tune(  # TODO: use training_time!!
             config=config,
-            model=baseline_model,
-            tokenizer=baseline_tokenizer,
-            data=datasets["train_datasets_without_rules"],
+            train_dataset=datasets["train_datasets_without_rules"],
         )
 
-    # Final model: Fine-tune with rules (NeSyKG-LLM)
-    final_model, final_tokenizer = train_model()  # TODO
-    final_results = evaluate_model(
+        # Evaluation
+        experiment_results["Baseline Model"] = evaluate_model(
+            config=config,
+            model=baseline_model,
+            data=datasets["test_data_with_rules"],
+        )
+
+    # Final fine-tune with rules (NeSyKG-LLM)
+    # Training
+    final_model, training_time = fine_tune(
         config=config,
-        model=baseline_model,
-        tokenizer=baseline_tokenizer,
-        data=datasets["train_datasets_with_rules"],
+        train_dataset=datasets["train_datasets_with_rules"],
+    )
+
+    # Evaluation
+    experiment_results["Final Model"] = evaluate_model(
+        config=config,
+        model=final_model,
+        data=datasets["test_data_with_rules"],
     )
 
     # Print results table
-    print_results_table(results, training_times)
+    png_file_path = config.data.output_dir / config.data.experiment_table
+    save_results_table_png(experiment_results, png_file_path)
 
     # Save all results
-    save_results(results, training_times)
+    save_results(config, experiment_results)
 
     # Generate comparison plot
     if config.run_settings.generate_plots:
-        create_comparison_plot(results)
+        create_comparison_plot(config, experiment_results)
 
     # Summary CSV
     summary_path = config.data.output_dir / config.data.summary_csv
