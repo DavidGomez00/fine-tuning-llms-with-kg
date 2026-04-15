@@ -112,7 +112,7 @@ class EvaluationMetrics:
         )
 
 
-def save_results_table_png(
+def create_results_table_png(
     results: Dict[str, EvaluationMetrics],
     output_path: Path,
 ) -> None:

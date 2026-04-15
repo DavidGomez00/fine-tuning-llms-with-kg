@@ -27,9 +27,13 @@ class TrainingConfig:
     """Configuration for the training loop and hyperparameters.
 
     Attributes:
+
+        TODO: Move this to datasets??
         --- Dataset settings ---
         train_samples: Number of samples for training.
         eval_samples: Number of samples for evaluation.
+
+
         --- TrainingArguments settings ---
         per_device_batch_size: Batch size per computing device.
         num_train_epochs: Total number of epochs to perform.
@@ -154,6 +158,7 @@ class RunConfig:
         skip_baseline: If True, skips the standard baseline comparisons.
         save_predictions: Whether to save model predictions to disk.
         generate_plots: Whether to generate and save evaluation plots.
+        generate_table: Whether to generate and save an experiment results table.
     """
 
     generate_datasets: bool = False
@@ -161,6 +166,7 @@ class RunConfig:
     skip_baseline: bool = False
     save_predictions: bool = True
     generate_plots: bool = True
+    generate_table: bool = True
 
 
 @dataclass

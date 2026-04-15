@@ -6,8 +6,8 @@ import pandas as pd
 from configuration import CoTGenerationConfig, ExperimentConfig
 from evaluation import (
     create_comparison_plot,
+    create_results_table_png,
     save_results,
-    save_results_table_png,
 )
 from KG import (
     create_relation_mapping,
@@ -131,7 +131,7 @@ def main() -> None:
         print("Skipping baseline evaluation.")
     else:
         # Training
-        baseline_model, training_time = fine_tune(  # TODO: use training_time!!
+        baseline_model, train_time = fine_tune(  # TODO: use training_time!!
             config=config,
             train_dataset=datasets["train_datasets_without_rules"],
         )
@@ -142,10 +142,11 @@ def main() -> None:
             model=baseline_model,
             data=datasets["test_data_with_rules"],
         )
+        experiment_results["Baseline Model"].train_time = train_time
 
     # Final fine-tune with rules (NeSyKG-LLM)
     # Training
-    final_model, training_time = fine_tune(
+    final_model, train_time = fine_tune(
         config=config,
         train_dataset=datasets["train_datasets_with_rules"],
     )
@@ -156,24 +157,18 @@ def main() -> None:
         model=final_model,
         data=datasets["test_data_with_rules"],
     )
-
-    # Print results table
-    png_file_path = config.data.output_dir / config.data.experiment_table
-    save_results_table_png(experiment_results, png_file_path)
+    experiment_results["Final Model"].train_time = train_time
 
     # Save all results
     save_results(config, experiment_results)
 
-    # Generate comparison plot
+    # Generate result plots and summaries
+    if config.run_settings.generate_table:
+        experiment_table_path = config.data.output_dir / config.data.experiment_table
+        create_results_table_png(experiment_results, experiment_table_path)
+
     if config.run_settings.generate_plots:
         create_comparison_plot(config, experiment_results)
-
-    # Summary CSV
-    summary_path = config.data.output_dir / config.data.summary_csv
-    print(f"\nResults Summary ({summary_path}):")
-    print("-" * 70)
-    summary_df = pd.read_csv(summary_path)
-    print(summary_df.to_string(index=False))
 
 
 if __name__ == "__main__":
