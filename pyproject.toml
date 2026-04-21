@@ -1,0 +1,44 @@
+# ==============================================================================
+# Project Metadata
+# ==============================================================================
+[project]
+name = "Using-rules-and-knowledge-graphs"
+version = "0.1.0"
+description = "This project implements methods and classes to deal with tasks that require rules and knowledge graphs."
+requires-python = ">=3.10"
+
+# ==============================================================================
+# Mypy Configuration
+# ==============================================================================
+[tool.mypy]
+python_version = "3.10"
+# Enable strict mode for high-quality code standards
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+# If using external libraries like pandas/numpy that might lack stubs:
+ignore_missing_imports = true
+
+# ==============================================================================
+# Ruff Configuration
+# ==============================================================================
+[tool.ruff]
+target-version = "py310"
+line-length = 88 # Standard line length (aligns with Black)
+
+[tool.ruff.lint]
+# Select specific rule sets to enforce best practices
+select = [
+    "E",   # pycodestyle errors
+    "F",   # pyflakes
+    "I",   # isort (automatically sorts your imports)
+    "UP",  # pyupgrade (forces modern syntax like `list[int]` instead of `List[int]`)
+    "B",   # flake8-bugbear (finds likely bugs and design problems)
+    "N",   # pep8-naming (enforces Google Style / PEP 8 naming conventions)
+]
+ignore = []
+
+[tool.ruff.format]
+# Enable auto-formatting (replaces Black)
+quote-style = "double"
+indent-style = "space"

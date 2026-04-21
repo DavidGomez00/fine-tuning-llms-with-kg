@@ -1,123 +1,423 @@
+"""Rules - Rule file that defines rule representations and logic."""
+# TODO: Can rules have empty heads or empty bodies?
+# TODO: Are subject, predicate, or object components of a rule/body always a variable?
+# TODO: Are there any expected formats or standards for the rules in the .csv files?
+
 import random
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 import pandas as pd
+import rdflib
 
-from configuration import CoTGenerationConfig
+from cot_generation_config import RuleToNLForCoTGenerationConfig
+from finetuning_config import CoTGenerationConfig
+from sparql import build_sparql_query
+
+# ---------------------------------------------------------------------------
+# Dataclasses
+# ---------------------------------------------------------------------------
 
 
-@dataclass
-class RuleDefinition:
-    """Represents a parsed logic rule form a knowledge graph.
+@dataclass(frozen=True, slots=True)
+class Atom:
+    """Represents a triple composed of subject predicate object.
+
+    The values of the each of these attributes are strings that represent either a
+    variable (e.g., ?a), a resource (e.g., ex:Patient), or a literal.
 
     Attributes:
-        rule_id: The extracted numerical ID of the rule.
-        rule_text: The natural language representation of the rule.
-        head: The head predicate.
-        body: The body predicate.
-        instances: A list of real instances found in the KG.
-        pca_confidence: The PCA confidence score.
-        classification: The rule's classification type.
+        subject: Subject of the triple.
+        predicate: Represents the relation between subject and object.
+        obj: Object of the triple.
     """
 
-    rule_id: str = ""
-    rule_text: str = ""
-    head: str = ""
-    body: str = ""
-    pca_confidence: float = -1.0
-    classification: str = ""
-    instances: List[str] = field(default_factory=list)
+    subject: str
+    predicate: str
+    obj: str
+
+    def __str__(self) -> str:
+        """Returns a string of the atom as '(subject predicate object)'."""
+        return f"({self.subject} {self.predicate} {self.obj})"
+
+    def to_natural_language(self) -> str:
+        """Returns a string with a natural language description of the atom."""
+        nl_pred = self.predicate_to_nl()
+        nl_obj = self.entity_to_nl
+        return f"{nl_pred} {nl_obj}"
+
+    def predicate_to_nl(self) -> str:
+        """Return the camelCase predicate to spaced lower-case natural language."""
+        nl_pred = re.sub(r"([A-Z])", r" \1", self.predicate).strip().lower()
+        if nl_pred.startswith("has "):
+            nl_pred = nl_pred[4:]
+        return nl_pred
+
+    def entity_to_nl(self) -> str:
+        """Return "-" spaced entity to " " spaced natural language."""
+        return self.obj.replace("_", " ")
 
 
-def _parse_rule_file(file_path: Path) -> RuleDefinition:
-    """Parses a rule text file to extract rule definitions and metrics.
+@dataclass(frozen=True, slots=True)
+class RuleSignature:
+    """Signature of a rule.
 
-    This function reads a specifically formatted text file containing logic rules
-    and uses regular expressions to extract metadata such as the rule ID, logical
-    head and body, real instances from a Knowledge Graph, and confidence metrics.
+    Represents the rule as a body -> head.
 
-    TODO: This may be better without re and with formated files.
+    Attributes:
+        body: The body of a rule is a set of atoms.
+        head: The head of a rule is a single atom.
+    """
+
+    body: frozenset[Atom]
+    head: Atom
+
+    def __str__(self) -> str:
+        """Returns the rule signature as a string '(atom), ... ,(atom) -> head'."""
+        body_str = " AND ".join(f"{atom}" for atom in self.body)
+        return f"{body_str} -> {str(self.head)}"
+
+    def to_natural_language(self) -> str:
+        """Returns a string with a natural language description of the rule."""
+        nl_body = " AND ".join(b.to_natural_language() for b in self.body)
+        nl_head = self.head.to_natural_language()
+        rule_desc = (
+            f"If {nl_body}, then {nl_head}.\n\n"
+            f"Formal Rule:\nHead: {self.head}\nBody: {self.body}"
+        )
+        return rule_desc
+
+
+@dataclass(slots=True)
+class HornRule:
+    """Represents a Horn Rule.
+
+    Attributes:
+        rule_id: String representing the ID of the rule.
+        signature: The representation of the rule, containing rule's head and body.
+        pca_confidence: The PCA confidence score of this rule.
+        support: The support of this rule.
+        head_coverage: The head coverage of the rule
+    """
+
+    rule_id: str
+    signature: RuleSignature
+    std_confidence: float = 0.0
+    pca_confidence: float = 0.0
+    support: int = 0
+    head_coverage: float = 0.0
+    classification: str = "UNKNOWN"
+
+    @property
+    def head(self) -> Atom:
+        """Exposes the head of the rule directly for convenience."""
+        return self.signature.head
+
+    @property
+    def body(self) -> frozenset[Atom]:
+        """Exposes the body of the rule directly for convenience."""
+        return self.signature.body
+
+    def __str__(self) -> str:
+        """Returns a formatted string representation of the rule and its stats."""
+        return (
+            f"{self.rule_id}: {self.signature} | "
+            f"PCA conf.: {self.pca_confidence}, "
+            f"supp.: {self.support}, "
+            f"hc: {self.head_coverage}"
+        )
+
+
+# ---------------------------------------------------------------------------
+# Rule parsing
+# ---------------------------------------------------------------------------
+
+# Compile the regex once at the module level.
+ATOM_PATTERN = re.compile(r"(\?\w+)\s+(\S+)\s+(\S+)")
+
+
+def parse_body(body_str: str) -> frozenset[Atom]:
+    """Parse body string containing one or more atoms.
+
+    # TODO: Define how body strings are expected.
 
     Args:
-        file_path: The absolute or relative path to the rule file.
+        body_str: String representing one or more atoms separated by whitespace.
 
     Returns:
-        RuleDefinition: A datacalss object containing the parsed rule metadata.
+        A frozenset of parsed Atom objects. Returns an empty frozenset
+        if the input string is empty or falsy.
+    """
+    if not body_str:
+        return frozenset()
+
+    return frozenset(
+        Atom(m.group(1), m.group(2), m.group(3))
+        for m in ATOM_PATTERN.finditer(body_str)
+    )
+
+
+def parse_head(head_str: str) -> Atom:
+    """Parse head string containing one atom.
+
+    # TODO: Define how body strings are expected.
+
+    Args:
+        head_str: String representing the head atom.
+
+    Returns:
+        The parsed Atom object, or None if the string does not contain
+        enough valid components.
 
     Raises:
-        FileNotFoundError: If the file specified in `file_path` does not exist.
-        ValueError: If the file is missing the promary rule ID and text.
+        ValueError: If the string format is not valid.
+    """
+    if not head_str:
+        raise ValueError("Head string format is not valid: Empty string.")
+
+    parts = head_str.strip().split()
+
+    # TODO: Consider if rules should have strictly 3 components.
+    if len(parts) < 3:
+        raise ValueError("Head string format is not valid: Too few components.")
+
+    return Atom(*parts[:3])
+
+
+def parse_rule_file(file: Path) -> RuleSignature:
+    """TODO: docs and logic"""
+    raise NotImplementedError()
+
+
+def parse_rule_csv(rule_csv: Path) -> pd.DataFrame:
+    """Parse a CSV containing a set of Horn Rules.
+
+    Args:
+        rule_csv: Path to the CSV file.
+
+    Returns:
+        A pandas DataFrame with the parsed and cleaned rules.
+
+    Raises:
+        ValueError: If the CSV does not contain 'Body' and 'Head' columns.
+        FileNotFoundError: If the CSV path does not exist.
+    """
+    rules_df = pd.read_csv(rule_csv)
+
+    # Ensure expected schema
+    required_cols = {"Body", "Head"}
+    if not required_cols.issubset(rules_df.columns):
+        raise ValueError(
+            f"CSV is missing required columns. "
+            f"Expected {required_cols}, got {set(rules_df.columns)}"
+        )
+
+    # Clean the DF
+    mask_body = rules_df["Body"].str.strip().str.startswith("?", na=False)
+    mask_head = rules_df["Head"].str.strip().str.startswith("?", na=False)
+    mask = mask_body & mask_head
+
+    clean_df = rules_df[mask].reset_index(drop=True)
+    removed = len(rules_df) - len(clean_df)
+
+    if removed:
+        # TODO: Implement logger
+        print(f"Removed {removed} invalid rows from rules dataframe")
+
+    return clean_df
+
+
+def _get_local_name(uri: str) -> str:
+    """Extract the name of a resource from a URI string.
+
+    rpartition searches from the right end of the string, stops at the first match, and
+    always returns a 3-tuple: (before, separator, after). If a match is not found, the
+    whole string is returned in "after".
+    """
+    if "#" in uri:
+        return uri.rpartition("#")[-1]
+    return uri.rpartition("/")[-1]
+
+
+def results_to_natural_language(
+    config: RuleToNLForCoTGenerationConfig,
+    results: rdflib.query.Result,
+    rule: HornRule,
+) -> str:
+    """Generate a description in natural language for a rule and all of its groundings.
+
+    Args:
+        rules_df: Pandas dataframe with the rule info.
+        rule_idx: Index of the rule.
+
+    Returns:
+        A string ?
     """
 
-    file_path = Path(file_path)
-    if not file_path.is_file():
-        raise FileNotFoundError(f"The file does not exist: {file_path}")
-
-    with open(file_path, "r", encoding="utf-8") as f:
-        content = f.read()
-
-    rule_info = RuleDefinition()
-
-    # Extract rule ID and text
-    rule_match = re.search(
-        r"Rule (\d+):\s*(.+?)(?=\n\nFormal Rule:)", content, re.DOTALL
-    )
-    if rule_match:
-        rule_info.rule_id = rule_match.group(1)
-        rule_info.rule_text = rule_match.group(2).strip()
+    if rule.classification == "POSITIVE":
+        operator = ">="
+    elif rule.classification == "NEGATIVE":
+        operator = "<"
     else:
-        raise ValueError(f"Could not find a valid Rule ID/Text in {file_path}")
+        operator = "?"
 
-    # Extract head and body
-    head_match = re.search(r"Head:\s*(.+)", content)
-    body_match = re.search(r"Body:\s*(.+)", content)
-
-    if head_match:
-        rule_info.head = head_match.group(1).strip()
-    if body_match:
-        rule_info.body = body_match.group(1).strip()
-
-    # Extract instances
-    instances_section = re.search(
-        r"Real Instances from Knowledge Graph.*?:\n\n(.+?)(?=\n\nRule Statistics:)",
-        content,
-        re.DOTALL,
+    rule_metrics_text = (
+        f"\nRule Statistics:\n- PCA Confidence: {rule.pca_confidence:.4f}\n"
+        f"- Rule Classification: {rule.classification}"
+        f"(PCA Confidence {rule.pca_confidence:.4f} {operator})"
+        f"threshold {config.pca_threshold})\n"
+        f"- Standard Confidence: {rule.std_confidence:.4f}\n"
+        f"- Positive Examples: {rule.support:.4f}\n"
+        f"- Head Coverage: {rule.head_coverage:.4f}\n"
     )
-    if instances_section:
-        for line in instances_section.group(1).strip().split("\n"):
-            if line.strip():
-                rule_info.instances.append(line.strip())
 
-    # Extract PCA confidence and classification
-    pca_match = re.search(r"PCA Confidence:\s*([\d.]+)", content)
-    classification_match = re.search(r"Rule Classification:\s*(\w+)", content)
-    if pca_match:
-        rule_info.pca_confidence = float(pca_match.group(1))
-    if classification_match:
-        rule_info.classification = classification_match.group(1)
+    # Header: Rule information
+    rule_text = (
+        f"{rule.signature.to_natural_language()}\n\n"
+        f"Real Instances from Knowledge Graph ({len(results)} found):\n\n"
+    )
 
-    return rule_info
+    # Body: Rule groundings information
+    if len(results) == 0:
+        groundings_text = "No matching instances found in the Knowledge Graph.\n"
+    else:
+        pca_text = (
+            f"The path is classified as {rule.classification} "
+            f"(PCA Confidence {rule.pca_confidence:.4f} {operator} "
+            f"threshold {config.pca_threshold})"
+        )
+        instances: list[str] = []
+        # Check if the head exists in the answers
+        for row in results:
+            row_dict = row.asdict()
+
+            # Get the answer
+            answer = "yes" if row_dict.get("_head_exists") == "true" else "no"
+
+            # Head: Show full head if exists, else show just the variable
+            head_string = (
+                f"{row_dict.get(rule.signature.head.subject)} has "
+                f"{rule.signature.head.predicate_to_nl()}"
+                f"{rule.signature.head.entity_to_nl()}"
+                if answer == "yes"
+                else f"{row_dict.get(rule.signature.head.subject)}"
+            )
+
+            # Body: rendered with their correct bound subject
+            body_facts_str: list[str] = []
+            for atom in rule.signature.body:
+                subject_str = (
+                    row_dict.get(atom.subject.lstrip("?"), "")
+                    if atom.subject.startswith("?")
+                    else atom.subject
+                )
+                obj_str = (
+                    row_dict.get(atom.obj.lstrip("?"), "")
+                    if atom.obj.startswith("?")
+                    else atom.obj
+                )
+                body_facts_str.append(f"{subject_str} has {atom.predicate} {obj_str}")
+
+            facts_str = "\n".join(fact_str for fact_str in body_facts_str)
+            row_text = f"{head_string}\n{facts_str} {pca_text} Answer: {answer}"
+            instances.append(row_text)
+
+        groundings_text = "\n".join(instance_str for instance_str in instances)
+
+    final_text = f"{rule_text}{groundings_text}{rule_metrics_text}"
+
+    return final_text
 
 
-def load_rules_from_path(rules_directory: Path) -> List[RuleDefinition]:
-    """Loads all parsed rules from a specified directory.
+def convert_all_rules_to_natural_language(
+    config: RuleToNLForCoTGenerationConfig, graph: rdflib.Graph, rules_df: pd.DataFrame
+) -> None:
+    """Creates a natural language description of all rules and groundings for each rule
+    in the rules_csv file and stores them in separate files.
 
-    Args:
-        rules_directory: Path to the directory containing the rule text files.
-
-    Returns:
-        A list containing RuleDefinitions for each successfully parsed rule.
-
-    Raises:
-        NotADirectoryError: If the provided `rules_directory` does not exist.
+    TODO: Complete docs.
     """
+    for rule_idx, row in enumerate(rules_df.itertuples(index=False)):
+        # Build a HornRule object
+        rule_id = str(rule_idx + 1)
+
+        rule_signature = RuleSignature(
+            head=parse_head(str(row.Head)),
+            body=parse_body(str(row.Body)),
+        )
+
+        std_confidence = float(rules_df["Std_Confidence"][rule_idx])
+
+        pca_confidence = rules_df["pca_confidence"]
+        if pca_confidence is None:
+            pca_confidence = "Not available"
+            classification = "UNKNOWN"
+        elif float(pca_confidence) >= config.pca_threshold:
+            classification = "POSITIVE"
+        else:
+            classification = "NEGATIVE"
+
+        support = int(rules_df["Positive Examples"][rule_idx])
+
+        head_coverage = float(rules_df["Head Coverage"][rule_idx])
+
+        rule = HornRule(
+            rule_id=rule_id,
+            signature=rule_signature,
+            std_confidence=std_confidence,
+            pca_confidence=float(pca_confidence),
+            support=support,
+            head_coverage=head_coverage,
+            classification=classification,
+        )
+
+        # Retrieve groundings of the HornRule from the KG
+        query_str = build_sparql_query(rule, config.namespace_prefix, config.namespace)
+        results = graph.query(query_str)
+
+        # Generate a rule + groundings natural language description
+        natural_language_results: str = results_to_natural_language(
+            config=config, results=results, rule=rule
+        )
+
+        # Save the rule + groundings natural language description as a file
+        fpath = config.output_dir / f"rule_{rule_idx + 1}.txt"
+        fpath.write_text(natural_language_results, encoding="utf-8")
+
+
+def create_summary(
+    config: RuleToNLForCoTGenerationConfig, graph: rdflib.Graph, rules_df: pd.DataFrame
+) -> None:
+    """TODO: work on docs"""
+    summary_path = config.output_dir / "rules_summary.txt"
+    with open(summary_path, "w", encoding="utf-8") as f:
+        f.write("=" * 80 + "\n")
+        f.write(f"{config.kg_name.upper()} CoT2 RULES — SUMMARY\n")
+        f.write("=" * 80 + "\n\n")
+        f.write(f"Total Rules        : {len(rules_df)}\n")
+        f.write(f"Output Directory   : {config.output_dir.absolute()}\n")
+        f.write(f"KG Triples         : {len(graph)}\n")
+        f.write(f"PCA Threshold      : {config.pca_threshold}\n")
+        f.write(f"Namespace          : {config.namespace}\n")
+        f.write(f"Namespace Prefix   : {config.namespace_prefix}\n\n")
+        valid_pca = rules_df["PCA Confidence"].dropna()
+        pos = (valid_pca >= config.pca_threshold).sum()
+        f.write(f"  Positive (>= {config.pca_threshold}) : {pos}\n")
+        neg = (valid_pca < config.pca_threshold).sum()
+        nan = rules_df["PCA Confidence"].isna().sum()
+        f.write(f"  Negative (<  {config.pca_threshold}) : {neg}\n")
+        f.write(f"  Missing PCA                   : {nan}\n")
+    print(f"Summary saved to: {summary_path}")
+
+
+def load_rules_from_path(rules_directory: Path) -> list[RuleSignature]:
+    """TODO: docs"""
     if not rules_directory.is_dir():
         raise NotADirectoryError(f"The directory '{rules_directory}' was not found.")
 
-    rules: List[RuleDefinition] = []
+    rules: list[RuleSignature] = []
 
     rule_files = list(rules_directory.glob("rule_*.txt"))
 
@@ -129,7 +429,7 @@ def load_rules_from_path(rules_directory: Path) -> List[RuleDefinition]:
 
     for file_path in rule_files:
         try:
-            rule_info = _parse_rule_file(file_path)
+            rule_info = parse_rule_file(file_path)
             rules.append(rule_info)
 
         except ValueError as e:
@@ -144,52 +444,21 @@ def load_rules_from_path(rules_directory: Path) -> List[RuleDefinition]:
     return rules
 
 
-def create_rule_context(rules: List[RuleDefinition], max_rules: int = 3) -> str:
-    """Create a natural language string describing symbolic rules for prompt injection.
-
-    Args:
-        rules (List[RuleDefinition]): List containing each of the rules as a RuleDefinition.
-        max_rules (int): Maximum number of rule descriptions to be added to context.
-                         Set to 3 by default.
-
-    Returns:
-        string: Natural language string describing the rules added to context.
-    """
-    if not rules:
-        return ""
-
-    context = ["###Symbolic Rules (for reference):"]
-
-    for i, rule in enumerate(rules[:max_rules], 1):
-        if rule.rule_text:
-            context.append(f"{i}. {rule.rule_text}")
-            if rule.pca_confidence is not None:
-                context.append(f"  (Confidence: {rule.pca_confidence:.3f})")
-    context.append("")
-
-    return "\n".join(context)
+def create_rule_context(rules: list[RuleSignature], max_rules: int = 3) -> str:
+    """TODO: docs and logic"""
+    raise NotImplementedError
 
 
+# TODO: delete??
 def generate_CoTs(
-    graph: Dict[Any, Dict[Any, Any]],
-    node_list: List[Any],
-    id2relation: Dict[Any, str],
-    rules: List[RuleDefinition],
+    graph: dict[Any, dict[Any, Any]],
+    node_list: list[Any],
+    id2relation: dict[Any, str],
+    rules: list[RuleSignature],
     config: CoTGenerationConfig,
 ) -> pd.DataFrame:
-    """Generates training data with chain-of-thought reasoning from a Knowledge Graph.
-
-    Args:
-        graph: A dictionary representing the Knowledge Graph adjacency list.
-        node_list: Flat list of all available nodes in the graph.
-        id2relation: Mapping from relation IDs to natural language names.
-        rules (List[RuleDefinition]): List of parsed symbolic rules.
-        config (CoTGenerationConfig): Settings for generation behaviour.
-
-    Returns:
-        pd.DataFrame: A DataFrame containing the generated training examples.
-    """
-    data: list[Dict[str, Any]] = []
+    """TODO: docs and logic or DELETE"""
+    data: list[dict[str, Any]] = []
     unique_paths: set[str] = set()
     pos_count = 0
     neg_count = 0
@@ -218,7 +487,7 @@ def generate_CoTs(
         previous_node = first_node
 
         # Build the path
-        for step in range(path_length - 1):
+        for _ in range(path_length - 1):
             if previous_node not in graph or not graph[previous_node]:
                 # Disconnected node logic
                 node = random.choice(node_list)

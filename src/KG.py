@@ -2,53 +2,25 @@ from collections import defaultdict
 from pathlib import Path
 from typing import Dict, List, Tuple, Union
 
+from rdflib import Graph
 
-def parse_kg(input_file: Path, output_file: Path) -> int:
-    """Preprocess Knowledge Graph data.
+# ---------------------------------------------------------------------------
+# Load KG from files
+# ---------------------------------------------------------------------------
 
-    The input file in tab-separated format is converted to space-separated format. The
-    result is saved in `output_file`.
+
+def load_kg_to_rdflib(kg_file: Path) -> Graph:
+    """Load a Graph to RDFlib from a file.
 
     Args:
-        input_file (Union[str, Path]): Absoulute or relative path to the document to parse.
-        output_file (Union[str, Path]): Absolute or relative path to the file where the
-            parsed document is saved.
+        kg_file: Path to the KG file.
 
     Returns:
-        int: The number of valid triples successfully processed and written.
-
-    Raises:
-        FileNotFoundError: If the input_file does not exist.
-        IOError: If there is an issue reading or writting the files.
+        The Graph object.
     """
-    if not input_file.is_file():
-        raise FileNotFoundError(f"The input file '{input_file}' does not exist.")
+    format = "nt" if kg_file.name.endswith(".nt") else "turtle"
 
-    with (
-        open(input_file, "r", encoding="utf-8") as f_in,
-        open(output_file, "w", encoding="utf-8") as f_out,
-    ):
-        # Count valid lines without loading the whole file into memory
-        valid_count = sum(1 for line in f_in if len(line.strip().split("\t")) == 3)
-
-        # Write the header
-        f_out.write(f"{valid_count}\n")
-
-        # Reset the reading pointer back to the beggining of the input file
-        f_in.seek(0)
-
-        # Write the valid data
-        for line_num, line in enumerate(f_in, 1):
-            parts = line.strip("\t")
-            if len(parts) == 3:
-                f_out.write(
-                    f"{parts[0]} {parts[1]} {parts[2]}\n"
-                )  # TODO: igual mejor con str.join()
-            else:
-                # TODO: logging of incorrect lines??
-                pass
-
-    return valid_count
+    return Graph().parse(kg_file, format=format)
 
 
 def load_knowledge_graph(
@@ -112,6 +84,54 @@ def load_knowledge_graph(
     # Convert the defaultdict back to a standard dict before returning
     # to prevent accidental empty key creations later.
     return dict(graph), list(nodes)
+
+
+def parse_kg(input_file: Path, output_file: Path) -> int:
+    """Preprocess Knowledge Graph data.
+
+    The input file in tab-separated format is converted to space-separated format. The
+    result is saved in `output_file`.
+
+    Args:
+        input_file (Union[str, Path]): Absoulute or relative path to the document to parse.
+        output_file (Union[str, Path]): Absolute or relative path to the file where the
+            parsed document is saved.
+
+    Returns:
+        int: The number of valid triples successfully processed and written.
+
+    Raises:
+        FileNotFoundError: If the input_file does not exist.
+        IOError: If there is an issue reading or writting the files.
+    """
+    if not input_file.is_file():
+        raise FileNotFoundError(f"The input file '{input_file}' does not exist.")
+
+    with (
+        open(input_file, "r", encoding="utf-8") as f_in,
+        open(output_file, "w", encoding="utf-8") as f_out,
+    ):
+        # Count valid lines without loading the whole file into memory
+        valid_count = sum(1 for line in f_in if len(line.strip().split("\t")) == 3)
+
+        # Write the header
+        f_out.write(f"{valid_count}\n")
+
+        # Reset the reading pointer back to the beggining of the input file
+        f_in.seek(0)
+
+        # Write the valid data
+        for line_num, line in enumerate(f_in, 1):
+            parts = line.strip("\t")
+            if len(parts) == 3:
+                f_out.write(
+                    f"{parts[0]} {parts[1]} {parts[2]}\n"
+                )  # TODO: igual mejor con str.join()
+            else:
+                # TODO: logging of incorrect lines??
+                pass
+
+    return valid_count
 
 
 def create_relation_mapping(kg_file_path: Path, relations_file_path: Path) -> None:

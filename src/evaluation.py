@@ -2,12 +2,12 @@ import json
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any
 
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from configuration import ExperimentConfig
+from finetuning_config import ExperimentConfig
 
 
 @dataclass
@@ -36,12 +36,12 @@ class EvaluationMetrics:
     eval_time: float = 0.0
     train_time: float = 0.0
 
-    y_true: List[bool] = field(default_factory=list)
-    y_pred: List[bool] = field(default_factory=list)
+    y_true: list[bool] = field(default_factory=list)
+    y_pred: list[bool] = field(default_factory=list)
 
     @classmethod
     def from_predictions(
-        cls, y_true: List[bool], y_pred: List[bool], **kwargs
+        cls, y_true: list[bool], y_pred: list[bool], **kwargs: float | int
     ) -> "EvaluationMetrics":
         """Factory method to calculate metrics directly from raw labels.
 
@@ -53,7 +53,7 @@ class EvaluationMetrics:
         Returns:
             EvaluationMetrics: A new instance with all metrics calculated.
         """
-        # Note: In a real script, you would use sklearn.metrics # TODO:
+        # TODO: use sklearn.metrics
         tp = sum(t and p for t, p in zip(y_true, y_pred))
         fp = sum(not t and p for t, p in zip(y_true, y_pred))
         fn = sum(t and not p for t, p in zip(y_true, y_pred))
@@ -76,7 +76,7 @@ class EvaluationMetrics:
             **kwargs,
         )
 
-    def to_dict(self, include_predictions: bool = False) -> Dict[str, Any]:
+    def to_dict(self, include_predictions: bool = False) -> dict[str, Any]:
         """Converts the stored metrics into a dictionary format.
 
         Args:
@@ -85,7 +85,7 @@ class EvaluationMetrics:
         Returns:
             A dictionary containing the metrics, rounded for readability.
         """
-        result: Dict[str, Any] = {
+        result: dict[str, Any] = {
             "accuracy": round(self.accuracy, 4),
             "precision": round(self.precision, 4),
             "recall": round(self.recall, 4),
@@ -113,14 +113,15 @@ class EvaluationMetrics:
 
 
 def create_results_table_png(
-    results: Dict[str, EvaluationMetrics],
+    results: dict[str, EvaluationMetrics],
     output_path: Path,
 ) -> None:
     """
     Generate a formatted results table and save it as a .png file.
 
     Args:
-        results: A dictionary containing EvaluationMetrics for each model in the experiment.
+        results: A dictionary containing EvaluationMetrics for each model in the
+                 experiment.
         filename: Name of the output file.
     """
     # 1. Define columns to match your original console output
@@ -170,7 +171,7 @@ def create_results_table_png(
 
 def _save_json_results(
     config: ExperimentConfig,
-    results: Dict[str, EvaluationMetrics],
+    results: dict[str, EvaluationMetrics],
 ) -> None:
     """Helper method to generate and save the JSON payload.
 
@@ -179,7 +180,7 @@ def _save_json_results(
 
     json_path = config.data.output_dir / config.data.results_file
 
-    results_dict: Dict[str, Any] = {
+    results_dict: dict[str, Any] = {
         "experiment_info": {
             "timestamp": datetime.now(timezone.utc).isoformat(),
             "model": config.model.name,
@@ -200,7 +201,7 @@ def _save_json_results(
 
 def _save_summary_csv(
     config: ExperimentConfig,
-    results: Dict[str, EvaluationMetrics],
+    results: dict[str, EvaluationMetrics],
 ) -> None:
     """Helper method to generate and save the summary CSV dataframe.
 
@@ -240,7 +241,7 @@ def _save_summary_csv(
 
 
 def save_results(
-    config: ExperimentConfig, results: Dict[str, EvaluationMetrics]
+    config: ExperimentConfig, results: dict[str, EvaluationMetrics]
 ) -> None:
     """Saves comprehensive results to multiple formats in disk.
 
@@ -262,7 +263,7 @@ def save_results(
     _save_summary_csv(config, results)
 
 
-def create_comparison_plot(config: ExperimentConfig, results: Dict[str, Any]) -> None:
+def create_comparison_plot(config: ExperimentConfig, results: dict[str, Any]) -> None:
     """Creates a bar chart comparing model performances.
 
     Args:

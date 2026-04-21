@@ -1,14 +1,15 @@
 from collections import defaultdict
-from typing import Any, Dict
+from typing import Any
 
 import pandas as pd
 
-from configuration import CoTGenerationConfig, ExperimentConfig
+from cot_generation_config import RuleToNLForCoTGenerationConfig
 from evaluation import (
     create_comparison_plot,
     create_results_table_png,
     save_results,
 )
+from finetuning_config import CoTGenerationConfig, ExperimentConfig
 from KG import (
     create_relation_mapping,
     load_id2relation_mapping,
@@ -16,6 +17,8 @@ from KG import (
     parse_kg,
 )
 from rules import (
+    convert_all_rules_to_natural_language,
+    create_summary,
     generate_CoTs,
     load_rules_from_path,
 )
@@ -36,8 +39,8 @@ def set_up(config: ExperimentConfig) -> None:
 
 
 def generate_data(
-    config: ExperimentConfig, dataset_configs: Dict[str, CoTGenerationConfig]
-):
+    config: ExperimentConfig, dataset_configs: dict[str, CoTGenerationConfig]
+) -> None:
     """Generates necessary data to perform an experiment.
 
     # TODO: gestion de errores
@@ -56,7 +59,7 @@ def generate_data(
     rules_path = config.data.data_dir / config.data.rules_dir
     rules = load_rules_from_path(rules_path)
 
-    datasets: Dict[str, pd.DataFrame] = {}
+    datasets: dict[str, pd.DataFrame] = {}
 
     for split_name, data_config in dataset_configs.items():
         datasets[split_name] = generate_CoTs(
@@ -73,7 +76,7 @@ def generate_data(
         dataset_df.to_csv(output_path, index=False)
 
 
-def load_datasets(config: ExperimentConfig) -> Dict[str, pd.DataFrame]:
+def load_datasets(config: ExperimentConfig) -> dict[str, pd.DataFrame]:
     """Retrieves or generates the datasets necessary for the experiment.
 
     Args:
@@ -93,7 +96,7 @@ def load_datasets(config: ExperimentConfig) -> Dict[str, pd.DataFrame]:
     if config.run_settings.generate_datasets:
         generate_data(config, dataset_configs)
 
-    datasets: Dict[str, pd.DataFrame] = {}
+    datasets: dict[str, pd.DataFrame] = {}
 
     # Load datasets from files
     for split_name, _ in dataset_configs.items():
@@ -105,11 +108,11 @@ def load_datasets(config: ExperimentConfig) -> Dict[str, pd.DataFrame]:
     return datasets
 
 
-def main() -> None:
+def fine_tuning_experiment() -> None:
     """Main method to execute an experiment."""
 
     config = ExperimentConfig()
-    experiment_results: Dict[str, Any] = defaultdict(dict)
+    experiment_results: dict[str, Any] = defaultdict(dict)
 
     # Maybe set up
     set_up(config)
@@ -171,5 +174,39 @@ def main() -> None:
         create_comparison_plot(config, experiment_results)
 
 
+def generate_nl_instancer_for_cot_generation_sparql() -> None:
+    # sparql = cfg.get("kg_sparql", {})
+    # kg_file = sparql.get("kg_file")
+    # rules_csv = sparql.get("rules_csv")
+    # namespace = sparql.get("namespace")
+
+    # kg_name = Path(cfg["data_dir"]).name  # e.g. "YAGO3-10"
+
+    config = RuleToNLForCoTGenerationConfig()
+
+    if not config.kg_file.is_file():
+        raise FileNotFoundError(f"File {config.kg_file} does not exist.")
+    if not config.rules_csv.is_file():
+        raise FileNotFoundError(f"File {config.rules_csv} does not exist.")
+
+    config.output_dir.mkdir(parents=True, exist_ok=True)
+
+    text = (
+        f"NL-instances-CoT2  (SPARQL-based)\n\tKG file          : {config.kg_file}\n"
+        f"\tRules CSV        : {config.rules_csv}\n"
+        f"\tNamespace        : {config.namespace}\n"
+        f"\tNamespace prefix : {config.namespace_prefix}\n"
+        f"\tPCA threshold    : {config.pca_threshold}\n"
+    )
+    # TODO: logger
+    print(text)
+
+    graph = load_knowledge_graph()  # TODO: this is not the actual method I think
+    rules_df = pd.read_csv(config.rules_csv, encoding="utf-8")
+
+    convert_all_rules_to_natural_language(config, graph, rules_df)
+    create_summary(config, graph, rules_df)
+
+
 if __name__ == "__main__":
-    main()
+    pass

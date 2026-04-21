@@ -1,5 +1,4 @@
 import time
-from typing import List, Tuple
 
 import bitsandbytes as bnb
 import pandas as pd
@@ -21,13 +20,13 @@ from transformers import (
     TrainingArguments,
 )
 
-from configuration import ExperimentConfig
 from evaluation import EvaluationMetrics
+from finetuning_config import ExperimentConfig
 
 
 def _load_model(
     config: ExperimentConfig,
-) -> Tuple[PreTrainedModel, PreTrainedTokenizerBase]:
+) -> tuple[PreTrainedModel, PreTrainedTokenizerBase]:
     """Loads a causal language model and its tokenizer with 4-bit quantization.
 
     This function initializes a BitsAndBytes configuration to load the model in 4-bit
@@ -44,8 +43,10 @@ def _load_model(
             - tokenizer: The configured tokenizer.
 
     Raises:
-        OSError: If the model name/path cannot be found on the Hugging Face Hub or locally.
-        ValueError: If the specified precision in the hardware config is invalid for bitsandbytes.
+        OSError: If the model name/path cannot be found on the Hugging Face Hub or
+                 locally.
+        ValueError: If the specified precision in the hardware config is invalid for
+                    bitsandbytes.
     """
 
     # Create bits and bytes configuration # TODO: Pasar esto a configuración
@@ -77,7 +78,7 @@ def _load_model(
     return model, tokenizer
 
 
-def _get_linear_names(model: PreTrainedModel | torch.nn.Module) -> List[str]:
+def _get_linear_names(model: PreTrainedModel | torch.nn.Module) -> list[str]:
     """Find all linear layer names for LoRA targeting.
 
     Args:
@@ -101,7 +102,7 @@ def fine_tune(
     train_dataset: pd.DataFrame,
     model: PreTrainedModel | None = None,
     tokenizer: PreTrainedTokenizerBase | None = None,
-) -> Tuple[PeftModel, float]:
+) -> tuple[PeftModel, float]:
     """
     Fine-tune a large language model using LoRA.
 
