@@ -1,68 +1,72 @@
+"""Fichero con las funciones complejas del framework"""
+
+# TODO: docstrings
+# TODO (generate_data): method may be obsolete
+# TODO (generate_data): Gestión de errores
+
 from collections import defaultdict
+from pathlib import Path
 from typing import Any
 
 import pandas as pd
 
-from cot_generation_config import RuleToNLForCoTGenerationConfig
-from evaluation import (
-    create_comparison_plot,
-    create_results_table_png,
-    save_results,
-)
-from finetuning_config import CoTGenerationConfig, ExperimentConfig
+from config import CoTGenerationConfig, DirConfig, KGConfig, RunConfig
 from KG import (
     create_relation_mapping,
     load_id2relation_mapping,
     load_knowledge_graph,
     parse_kg,
 )
+from model import (
+    create_comparison_plot,
+    create_results_table_png,
+    evaluate_model,
+    fine_tune,
+    save_results,
+)
 from rules import (
     convert_all_rules_to_natural_language,
     create_summary,
-    generate_CoTs,
+    generate_cots,
     load_rules_from_path,
 )
-from training import evaluate_model, fine_tune
 
 
-def set_up(config: ExperimentConfig) -> None:
+def _set_up(config: RunConfig) -> None:
     """Set up method to load and generate data before training."""
 
     # Parse KG file
-    kg_input = config.data.data_dir / config.data.kg_file
-    kg_processed = config.data.data_dir / config.data.kg_file_processed
-    parse_kg(kg_input, kg_processed)
+    kg_input = config.data.input_dir / config.kg.raw_kg_file
+    kg_file = config.data.input_dir / config.kg.kg_file
+    parse_kg(kg_input, kg_file)
 
     # Create relation file
-    relations_file = config.data.data_dir / config.data.relation_file
-    create_relation_mapping(kg_processed, relations_file)
+    relations_file = config.data.input_dir / config.kg.relation_file
+    create_relation_mapping(kg_file, relations_file)
 
 
-def generate_data(
-    config: ExperimentConfig, dataset_configs: dict[str, CoTGenerationConfig]
+def _generate_data(
+    data_config: DirConfig,
+    kg_config: KGConfig,
+    dataset_configs: dict[str, CoTGenerationConfig],
 ) -> None:
-    """Generates necessary data to perform an experiment.
-
-    # TODO: gestion de errores
-
-    Args:
-        config: Experiment configuratoin.
-    """
+    """Generates necessary data to perform an experiment."""
 
     # Load data from files
-    kg_processed = config.data.data_dir / config.data.kg_file_processed
-    graph, node_list = load_knowledge_graph(kg_processed)
+    # TODO: error if kg is not parsed
+    kg_file = data_config.input_dir / kg_config.kg_file
+    graph, node_list = load_knowledge_graph(kg_file)
 
-    relations_file = config.data.data_dir / config.data.relation_file
+    relations_file = data_config.input_dir / kg_config.relation_file
     id2relation = load_id2relation_mapping(relations_file)
 
-    rules_path = config.data.data_dir / config.data.rules_dir
+    rules_path = data_config.input_dir / data_config.rules_dir
     rules = load_rules_from_path(rules_path)
 
     datasets: dict[str, pd.DataFrame] = {}
 
     for split_name, data_config in dataset_configs.items():
-        datasets[split_name] = generate_CoTs(
+        datasets[split_name] = generate_cots(
             graph=graph,
             node_list=node_list,
             id2relation=id2relation,
@@ -72,11 +76,11 @@ def generate_data(
 
     # Save generated data
     for split_name, dataset_df in datasets.items():
-        output_path = config.data.output_dir / f"{split_name}.csv"
+        output_path = data_config.output_dir / f"{split_name}.csv"
         dataset_df.to_csv(output_path, index=False)
 
 
-def load_datasets(config: ExperimentConfig) -> dict[str, pd.DataFrame]:
+def _load_datasets(config: RunConfig) -> dict[str, pd.DataFrame]:
     """Retrieves or generates the datasets necessary for the experiment.
 
     Args:
@@ -94,7 +98,11 @@ def load_datasets(config: ExperimentConfig) -> dict[str, pd.DataFrame]:
     }
 
     if config.run_settings.generate_datasets:
-        generate_data(config, dataset_configs)
+        _generate_data(
+            data_config=config.data,
+            kg_config=config.kg,
+            dataset_configs=dataset_configs,
+        )
 
     datasets: dict[str, pd.DataFrame] = {}
 
@@ -111,13 +119,13 @@ def load_datasets(config: ExperimentConfig) -> dict[str, pd.DataFrame]:
 def fine_tuning_experiment() -> None:
     """Main method to execute an experiment."""
 
-    config = ExperimentConfig()
+    config = RunConfig()
     experiment_results: dict[str, Any] = defaultdict(dict)
 
     # Maybe set up
-    set_up(config)
+    _set_up(config)
 
-    datasets = load_datasets(config)
+    datasets = _load_datasets(config)
 
     # Base model
     if config.run_settings.skip_base_eval:
@@ -174,16 +182,12 @@ def fine_tuning_experiment() -> None:
         create_comparison_plot(config, experiment_results)
 
 
-def generate_nl_instancer_for_cot_generation_sparql() -> None:
-    # sparql = cfg.get("kg_sparql", {})
-    # kg_file = sparql.get("kg_file")
-    # rules_csv = sparql.get("rules_csv")
-    # namespace = sparql.get("namespace")
+def generate_cots_sparql(config_json: Path) -> None:
+    """Generate natural language descriptions for each rule in the csv and each
+    grounding of the rule in the KG."""
+    config = RunConfig.from_json(config_json)
 
-    # kg_name = Path(cfg["data_dir"]).name  # e.g. "YAGO3-10"
-
-    config = RuleToNLForCoTGenerationConfig()
-
+    # TODO: plan config checks
     if not config.kg_file.is_file():
         raise FileNotFoundError(f"File {config.kg_file} does not exist.")
     if not config.rules_csv.is_file():

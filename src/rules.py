@@ -2,6 +2,7 @@
 # TODO: Can rules have empty heads or empty bodies?
 # TODO: Are subject, predicate, or object components of a rule/body always a variable?
 # TODO: Are there any expected formats or standards for the rules in the .csv files?
+# TODO: Docstrings
 
 import random
 import re
@@ -12,8 +13,7 @@ from typing import Any
 import pandas as pd
 import rdflib
 
-from cot_generation_config import RuleToNLForCoTGenerationConfig
-from finetuning_config import CoTGenerationConfig
+from config import RunConfig
 from sparql import build_sparql_query
 
 # ---------------------------------------------------------------------------
@@ -45,7 +45,7 @@ class Atom:
     def to_natural_language(self) -> str:
         """Returns a string with a natural language description of the atom."""
         nl_pred = self.predicate_to_nl()
-        nl_obj = self.entity_to_nl
+        nl_obj = self.entity_to_nl()
         return f"{nl_pred} {nl_obj}"
 
     def predicate_to_nl(self) -> str:
@@ -187,7 +187,7 @@ def parse_head(head_str: str) -> Atom:
 
 
 def parse_rule_file(file: Path) -> RuleSignature:
-    """TODO: docs and logic"""
+    """To implement"""
     raise NotImplementedError()
 
 
@@ -242,7 +242,7 @@ def _get_local_name(uri: str) -> str:
 
 
 def results_to_natural_language(
-    config: RuleToNLForCoTGenerationConfig,
+    config: RunConfig,
     results: rdflib.query.Result,
     rule: HornRule,
 ) -> str:
@@ -267,7 +267,7 @@ def results_to_natural_language(
         f"\nRule Statistics:\n- PCA Confidence: {rule.pca_confidence:.4f}\n"
         f"- Rule Classification: {rule.classification}"
         f"(PCA Confidence {rule.pca_confidence:.4f} {operator})"
-        f"threshold {config.pca_threshold})\n"
+        f"threshold {config.rules.pca_threshold})\n"
         f"- Standard Confidence: {rule.std_confidence:.4f}\n"
         f"- Positive Examples: {rule.support:.4f}\n"
         f"- Head Coverage: {rule.head_coverage:.4f}\n"
@@ -286,7 +286,7 @@ def results_to_natural_language(
         pca_text = (
             f"The path is classified as {rule.classification} "
             f"(PCA Confidence {rule.pca_confidence:.4f} {operator} "
-            f"threshold {config.pca_threshold})"
+            f"threshold {config.rules.pca_threshold})"
         )
         instances: list[str] = []
         # Check if the head exists in the answers
@@ -332,7 +332,7 @@ def results_to_natural_language(
 
 
 def convert_all_rules_to_natural_language(
-    config: RuleToNLForCoTGenerationConfig, graph: rdflib.Graph, rules_df: pd.DataFrame
+    config: RunConfig, graph: rdflib.Graph, rules_df: pd.DataFrame
 ) -> None:
     """Creates a natural language description of all rules and groundings for each rule
     in the rules_csv file and stores them in separate files.
@@ -354,7 +354,7 @@ def convert_all_rules_to_natural_language(
         if pca_confidence is None:
             pca_confidence = "Not available"
             classification = "UNKNOWN"
-        elif float(pca_confidence) >= config.pca_threshold:
+        elif float(pca_confidence) >= config.rules.pca_threshold:
             classification = "POSITIVE"
         else:
             classification = "NEGATIVE"
@@ -374,7 +374,9 @@ def convert_all_rules_to_natural_language(
         )
 
         # Retrieve groundings of the HornRule from the KG
-        query_str = build_sparql_query(rule, config.namespace_prefix, config.namespace)
+        query_str = build_sparql_query(
+            rule, config.kg.namespace_prefix, config.kg.namespace
+        )
         results = graph.query(query_str)
 
         # Generate a rule + groundings natural language description
@@ -388,26 +390,26 @@ def convert_all_rules_to_natural_language(
 
 
 def create_summary(
-    config: RuleToNLForCoTGenerationConfig, graph: rdflib.Graph, rules_df: pd.DataFrame
+    config: RunConfig, graph: rdflib.Graph, rules_df: pd.DataFrame
 ) -> None:
     """TODO: work on docs"""
-    summary_path = config.output_dir / "rules_summary.txt"
+    summary_path = config.data.output_dir / "rules_summary.txt"
     with open(summary_path, "w", encoding="utf-8") as f:
         f.write("=" * 80 + "\n")
-        f.write(f"{config.kg_name.upper()} CoT2 RULES — SUMMARY\n")
+        f.write(f"{config.kg.kg_name.upper()} CoT2 RULES — SUMMARY\n")
         f.write("=" * 80 + "\n\n")
         f.write(f"Total Rules        : {len(rules_df)}\n")
-        f.write(f"Output Directory   : {config.output_dir.absolute()}\n")
+        f.write(f"Output Directory   : {config.data.output_dir.absolute()}\n")
         f.write(f"KG Triples         : {len(graph)}\n")
-        f.write(f"PCA Threshold      : {config.pca_threshold}\n")
-        f.write(f"Namespace          : {config.namespace}\n")
-        f.write(f"Namespace Prefix   : {config.namespace_prefix}\n\n")
+        f.write(f"PCA Threshold      : {config.rules.pca_threshold}\n")
+        f.write(f"Namespace          : {config.kg.namespace}\n")
+        f.write(f"Namespace Prefix   : {config.kg.namespace_prefix}\n\n")
         valid_pca = rules_df["PCA Confidence"].dropna()
-        pos = (valid_pca >= config.pca_threshold).sum()
-        f.write(f"  Positive (>= {config.pca_threshold}) : {pos}\n")
-        neg = (valid_pca < config.pca_threshold).sum()
+        pos = (valid_pca >= config.rules.pca_threshold).sum()
+        f.write(f"  Positive (>= {config.rules.pca_threshold}) : {pos}\n")
+        neg = (valid_pca < config.rules.pca_threshold).sum()
         nan = rules_df["PCA Confidence"].isna().sum()
-        f.write(f"  Negative (<  {config.pca_threshold}) : {neg}\n")
+        f.write(f"  Negative (<  {config.rules.pca_threshold}) : {neg}\n")
         f.write(f"  Missing PCA                   : {nan}\n")
     print(f"Summary saved to: {summary_path}")
 
@@ -449,13 +451,13 @@ def create_rule_context(rules: list[RuleSignature], max_rules: int = 3) -> str:
     raise NotImplementedError
 
 
-# TODO: delete??
-def generate_CoTs(
+# TODO: Move to main
+def generate_cots(
+    config: RunConfig,
     graph: dict[Any, dict[Any, Any]],
     node_list: list[Any],
     id2relation: dict[Any, str],
     rules: list[RuleSignature],
-    config: CoTGenerationConfig,
 ) -> pd.DataFrame:
     """TODO: docs and logic or DELETE"""
     data: list[dict[str, Any]] = []
@@ -465,20 +467,24 @@ def generate_CoTs(
 
     # Initialize Context
     rule_context = ""
-    if config.use_rules and rules:
-        rule_context = create_rule_context(rules, max_rules=config.max_rules_in_context)
+    if config.cot_generation.use_rules and rules:
+        rule_context = create_rule_context(
+            rules, max_rules=config.cot_generation.max_rules_in_context
+        )
 
     has_active_rules = bool(rule_context)  # See if there are rules in context
 
-    max_attempts = config.samples * config.max_attempts_multiplier
+    max_attempts = (
+        config.cot_generation.max_samples * config.cot_generation.attempts_multiplier
+    )
     attempts = 0
-    half_samples = config.samples // 2
+    half_samples = config.cot_generation.max_samples // 2
 
     # CoT generation loop
-    while len(data) < config.samples and attempts < max_attempts:
+    while len(data) < config.cot_generation.max_samples and attempts < max_attempts:
         attempts += 1
 
-        path_length = random.randint(2, config.max_path_length)
+        path_length = random.randint(2, config.cot_generation.max_path_length)
         first_node = random.choice(node_list)
         visited = {first_node}
 
@@ -497,7 +503,7 @@ def generate_CoTs(
                     safety += 1
 
                 path_text += f"node_{previous_node} not connected with node_{node}. "
-                if config.include_reasoning:
+                if config.cot_generation.include_reasoning:
                     reasoning_text += f"node_{previous_node} not connected with node_{node} means there is no relationship. "
 
                 visited.add(node)
@@ -517,7 +523,7 @@ def generate_CoTs(
                 path_text += (
                     f"node_{previous_node} has {rel_name} with node_{next_node}. "
                 )
-                if config.include_reasoning:
+                if config.cot_generation.include_reasoning:
                     reasoning_text += (
                         f"node_{previous_node} has {rel_name} with node_{next_node}. "
                     )
@@ -544,8 +550,8 @@ def generate_CoTs(
             continue
 
         # Construct answer logic
-        answer = reasoning_text if config.include_reasoning else ""
-        if has_active_rules and config.include_reasoning:
+        answer = reasoning_text if config.cot_generation.include_reasoning else ""
+        if has_active_rules and config.cot_generation.include_reasoning:
             context_phrase = "Applying symbolic rules and path analysis together: "
             answer += context_phrase
         answer += "The answer is yes." if is_connected else "The answer is no."
@@ -557,7 +563,7 @@ def generate_CoTs(
 
         # Construct prompt
         instruction = ""
-        if config.include_reasoning:
+        if config.cot_generation.include_reasoning:
             instruction = "###Instruction:\nAnswer the following yes/no question by reasoning step-by-step."
             if has_active_rules:
                 instruction += " Use the symbolic rules as additional context along with the path information."
@@ -586,6 +592,6 @@ def generate_CoTs(
         )
 
     print(
-        f"Generated {len(data)} samples (positive: {pos_count}, negative: {neg_count})"
+        f"Generated {len(data)} samples: {neg_count} negative and {pos_count} positive."
     )  # TODO: add logger
     return pd.DataFrame(data)

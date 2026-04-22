@@ -1,6 +1,5 @@
 from collections import defaultdict
 from pathlib import Path
-from typing import Dict, List, Tuple, Union
 
 from rdflib import Graph
 
@@ -24,8 +23,8 @@ def load_kg_to_rdflib(kg_file: Path) -> Graph:
 
 
 def load_knowledge_graph(
-    file_path: Union[str, Path],
-) -> Tuple[Dict[str, Dict[str, int]], List[str]]:
+    file_path: str | Path,
+) -> tuple[dict[str, dict[str, int]], list[str]]:
     """Loads a Knowledge Graph from a specifically formatted text file.
 
     The expected file format starts with a line indicating the number of edges,
@@ -46,10 +45,10 @@ def load_knowledge_graph(
     if not file_path.is_file():
         raise FileNotFoundError(f"Knowledge Graph file not found: {file_path}")
 
-    graph: Dict[str, Dict[str, int]] = defaultdict(dict)
+    graph: dict[str, dict[str, int]] = defaultdict(dict)
     nodes: set[str] = set()
 
-    with open(file_path, "r", encoding="utf-8") as f:
+    with open(file_path, encoding="utf-8") as f:
         try:
             _ = int(f.readline().strip())
         except ValueError:
@@ -108,7 +107,7 @@ def parse_kg(input_file: Path, output_file: Path) -> int:
         raise FileNotFoundError(f"The input file '{input_file}' does not exist.")
 
     with (
-        open(input_file, "r", encoding="utf-8") as f_in,
+        open(input_file, encoding="utf-8") as f_in,
         open(output_file, "w", encoding="utf-8") as f_out,
     ):
         # Count valid lines without loading the whole file into memory
@@ -154,7 +153,7 @@ def create_relation_mapping(kg_file_path: Path, relations_file_path: Path) -> No
     relations = set()
     expected_triples = 0
 
-    with open(kg_file_path, "r", encoding="utf-8") as f:
+    with open(kg_file_path, encoding="utf-8") as f:
         first_line = f.readline().strip()
         if not first_line:
             raise ValueError(f"The file {kg_file_path} is completely empty.")
@@ -188,7 +187,7 @@ def create_relation_mapping(kg_file_path: Path, relations_file_path: Path) -> No
     print(f"Found and saved {len(relations)} unique relations to {relations_file_path}")
 
 
-def load_id2relation_mapping(file_path: Union[str, Path]) -> Dict[int, str]:
+def load_id2relation_mapping(file_path: str | Path) -> dict[int, str]:
     """Loads a mapping of relation IDs to their natural language name from a file.
 
     The expected file format is a header line with the number of relations,
@@ -209,9 +208,9 @@ def load_id2relation_mapping(file_path: Union[str, Path]) -> Dict[int, str]:
     if not file_path.is_file():
         raise FileNotFoundError(f"Mapping file not found: {file_path}")
 
-    id2relation: Dict[int, str] = {}
+    id2relation: dict[int, str] = {}
 
-    with open(file_path, "r", encoding="utf-8") as f:
+    with open(file_path, encoding="utf-8") as f:
         # Read and discard the first line (number of relations)
         _ = f.readline()
 
