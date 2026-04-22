@@ -182,34 +182,7 @@ def fine_tuning_experiment() -> None:
         create_comparison_plot(config, experiment_results)
 
 
-def generate_cots_sparql(config_json: Path) -> None:
-    """Generate natural language descriptions for each rule in the csv and each
-    grounding of the rule in the KG."""
-    config = RunConfig.from_json(config_json)
 
-    # TODO: plan config checks
-    if not config.kg_file.is_file():
-        raise FileNotFoundError(f"File {config.kg_file} does not exist.")
-    if not config.rules_csv.is_file():
-        raise FileNotFoundError(f"File {config.rules_csv} does not exist.")
-
-    config.output_dir.mkdir(parents=True, exist_ok=True)
-
-    text = (
-        f"NL-instances-CoT2  (SPARQL-based)\n\tKG file          : {config.kg_file}\n"
-        f"\tRules CSV        : {config.rules_csv}\n"
-        f"\tNamespace        : {config.namespace}\n"
-        f"\tNamespace prefix : {config.namespace_prefix}\n"
-        f"\tPCA threshold    : {config.pca_threshold}\n"
-    )
-    # TODO: logger
-    print(text)
-
-    graph = load_knowledge_graph()  # TODO: this is not the actual method I think
-    rules_df = pd.read_csv(config.rules_csv, encoding="utf-8")
-
-    convert_all_rules_to_natural_language(config, graph, rules_df)
-    create_summary(config, graph, rules_df)
 
 
 if __name__ == "__main__":

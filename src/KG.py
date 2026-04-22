@@ -8,21 +8,7 @@ from rdflib import Graph
 # ---------------------------------------------------------------------------
 
 
-def load_kg_to_rdflib(kg_file: Path) -> Graph:
-    """Load a Graph to RDFlib from a file.
-
-    Args:
-        kg_file: Path to the KG file.
-
-    Returns:
-        The Graph object.
-    """
-    format = "nt" if kg_file.name.endswith(".nt") else "turtle"
-
-    return Graph().parse(kg_file, format=format)
-
-
-def load_knowledge_graph(
+def deprecated_load_knowledge_graph(
     file_path: str | Path,
 ) -> tuple[dict[str, dict[str, int]], list[str]]:
     """Loads a Knowledge Graph from a specifically formatted text file.
@@ -83,6 +69,12 @@ def load_knowledge_graph(
     # Convert the defaultdict back to a standard dict before returning
     # to prevent accidental empty key creations later.
     return dict(graph), list(nodes)
+
+
+def load_knowledge_graph(kg_file: Path) -> Graph:
+    """Loads a knowledge graph from file."""
+    format = "nt" if kg_file.name.endswith(".nt") else "turtle"
+    return Graph().parse(kg_file, format=format)
 
 
 def parse_kg(input_file: Path, output_file: Path) -> int:

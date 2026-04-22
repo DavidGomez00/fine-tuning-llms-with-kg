@@ -23,8 +23,8 @@
     "attempts_multiplier": 10
   },
   "data": {
-    "input_dir": "/.data/",
-    "output_dir": "/.experiments/",
+    "input_dir": ".data/",
+    "output_dir": ".experiments/",
     "rules_dir": "rules"
   },
   "hardware": {

@@ -13,8 +13,12 @@ from typing import Any
 import pandas as pd
 import rdflib
 
-from config import RunConfig
+from config import RunConfig, KGConfig, DirConfig
 from sparql import build_sparql_query
+
+import logging
+
+logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
 # Dataclasses
@@ -242,7 +246,7 @@ def _get_local_name(uri: str) -> str:
 
 
 def results_to_natural_language(
-    config: RunConfig,
+    kg_config: KGConfig,
     results: rdflib.query.Result,
     rule: HornRule,
 ) -> str:
@@ -267,7 +271,7 @@ def results_to_natural_language(
         f"\nRule Statistics:\n- PCA Confidence: {rule.pca_confidence:.4f}\n"
         f"- Rule Classification: {rule.classification}"
         f"(PCA Confidence {rule.pca_confidence:.4f} {operator})"
-        f"threshold {config.rules.pca_threshold})\n"
+        f"threshold {kg_config.pca_threshold})\n"
         f"- Standard Confidence: {rule.std_confidence:.4f}\n"
         f"- Positive Examples: {rule.support:.4f}\n"
         f"- Head Coverage: {rule.head_coverage:.4f}\n"
@@ -286,7 +290,7 @@ def results_to_natural_language(
         pca_text = (
             f"The path is classified as {rule.classification} "
             f"(PCA Confidence {rule.pca_confidence:.4f} {operator} "
-            f"threshold {config.rules.pca_threshold})"
+            f"threshold {kg_config.pca_threshold})"
         )
         instances: list[str] = []
         # Check if the head exists in the answers
@@ -332,12 +336,16 @@ def results_to_natural_language(
 
 
 def convert_all_rules_to_natural_language(
-    config: RunConfig, graph: rdflib.Graph, rules_df: pd.DataFrame
+    kg_config: KGConfig, 
+    data_config: DirConfig, 
+    graph: rdflib.Graph, 
+    rules_df: pd.DataFrame
 ) -> None:
     """Creates a natural language description of all rules and groundings for each rule
     in the rules_csv file and stores them in separate files.
 
     TODO: Complete docs.
+    TODO: Este bucle for sobra seguro.
     """
     for rule_idx, row in enumerate(rules_df.itertuples(index=False)):
         # Build a HornRule object
@@ -348,20 +356,20 @@ def convert_all_rules_to_natural_language(
             body=parse_body(str(row.Body)),
         )
 
-        std_confidence = float(rules_df["Std_Confidence"][rule_idx])
+        std_confidence = float(row.Std_Confidence)
 
-        pca_confidence = rules_df["pca_confidence"]
+        pca_confidence = row.PCA_Confidence
         if pca_confidence is None:
             pca_confidence = "Not available"
             classification = "UNKNOWN"
-        elif float(pca_confidence) >= config.rules.pca_threshold:
+        elif float(pca_confidence) >= kg_config.pca_threshold:
             classification = "POSITIVE"
         else:
             classification = "NEGATIVE"
 
-        support = int(rules_df["Positive Examples"][rule_idx])
+        support = int(row.Positive_Examples)
 
-        head_coverage = float(rules_df["Head Coverage"][rule_idx])
+        head_coverage = float(row.Head_Coverage)
 
         rule = HornRule(
             rule_id=rule_id,
@@ -375,43 +383,18 @@ def convert_all_rules_to_natural_language(
 
         # Retrieve groundings of the HornRule from the KG
         query_str = build_sparql_query(
-            rule, config.kg.namespace_prefix, config.kg.namespace
+            rule, kg_config.namespace_prefix, kg_config.namespace
         )
         results = graph.query(query_str)
 
         # Generate a rule + groundings natural language description
         natural_language_results: str = results_to_natural_language(
-            config=config, results=results, rule=rule
+            kg_config=kg_config, results=results, rule=rule
         )
 
         # Save the rule + groundings natural language description as a file
-        fpath = config.output_dir / f"rule_{rule_idx + 1}.txt"
-        fpath.write_text(natural_language_results, encoding="utf-8")
-
-
-def create_summary(
-    config: RunConfig, graph: rdflib.Graph, rules_df: pd.DataFrame
-) -> None:
-    """TODO: work on docs"""
-    summary_path = config.data.output_dir / "rules_summary.txt"
-    with open(summary_path, "w", encoding="utf-8") as f:
-        f.write("=" * 80 + "\n")
-        f.write(f"{config.kg.kg_name.upper()} CoT2 RULES — SUMMARY\n")
-        f.write("=" * 80 + "\n\n")
-        f.write(f"Total Rules        : {len(rules_df)}\n")
-        f.write(f"Output Directory   : {config.data.output_dir.absolute()}\n")
-        f.write(f"KG Triples         : {len(graph)}\n")
-        f.write(f"PCA Threshold      : {config.rules.pca_threshold}\n")
-        f.write(f"Namespace          : {config.kg.namespace}\n")
-        f.write(f"Namespace Prefix   : {config.kg.namespace_prefix}\n\n")
-        valid_pca = rules_df["PCA Confidence"].dropna()
-        pos = (valid_pca >= config.rules.pca_threshold).sum()
-        f.write(f"  Positive (>= {config.rules.pca_threshold}) : {pos}\n")
-        neg = (valid_pca < config.rules.pca_threshold).sum()
-        nan = rules_df["PCA Confidence"].isna().sum()
-        f.write(f"  Negative (<  {config.rules.pca_threshold}) : {neg}\n")
-        f.write(f"  Missing PCA                   : {nan}\n")
-    print(f"Summary saved to: {summary_path}")
+        rule_file_path = data_config.output_dir / f"rule_{rule_id}.txt"
+        rule_file_path.write_text(natural_language_results, encoding="utf-8")
 
 
 def load_rules_from_path(rules_directory: Path) -> list[RuleSignature]:
