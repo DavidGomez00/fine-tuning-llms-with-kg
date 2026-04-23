@@ -33,17 +33,15 @@
     "precision": "float16",
     "max_memory_mb": 40960
   },
-  "rules": {
-    "rules_csv": "rules.csv",
-    "pca_threshold": 0.5,
-    "max_rules": null
-  },
   "kg": {
     "kg_name": "KnowledgeGraph_v1",
     "raw_kg_file": "train2id.txt",
     "kg_file": "train2id_processed.txt",
     "relation_file": "relation2id",
     "namespace": "example.org",
-    "namespace_prefix": "ex"
+    "namespace_prefix": "ex",
+    "rules_csv": "rules.csv",
+    "pca_threshold": 0.5,
+    "max_rules": null
   }
 }

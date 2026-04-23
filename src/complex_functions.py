@@ -3,12 +3,14 @@
 # TODO: docstrings
 # TODO (generate_data): method may be obsolete
 # TODO (generate_data): Gestión de errores
-
+import logging
+import time
 from collections import defaultdict
 from pathlib import Path
 from typing import Any
 
 import pandas as pd
+from rdflib import Graph
 
 from config import CoTGenerationConfig, DirConfig, KGConfig, RunConfig
 from KG import (
@@ -25,11 +27,14 @@ from model import (
     save_results,
 )
 from rules import (
-    convert_all_rules_to_natural_language,
-    create_summary,
+    build_sparql_query,
     generate_cots,
     load_rules_from_path,
+    parse_horn_rule,
+    result_to_natural_language,
 )
+
+logger = logging.getLogger(__name__)
 
 
 def _set_up(config: RunConfig) -> None:
@@ -182,8 +187,143 @@ def fine_tuning_experiment() -> None:
         create_comparison_plot(config, experiment_results)
 
 
+def _create_summary(
+    kg_config: KGConfig,
+    data_config: DirConfig,
+    graph: Graph,
+    rules_df: pd.DataFrame,
+    time: float,
+) -> None:
+    """Writes a summary report of the rules transformed into natural language
 
+    Args:
+        kg_config: Configuration object containing KG and rules parameters.
+        data_config: Configuration object containing directory paths.
+        graph: The loaded RDFLib knowledge graph.
+        rules_df: DataFrame containing the parsed rules and their confidence scores.
+    """
+    summary_path = data_config.output_dir / kg_config.rule_summary_file
+
+    pca_series = rules_df["PCA_Confidence"]
+    valid_pca = pca_series.dropna()
+    neg = (valid_pca < kg_config.pca_threshold).sum()
+    pos = (valid_pca >= kg_config.pca_threshold).sum()
+    nan = pca_series.isna().sum()
+
+    summary_content = (
+        f"{kg_config.kg_name.upper()} CoT2 RULES — SUMMARY\n"
+        f"\tTotal Rules        : {len(rules_df)}\n"
+        f"\tOutput Directory   : {data_config.output_dir.absolute()}\n"
+        f"\tKG Triples         : {len(graph)}\n"
+        f"\tPCA Threshold      : {kg_config.pca_threshold}\n"
+        f"\tNamespace          : {kg_config.namespace}\n"
+        f"\tNamespace Prefix   : {kg_config.namespace_prefix}\n\n"
+        f"\tPositive (>= {kg_config.pca_threshold})  : {pos}\n"
+        f"\tNegative (<  {kg_config.pca_threshold})  : {neg}\n"
+        f"\tMissing PCA        : {nan}\n\n"
+        f"\tTotal time: {time:.2f} s"
+    )
+    summary_path.write_text(summary_content, encoding="utf-8")
+    logger.info(f"Summary saved to: {summary_path}")
+
+
+def generate_cots_sparql(kg_config: KGConfig, data_config: DirConfig) -> None:
+    """Generate natural language descriptions for each rule in the csv and each
+    grounding of the rule in the KG."""
+
+    # Files and paths
+    kg_file_path = data_config.input_dir / kg_config.kg_file
+    rules_csv_path = data_config.input_dir / kg_config.rules_csv
+
+    if not kg_file_path.is_file():
+        raise FileNotFoundError(f"File {kg_file_path} does not exist.")
+    if not rules_csv_path.is_file():
+        raise FileNotFoundError(f"File {rules_csv_path} does not exist.")
+
+    # Start cot generation
+    _header = "\nNL-instances-CoT2  (SPARQL-based)"
+    text = (
+        f"{_header}\n"
+        f"\tKG file          : {kg_config.kg_file}\n"
+        f"\tRules CSV        : {kg_config.rules_csv}\n"
+        f"\tNamespace        : {kg_config.namespace}\n"
+        f"\tNamespace prefix : {kg_config.namespace_prefix}\n"
+        f"\tPCA threshold    : {kg_config.pca_threshold}\n"
+    )
+    logger.info(text)
+
+    # 1. Load graph and rules
+    graph = load_knowledge_graph(kg_file_path)
+    rules_df = pd.read_csv(rules_csv_path, encoding="utf-8")
+    logger.info("Loaded %s file with %d rules.", rules_csv_path.name, len(rules_df))
+
+    # 2. For each rule, generate a query
+    results: defaultdict[str, Any] = defaultdict()
+    logger.info("Generating queries for 5 rules.")
+    start_time = time.time()
+    for rule_idx, row in enumerate(rules_df.itertuples(index=False), start=1):
+        if rule_idx == 6:
+            break
+        rule_id = str(rule_idx)
+        rule = parse_horn_rule(
+            row=row, rule_id=rule_id, pca_threshold=kg_config.pca_threshold
+        )
+
+        query = build_sparql_query(
+            rule_signature=rule.signature,
+            ns_prefix=kg_config.namespace_prefix,
+            namespace=kg_config.namespace,
+        )
+        results[rule_id] = query
+
+    # 3. Query the KG
+    logger.info("Executing 5 queries and generating a text description of the results.")
+    for rule_id, query_result in results.items():
+        result = graph.query(query_result)
+
+        # Generate rule + groundings natural language description
+        grounding_description = result_to_natural_language(
+            kg_config=kg_config, result=result, rule=rule
+        )
+
+        # 4. Save the rule + groundings natural language description as a file
+        rule_file_path = data_config.output_dir / f"rule_{rule_id}.txt"
+        rule_file_path.write_text(grounding_description, encoding="utf-8")
+        logger.debug("Saving description of %s in %s", rule_id, rule_file_path.name)
+
+    total_time = time.time() - start_time
+
+    logger.info("Succesfully created 5 query result descriptions.")
+    _create_summary(
+        kg_config=kg_config,
+        data_config=data_config,
+        graph=graph,
+        rules_df=rules_df,
+        time=total_time,
+    )
+
+
+# -----
+# Testing
+# ----
+
+
+def setup_logging() -> None:
+    """Configures the root logger to output to the console."""
+    logging.basicConfig(
+        level=logging.DEBUG,
+        format="%(asctime)s | %(name)-12s | %(levelname)-8s | %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+    )
 
 
 if __name__ == "__main__":
-    pass
+    # Set up logger
+    setup_logging()
+
+    # Load configuration
+    configuration_json = Path("configurations/gen_fr_cots.json")
+    config = RunConfig.from_json(configuration_json)
+
+    # Generate CoTs
+    generate_cots_sparql(kg_config=config.kg, data_config=config.data)

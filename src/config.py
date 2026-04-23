@@ -9,13 +9,12 @@ import logging
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Literal
-from typing_extensions import Self
 
 import torch
+from typing_extensions import Self
 
-
-# This ensures the logger is identified by the module path
 logger = logging.getLogger(__name__)
+
 
 @dataclass
 class FineTuningConfig:
@@ -120,7 +119,7 @@ class HardwareConfig:
     device: Literal["gpu", "cpu"] = field(
         default_factory=lambda: "gpu" if torch.cuda.is_available() else "cpu"
     )
-    precision: torch.dtype = torch.float16
+    precision: str = "float16"
     max_memory_mb: int = 40960
 
 
@@ -137,6 +136,7 @@ class KGConfig:
     rules_csv: Path = Path("rules.csv")
     pca_threshold: float = 0.5
     max_rules: int | None = None
+    rule_summary_file: str = "rules_summary.txt"
 
 
 @dataclass
@@ -167,27 +167,21 @@ class RunConfig:
         def _get_config_section(key: str) -> dict[str, Any]:
             """Fetches a section from JSON or returns an empty dict with logging."""
             if key not in data:
-                logger.debug("Configuration section '%s' not found; using defaults.", key)
+                logger.debug(
+                    "Configuration section '%s' not found; using defaults.", key
+                )
                 return {}
-            
+
             section = data[key]
             if not isinstance(section, dict):
-                raise ValueError(f"Expected '{key}' to be a mapping, got {type(section).__name__}")
+                raise ValueError(
+                    f"Expected '{key}' to be a mapping, got {type(section).__name__}"
+                )
             return section
 
         kg_config = KGConfig(**_get_config_section("kg"))
         dir_config = DirConfig(**_get_config_section("data"))
-        hw_raw = _get_config_section("hardware")
-
-        _precision_mapping: dict[str, torch.dtype] = {
-            "float16": torch.float16,
-            "float32": torch.float32,
-            "bfloat16": torch.bfloat16,
-        }
-        if "precision" in hw_raw and isinstance(hw_raw["precision"], str):
-            hw_raw["precision"] = _precision_mapping.get(hw_raw["precision"], torch.float16)
-        hardware_config = HardwareConfig(**hw_raw)
-        
+        hardware_config = HardwareConfig(**_get_config_section("hardware"))
 
         # --- Optional attributes ---
         if "cot_generation" in data:
@@ -209,3 +203,6 @@ class RunConfig:
             hardware=hardware_config,
             kg=kg_config,
         )
+
+    def __post_init__(self) -> None:
+        logger.debug("Confifuration correctly instantiated.")

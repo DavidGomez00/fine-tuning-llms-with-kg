@@ -160,25 +160,24 @@ def _load_model(
                     bitsandbytes.
     """
 
-    # Create bits and bytes configuration # TODO: Pasar esto a configuración
-    bnb_config = BitsAndBytesConfig(
-        load_in_4bit=True,
-        bnb_4bit_use_double_quant=True,
-        bnb_4bit_quant_type="nf4",
-        bnb_4bit_compute_dtype=config.hardware.precision,
-    )
+    # Create bits and bytes configuration # TODO: Ver si hace falta configurar BnB
+    # bnb_config = BitsAndBytesConfig(
+    #     load_in_4bit=True,
+    #     bnb_4bit_use_double_quant=True,
+    #     bnb_4bit_quant_type="nf4",
+    #     bnb_4bit_compute_dtype=config.hardware.precision,
+    # )
 
     # Determine maximum memmory per GPU
-    n_gpus = config.hardware.n_gpus
-    if n_gpus > 0:
-        max_memory = {i: f"{config.hardware.max_memory_mb}MB" for i in range(n_gpus)}
+    if config.hardware.n_gpus > 0:
+        max_memory = {i: f"{config.hardware.max_memory_mb}MB" for i in range(config.hardware.n_gpus)}
     else:
         max_memory = None
 
     # Load model and tokenizer
     model = AutoModelForCausalLM.from_pretrained(
         pretrained_model_name_or_path=config.fine_tuning.model_name,
-        quantization_config=bnb_config,
+        # quantization_config=bnb_config,
         device_map="auto",
         max_memory=max_memory,
     )
@@ -233,18 +232,18 @@ def fine_tune(
 
     # Prepare model for LoRA
     model.gradient_checkpointing_enable()
-    peft_prepared_model = prepare_model_for_kbit_training(model)
+    # peft_prepared_model = prepare_model_for_kbit_training(model)
 
     peft_config = LoraConfig(
         r=config.fine_tuning.lora.r,
         lora_alpha=config.fine_tuning.lora.lora_alpha,
-        target_modules=_get_linear_names(peft_prepared_model),
+        target_modules=_get_linear_names(model),
         lora_dropout=config.fine_tuning.lora.lora_dropout,
         bias=config.fine_tuning.lora.bias,
         task_type=config.fine_tuning.lora.task_type,
     )
 
-    peft_model = get_peft_model(peft_prepared_model, peft_config)
+    peft_model = get_peft_model(model, peft_config)
     assert isinstance(peft_model, PeftModel), "Failed to initialize PEFT model."
     peft_model.config.use_cache = False
 
