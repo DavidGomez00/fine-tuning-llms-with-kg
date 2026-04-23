@@ -338,7 +338,7 @@ def _build_grounding_text(
     return "\n".join(instance_str for instance_str in instances)
 
 
-def result_to_natural_language(
+def query_result_to_natural_language(
     kg_config: KGConfig,
     result: rdflib.query.Result,
     rule: HornRule,

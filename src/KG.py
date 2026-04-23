@@ -7,6 +7,8 @@ from pathlib import Path
 
 from rdflib import Graph
 
+from config import DirConfig, KGConfig
+
 logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
@@ -86,54 +88,40 @@ def load_knowledge_graph(kg_file: Path) -> Graph:
     return graph
 
 
-def parse_kg(input_file: Path, output_file: Path) -> int:
-    """Preprocess Knowledge Graph data.
+def parse_kg(data_config: DirConfig, kg_config: KGConfig) -> Path:
+    """Returns path to the parsed KG file."""
 
-    The input file in tab-separated format is converted to space-separated format. The
-    result is saved in `output_file`.
+    raw_kg: Path = data_config.input_dir / kg_config.raw_kg
+    kg_file: Path = data_config.input_dir / kg_config.kg_file
+    if not raw_kg.is_file():
+        raise FileNotFoundError("File {raw_kg} does not exist.")
 
-    Args:
-        input_file: Path to the document to parse.
-        output_file: Path to the file where the document is saved.
+    valid_lines: list[list[str]] = []
 
-    Returns:
-        int: The number of valid triples successfully processed and written.
-
-    Raises:
-        FileNotFoundError: If the input_file does not exist.
-        IOError: If there is an issue reading or writting the files.
-    """
-    if not input_file.is_file():
-        raise FileNotFoundError(f"The input file '{input_file}' does not exist.")
-
-    with (
-        open(input_file, encoding="utf-8") as f_in,
-        open(output_file, "w", encoding="utf-8") as f_out,
-    ):
-        # Count valid lines without loading the whole file into memory
-        valid_count = sum(1 for line in f_in if len(line.strip().split("\t")) == 3)
-
-        # Write the header
-        f_out.write(f"{valid_count}\n")
-
-        # Reset the reading pointer back to the beggining of the input file
-        f_in.seek(0)
-
-        # Write the valid data
+    with raw_kg.open(encoding="utf-8") as f_in:
         for line_num, line in enumerate(f_in, 1):
-            parts = line.strip("\t")
+            parts = line.strip().split("\t")
             if len(parts) == 3:
-                f_out.write(
-                    f"{parts[0]} {parts[1]} {parts[2]}\n"
-                )  # TODO: igual mejor con str.join()
+                valid_lines.append(parts)
             else:
-                # TODO: logging of incorrect lines??
-                pass
+                logging.warning(
+                    "Line %d is invalid: expected 3 columns, got %d. Skipping.",
+                    line_num,
+                    len(parts),
+                )
 
-    return valid_count
+    with kg_file.open("w", encoding="utf-8") as f_out:
+        f_out.write(f"{len(valid_lines)}\n")
+
+        for parts in valid_lines:
+            f_out.write(f"{' '.join(parts)}\n")
+
+    # TODO: consider delete if useless
+    # _create_relation_mapping(kg_file, relations_file)
+    return kg_file
 
 
-def create_relation_mapping(kg_file_path: Path, relations_file_path: Path) -> None:
+def _create_relation_mapping(kg_file_path: Path, relations_file_path: Path) -> None:
     """Creates the relation mapping from a file defined in config.
 
     Extracts unique relations from `kg_file_path` and writes them into
@@ -192,7 +180,7 @@ def create_relation_mapping(kg_file_path: Path, relations_file_path: Path) -> No
     )
 
 
-def load_id2relation_mapping(file_path: str | Path) -> dict[int, str]:
+def load_id2relation_mapping(file_path: Path) -> dict[int, str]:
     """Loads a mapping of relation IDs to their natural language name from a file.
 
     The expected file format is a header line with the number of relations,
@@ -209,7 +197,6 @@ def load_id2relation_mapping(file_path: str | Path) -> dict[int, str]:
         FileNotFoundError: If the dictionary file does not exist.
         ValueError: If there is an issue parsing the IDs into integers.
     """
-    file_path = Path(file_path)
     if not file_path.is_file():
         raise FileNotFoundError(f"Mapping file not found: {file_path}")
 

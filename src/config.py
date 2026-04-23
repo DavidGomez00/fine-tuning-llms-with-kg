@@ -35,9 +35,9 @@ class FineTuningConfig:
 
     # Dataset generation for fine-tuning
     generate_datasets: bool = False
-    train_samples: int = 2000
-    eval_samples: int = 2000
-    test_samples: int = 1000
+    train_with_rules_samples: int = 10
+    train_without_rules_samples: int = 5
+    test_samples: int = 3
 
     # Base model configuration
     model_name: str = "meta-llama/Llama-3.2-1B-Instruct"
@@ -69,6 +69,8 @@ class CoTGenerationConfig:
 
     # Behavior for generating CoTs
     max_samples: int = 100
+
+    # TODO: check, unused??
     max_path_length: int = 10
     include_reasoning: bool = True
     use_rules: bool = True
@@ -128,7 +130,7 @@ class KGConfig:
     """Configuration for KG related files and paths."""
 
     kg_name: str = "KG"
-    raw_kg_file: str = "train2id.txt"
+    raw_kg: str = "train2id.txt"
     kg_file: str = "train2id_processed.txt"
     relation_file: str = "relation2id"
     namespace: str = "example.org"
