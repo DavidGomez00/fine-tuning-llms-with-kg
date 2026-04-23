@@ -1,0 +1,2259 @@
+If child ?b, then successor ?b.
+
+Formal Rule:
+	Head: ?a successor ?b
+	Body: ?a child ?b
+
+Real Instances from Knowledge Graph (561 found):
+
+Aimery I Viscount of Ch tellerault, Aimery I Viscount of Ch tellerault has child A nor de Ch tellerault
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Fulk II Count of Anjou, Fulk II Count of Anjou has child Adelaide Blanche of Anjou
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Conrad II Duke of Transjurane Burgundy, Conrad II Duke of Transjurane Burgundy has child Adelaide of Auxerre born c. 870
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Conrad II Duke of Transjurane Burgundy, Conrad II Duke of Transjurane Burgundy has child Rudolph I of Burgundy
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Hugh IV Duke of Burgundy, Hugh IV Duke of Burgundy has child Adelaide of Burgundy Duchess of Brabant
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Hugh IV Duke of Burgundy has successor Robert II Duke of Burgundy, Hugh IV Duke of Burgundy has child Robert II Duke of Burgundy
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+John VII Duke of Mecklenburg Schwerin, John VII Duke of Mecklenburg Schwerin has child Adolphus Frederick I Duke of Mecklenburg Schwerin
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Henry Count of Portugal has successor Afonso I of Portugal, Henry Count of Portugal has child Afonso I of Portugal
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Edward King of Portugal has successor Afonso V of Portugal, Edward King of Portugal has child Afonso V of Portugal
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Edward King of Portugal, Edward King of Portugal has child Eleanor of Portugal Holy Roman Empress
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Edward King of Portugal, Edward King of Portugal has child Ferdinand Duke of Viseu
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Dedi III Margrave of Lusatia, Dedi III Margrave of Lusatia has child Agnes of Rochlitz
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+John Stewart of Darnley, John Stewart of Darnley has child Alan Stewart of Darnley
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Albert Azzo I Margrave of Milan, Albert Azzo I Margrave of Milan has child Albert Azzo II Margrave of Milan
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Oberto II Margrave of Milan, Oberto II Margrave of Milan has child Albert Azzo I Margrave of Milan
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Werner II Count of Habsburg, Werner II Count of Habsburg has child Albert III Count of Habsburg
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Albert I Duke of Brunswic L neburg, Albert I Duke of Brunswic L neburg has child Albert II Duke of Brunswic L neburg
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Rudolf II Count of Habsburg, Rudolf II Count of Habsburg has child Albert IV Count of Habsburg
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Otto I Duke of Brunswic L neburg has successor Albert I Duke of Brunswic L neburg, Otto I Duke of Brunswic L neburg has child Albert I Duke of Brunswic L neburg
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Richard Fitzalan 3rd Earl of Arundel, Richard Fitzalan 3rd Earl of Arundel has child Alice Holland Countess of Kent
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Richard Fitzalan 3rd Earl of Arundel, Richard Fitzalan 3rd Earl of Arundel has child Joan Fitzalan Countess of Hereford
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Guillaume de Montfort of Hainaut has successor Amaury I de Montfort, Guillaume de Montfort of Hainaut has child Amaury I de Montfort
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Peter of Courtenay Lord of Conches, Peter of Courtenay Lord of Conches has child Amicie de Courtenay
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Enno III Count of East Frisia, Enno III Count of East Frisia has child Anna Maria of Ostfriesland
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Adolf Duke of Holstei Gottorp, Adolf Duke of Holstei Gottorp has child Anna of Holstei Gottorp
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Philip III of Spain, Philip III of Spain has child Anne of Austria
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Philip III of Spain has successor Philip IV of Spain, Philip III of Spain has child Philip IV of Spain
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Frederick I Count of Vaud mont, Frederick I Count of Vaud mont has child Antoine Count of Vaud mont
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Francis IV Duke of Modena, Francis IV Duke of Modena has child Archduchess Maria Theresa of Austria Este 1817 1886
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Baldwin III Count of Flanders, Baldwin III Count of Flanders has child Arnulf II Count of Flanders
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Baldwin II Margrave of Flanders, Baldwin II Margrave of Flanders has child Arnulf I Count of Flanders
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Arnulf I Count of Flanders, Arnulf I Count of Flanders has child Baldwin III Count of Flanders
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Baldwin II Count of Hainaut, Baldwin II Count of Hainaut has child Baldwin III Count of Hainaut
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Baldwin VI Count of Flanders, Baldwin VI Count of Flanders has child Baldwin II Count of Hainaut
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Baldwin I Margrave of Flanders, Baldwin I Margrave of Flanders has child Baldwin II Margrave of Flanders
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Arnulf II Count of Flanders, Arnulf II Count of Flanders has child Baldwin IV Count of Flanders
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Baldwin III Count of Hainaut, Baldwin III Count of Hainaut has child Baldwin IV Count of Hainaut
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Baldwin V Count of Flanders, Baldwin V Count of Flanders has child Baldwin VI Count of Flanders
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Baldwin IV Count of Hainaut, Baldwin IV Count of Hainaut has child Baldwin V Count of Hainaut
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Mastino II della Scala, Mastino II della Scala has child Beatrice Regina della Scala
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Otto V Margrave of Brandenburg Salzwedel, Otto V Margrave of Brandenburg Salzwedel has child Beatrice of Brandenburg
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Nuno  lvares Pereira, Nuno  lvares Pereira has child Beatriz Pereira de Alvim
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Ramon Berenguer III Count of Barcelona, Ramon Berenguer III Count of Barcelona has child Berengaria of Barcelona
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Ramon Berenguer III Count of Barcelona has successor Ramon Berenguer IV Count of Barcelona, Ramon Berenguer III Count of Barcelona has child Ramon Berenguer IV Count of Barcelona
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Ramon Borrell Count of Barcelona, Ramon Borrell Count of Barcelona has child Berenguer Ramon I Count of Barcelona
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Magnus II Duke of Brunswic L neburg, Magnus II Duke of Brunswic L neburg has child Bernard I Duke of Brunswic L neburg
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Conrad I of Burgundy, Conrad I of Burgundy has child Bertha of Burgundy
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Berthold I of Istria, Berthold I of Istria has child Berthold Duke of Merania
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Berthold II Count of Andechs, Berthold II Count of Andechs has child Berthold I of Istria
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Charibert of Laon, Charibert of Laon has child Bertrada of Laon
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+John II Duke of Brittany, John II Duke of Brittany has child Blanche of Brittany
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+John II Duke of Brittany, John II Duke of Brittany has child Marie of Brittany Countess of Saint Pol
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Otto IV Count of Burgundy, Otto IV Count of Burgundy has child Blanche of Burgundy
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Otto IV Count of Burgundy has successor Joan II Countess of Burgundy, Otto IV Count of Burgundy has child Joan II Countess of Burgundy
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Sunyer Count of Barcelona, Sunyer Count of Barcelona has child Borrell II Count of Barcelona
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+James of Avesnes, James of Avesnes has child Bouchard IV of Avesnes
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Giuseppe Maria Buonaparte, Giuseppe Maria Buonaparte has child Carlo Buonaparte
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Louis the Stammerer has successor Carloman II, Louis the Stammerer has child Carloman II
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Louis the Stammerer has successor Louis III of France, Louis the Stammerer has child Louis III of France
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Gaston IV Count of Foix, Gaston IV Count of Foix has child Catherine of Foix Countess of Candale
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Gaston IV Count of Foix, Gaston IV Count of Foix has child Margaret of Foix
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+John VI of Vend me, John VI of Vend me has child Catherine of Vend me
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+John Count of Angoul me, John Count of Angoul me has child Charles Count of Angoul me
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Philip V of Spain, Philip V of Spain has child Charles III of Spain
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Philip V of Spain, Philip V of Spain has child Maria Antonia Ferdinanda of Spain
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Nicholas Francis Duke of Lorraine, Nicholas Francis Duke of Lorraine has child Charles V Duke of Lorraine
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Philip I of Castile has successor Charles V Holy Roman Emperor, Philip I of Castile has child Charles V Holy Roman Emperor
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Philip I of Castile, Philip I of Castile has child Ferdinand I Holy Roman Emperor
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Philip I Landgrave of Hesse, Philip I Landgrave of Hesse has child Christine of Hesse
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Giovanni di Bicci de Medici, Giovanni di Bicci de Medici has child Cosimo de Medici
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Giovanni di Bicci de Medici, Giovanni di Bicci de Medici has child Lorenzo the Elder
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Louis Crato Count of Nassau Saarbr cken, Louis Crato Count of Nassau Saarbr cken has child Countess Caroline of Nassau Saarbr cken
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+George Louis I Count of Erbach Erbach, George Louis I Count of Erbach Erbach has child Countess Sophia Albertine of Erbach Erbach
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Ranulf II of Aquitaine, Ranulf II of Aquitaine has child Ebalus Duke of Aquitaine
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Otto I Count of Scheyern, Otto I Count of Scheyern has child Eckhard I Count of Scheyern
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Edward II of England has successor Edward III of England, Edward II of England has child Edward III of England
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Leuthard I of Paris, Leuthard I of Paris has child Engeltrude de F zensac
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Elias I Count of Maine, Elias I Count of Maine has child Ermengarde Countess of Maine
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Fulk III Count of Anjou, Fulk III Count of Anjou has child Ermengarde of Anjou Duchess of Burgundy
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Leopold III Duke of Austria, Leopold III Duke of Austria has child Ernest Duke of Austria
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Henry the Middle Duke of Brunswic L neburg, Henry the Middle Duke of Brunswic L neburg has child Ernest I Duke of Brunswic L neburg
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Gabriel de Rochechouart de Mortemart, Gabriel de Rochechouart de Mortemart has child Fran oise Ath na s de Rochechouart Marquise de Montespan
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Constant d Aubign , Constant d Aubign  has child Fran oise d Aubign  Marquise de Maintenon
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Muzio Attendolo Sforza, Muzio Attendolo Sforza has child Francesco I Sforza
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+John VIII Count of Vend me, John VIII Count of Vend me has child Francis Count of Vend me
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+John VIII Count of Vend me, John VIII Count of Vend me has child Jeanne de Bourbon Duchess of Bourbon
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Henry II of France, Henry II of France has child Francis Duke of Anjou
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Henry II of France has successor Francis II of France, Henry II of France has child Francis II of France
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Henry II of France, Henry II of France has child Henry III of France
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Henry II of France, Henry II of France has child Margaret of Valois
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Ernest Duke of Austria has successor Frederick III Holy Roman Emperor, Ernest Duke of Austria has child Frederick III Holy Roman Emperor
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Antoine Count of Vaud mont, Antoine Count of Vaud mont has child Frederick II Count of Vaud mont
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Bernard I Duke of Brunswic L neburg, Bernard I Duke of Brunswic L neburg has child Frederick II Duke of Brunswic L neburg
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+John I Duke of Lorraine, John I Duke of Lorraine has child Frederick I Count of Vaud mont
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Fulk I Count of Anjou, Fulk I Count of Anjou has child Fulk II Count of Anjou
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Francesco I Sforza, Francesco I Sforza has child Galeazzo Maria Sforza
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+William the Younger Duke of Brunswic L neburg, William the Younger Duke of Brunswic L neburg has child George Duke of Brunswic Calenberg
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Rollo, Rollo has child Gerloc
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Bernard II Duke of Saxony, Bernard II Duke of Saxony has child Gertrude of Saxony
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Giovanni il Popolano, Giovanni il Popolano has child Giovanni delle Bande Nere
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Averardo de Medici, Averardo de Medici has child Giovanni di Bicci de Medici
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Pierfrancesco the Elder, Pierfrancesco the Elder has child Giovanni il Popolano
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+William I Count of Burgundy, William I Count of Burgundy has child Gisela of Burgundy Marchioness of Montferrat
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+William I Count of Burgundy, William I Count of Burgundy has child Stephen I Count of Burgundy
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+William I Count of Burgundy, William I Count of Burgundy has child Raymond of Burgundy
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Godfrey II Count of Louvain, Godfrey II Count of Louvain has child Godfrey III Count of Louvain
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Godfrey I Count of Louvain, Godfrey I Count of Louvain has child Godfrey II Count of Louvain
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Henry II Count of Louvain, Henry II Count of Louvain has child Godfrey I Count of Louvain
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Isambart, Isambart has child Hedwig of Bavaria
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Charles Ferdinand Duke of Berry, Charles Ferdinand Duke of Berry has child Henri Count of Chambord
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Henry II Duke of Brabant, Henry II Duke of Brabant has child Henry III Duke of Brabant
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Henry II Duke of Brabant, Henry II Duke of Brabant has child Matilda of Brabant Countess of Artois
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Lambert II Count of Louvain, Lambert II Count of Louvain has child Henry II Count of Louvain
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Henry I Duke of Brabant, Henry I Duke of Brabant has child Henry II Duke of Brabant
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+John of Gaunt has successor Henry IV of England, John of Gaunt has child Henry IV of England
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Welf I Duke of Bavaria, Welf I Duke of Bavaria has child Henry IX Duke of Bavaria
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Theobald II Count of Champagne, Theobald II Count of Champagne has child Henry I Count of Champagne
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Theobald II Count of Champagne, Theobald II Count of Champagne has child Adela of Champagne
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Godfrey III Count of Louvain, Godfrey III Count of Louvain has child Henry I Duke of Brabant
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Henry IX Duke of Bavaria, Henry IX Duke of Bavaria has child Henry X Duke of Bavaria
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Robert I Duke of Burgundy, Robert I Duke of Burgundy has child Henry son of Robert I of Burgundy
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Otto V Duke of Brunswic L neburg, Otto V Duke of Brunswic L neburg has child Henry the Middle Duke of Brunswic L neburg
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Gerold of Vinzgau, Gerold of Vinzgau has child Hildegard of the Vinzgau
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Robert II of France, Robert II of France has child Hugh Magnus
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Robert II of France has successor Henry I of France, Robert II of France has child Henry I of France
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Robert II of France, Robert II of France has child Robert I Duke of Burgundy
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Robert I of France, Robert I of France has child Hugh the Great
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Amadeus II Count of Savoy has successor Humbert II Count of Savoy, Amadeus II Count of Savoy has child Humbert II Count of Savoy
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Pedro Fern ndez de Castro, Pedro Fern ndez de Castro has child In s de Castro
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Valdemar I of Denmark, Valdemar I of Denmark has child Ingeborg of Denmark Queen of France
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Stephen III Duke of Bavaria, Stephen III Duke of Bavaria has child Isabeau of Bavaria
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Afonso I Duke of Braganza, Afonso I Duke of Braganza has child Isabel of Barcelos
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+William de Beauchamp 9th Earl of Warwick, William de Beauchamp 9th Earl of Warwick has child Isabella de Beauchamp
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+John Constable of Portugal, John Constable of Portugal has child Isabella of Portugal Queen of Castile
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+John Constable of Portugal, John Constable of Portugal has child Beatriz of Portugal Duchess of Viseu
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Patrick Hepburn 3rd Earl of Bothwell, Patrick Hepburn 3rd Earl of Bothwell has child James Hepburn 4th Earl of Bothwell
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Alexander Stewart 4th High Steward of Scotland has successor James Stewart 5th High Steward of Scotland, Alexander Stewart 4th High Steward of Scotland has child James Stewart 5th High Steward of Scotland
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Nicholas d Oisy Lord of Avesnes, Nicholas d Oisy Lord of Avesnes has child James of Avesnes
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+John Beaufort 1st Earl of Somerset, John Beaufort 1st Earl of Somerset has child Joan Beaufort Queen of Scots
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Louis I Duke of Orl ans, Louis I Duke of Orl ans has child John Count of Angoul me
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Louis I Duke of Orl ans has successor Charles Duke of Orl ans, Louis I Duke of Orl ans has child Charles Duke of Orl ans
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Stephen III of Auxonne, Stephen III of Auxonne has child John Count of Chalon
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+John I Count of Hainaut, John I Count of Hainaut has child John II Count of Holland
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Bouchard IV of Avesnes, Bouchard IV of Avesnes has child John I Count of Hainaut
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+James I Count of La Marche, James I Count of La Marche has child John I Count of La Marche
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Louis X of France has successor John I of France, Louis X of France has child John I of France
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Alan Stewart of Darnley, Alan Stewart of Darnley has child John Stewart 1st Earl of Lennox
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Matthew Stewart 2nd Earl of Lennox, Matthew Stewart 2nd Earl of Lennox has child John Stewart 3rd Earl of Lennox
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Alexander Stewart of Darnley died 1404, Alexander Stewart of Darnley died 1404 has child John Stewart of Darnley
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Louis Count of Vend me has successor John VIII Count of Vend me, Louis Count of Vend me has child John VIII Count of Vend me
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Welf father of Judith, Welf father of Judith has child Judith of Bavaria died 843
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Welf father of Judith, Welf father of Judith has child Hemma
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Lambert I Count of Louvain, Lambert I Count of Louvain has child Lambert II Count of Louvain
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Reginar III Count of Hainaut, Reginar III Count of Hainaut has child Lambert I Count of Louvain
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Albert II Duke of Austria, Albert II Duke of Austria has child Leopold III Duke of Austria
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Brun I Count of Brunswick, Brun I Count of Brunswick has child Liudolf Margrave of Frisia
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Piero di Cosimo de Medici, Piero di Cosimo de Medici has child Lorenzo de Medici
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Piero the Unfortunate, Piero the Unfortunate has child Lorenzo de Medici Duke of Urbino
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Charles X, Charles X has child Louis Antoine Duke of Angoul me
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Charles X, Charles X has child Charles Ferdinand Duke of Berry
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+John I Count of La Marche, John I Count of La Marche has child Louis Count of Vend me
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+John I Count of La Marche, John I Count of La Marche has child Charlotte of Bourbon Queen of Cyprus
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Otto II Duke of Bavaria, Otto II Duke of Bavaria has child Louis II Duke of Bavaria
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Otto I Duke of Bavaria, Otto I Duke of Bavaria has child Louis I Duke of Bavaria
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Louis Philippe II Duke of Orl ans has successor Louis Philippe I, Louis Philippe II Duke of Orl ans has child Louis Philippe I
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Lothair of France has successor Louis V of France, Lothair of France has child Louis V of France
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Louis XVI, Louis XVI has child Louis XVII
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Louis XVI, Louis XVI has child Marie Th r se of France
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Louis Dauphin of France son of Louis XV, Louis Dauphin of France son of Louis XV has child Louis XVIII
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Louis Dauphin of France son of Louis XV, Louis Dauphin of France son of Louis XV has child Charles X
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Louis Dauphin of France son of Louis XV, Louis Dauphin of France son of Louis XV has child Louis XVI
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Nicolas Duke of Merc ur, Nicolas Duke of Merc ur has child Louise of Lorraine
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Herbert II Count of Vermandois, Herbert II Count of Vermandois has child Luitgarde of Vermandois
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+John III Count of Auvergne, John III Count of Auvergne has child Madeleine de La Tour d Auvergne
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Albert Frederick Duke of Prussia, Albert Frederick Duke of Prussia has child Magdalene Sibylle of Prussia
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Magnus I Duke of Brunswic L neburg, Magnus I Duke of Brunswic L neburg has child Magnus II Duke of Brunswic L neburg
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Albert II Duke of Brunswic L neburg, Albert II Duke of Brunswic L neburg has child Magnus I Duke of Brunswic L neburg
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Robert II Count of Artois has successor Mahaut Countess of Artois, Robert II Count of Artois has child Mahaut Countess of Artois
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Guy IV Count of Saint Pol, Guy IV Count of Saint Pol has child Mahaut of Ch tillon
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Thomas Holland 2nd Earl of Kent, Thomas Holland 2nd Earl of Kent has child Margaret Holland Duchess of Clarence
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Thierry Count of Flanders, Thierry Count of Flanders has child Margaret I Countess of Flanders
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+James I of Scotland, James I of Scotland has child Margaret Stewart Dauphine of France
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+James I of Scotland, James I of Scotland has child James II of Scotland
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Philip of Artois, Philip of Artois has child Margaret of Artois
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Francis of Baux, Francis of Baux has child Margaret of Baux
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Guy Count of Flanders, Guy Count of Flanders has child Margaret of Flanders Duchess of Brabant
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+William I of Geneva, William I of Geneva has child Margaret of Geneva
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Philip Duke of Parma, Philip Duke of Parma has child Maria Luisa of Parma
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Ferdinand I Holy Roman Emperor, Ferdinand I Holy Roman Emperor has child Maria of Austria Duchess of J lich Cleves Berg
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Ferdinand I Holy Roman Emperor has successor Maximilian II Holy Roman Emperor, Ferdinand I Holy Roman Emperor has child Maximilian II Holy Roman Emperor
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Ferdinand I Holy Roman Emperor, Ferdinand I Holy Roman Emperor has child Joanna of Austria Grand Duchess of Tuscany
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Ferdinand I Holy Roman Emperor, Ferdinand I Holy Roman Emperor has child Archduchess Anna of Austria
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Philip of Swabia, Philip of Swabia has child Maria of Swabia
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+William IV Count of Ponthieu, William IV Count of Ponthieu has child Marie Countess of Ponthieu
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Victor Amadeus III of Sardinia, Victor Amadeus III of Sardinia has child Marie Jos phine of Savoy
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Victor Amadeus III of Sardinia, Victor Amadeus III of Sardinia has child Maria Theresa of Savoy
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Peter II Count of Saint Pol, Peter II Count of Saint Pol has child Marie of Luxembourg Countess of Vend me
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Henry VII Holy Roman Emperor, Henry VII Holy Roman Emperor has child Marie of Luxembourg Queen of France
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Henry VII Holy Roman Emperor has successor John of Bohemia, Henry VII Holy Roman Emperor has child John of Bohemia
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Humphrey de Bohun 7th Earl of Hereford, Humphrey de Bohun 7th Earl of Hereford has child Mary de Bohun
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Robert VII Lord of B thune, Robert VII Lord of B thune has child Matilda of B thune
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Louis IV Holy Roman Emperor, Louis IV Holy Roman Emperor has child Matilda of Bavaria Margravine of Meissen
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Louis IV Holy Roman Emperor, Louis IV Holy Roman Emperor has child Stephen II Duke of Bavaria
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Engelbert Duke of Carinthia, Engelbert Duke of Carinthia has child Matilda of Carinthia
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Liudolf Margrave of Frisia, Liudolf Margrave of Frisia has child Matilda of Frisia
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Hermann Billung, Hermann Billung has child Matilda of Saxony countess of Flanders
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+John Stewart 1st Earl of Lennox, John Stewart 1st Earl of Lennox has child Matthew Stewart 2nd Earl of Lennox
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+John Stewart 3rd Earl of Lennox, John Stewart 3rd Earl of Lennox has child Matthew Stewart 4th Earl of Lennox
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Patrick de Chaworth Lord of Kidwelly, Patrick de Chaworth Lord of Kidwelly has child Maud Chaworth
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Napoleon has successor Napoleon II, Napoleon has child Napoleon II
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Walter I Lord of Avesnes, Walter I Lord of Avesnes has child Nicholas d Oisy Lord of Avesnes
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Oberto I, Oberto I has child Oberto II Margrave of Milan
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Odo I Count of Blois, Odo I Count of Blois has child Odo II Count of Blois
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Theobald I Count of Blois, Theobald I Count of Blois has child Odo I Count of Blois
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Robert the Strong, Robert the Strong has child Odo of France
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Robert the Strong, Robert the Strong has child Robert I of France
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Werner I Count of Klettgau, Werner I Count of Klettgau has child Otto II Count of Habsburg
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Louis I Duke of Bavaria, Louis I Duke of Bavaria has child Otto II Duke of Bavaria
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Hugh Count of Burgundy, Hugh Count of Burgundy has child Otto IV Count of Burgundy
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Eckhard I Count of Scheyern, Eckhard I Count of Scheyern has child Otto IV Count of Scheyern
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Otto IV Count of Scheyern, Otto IV Count of Scheyern has child Otto I Duke of Bavaria
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+William of Winchester Lord of Lunenburg, William of Winchester Lord of Lunenburg has child Otto I Duke of Brunswic L neburg
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Liudolf Duke of Saxony, Liudolf Duke of Saxony has child Otto I Duke of Saxony
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Frederick II Duke of Brunswic L neburg, Frederick II Duke of Brunswic L neburg has child Otto V Duke of Brunswic L neburg
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Adalbert of Italy, Adalbert of Italy has child Otto William Count of Burgundy
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Maredudd ap Tudur, Maredudd ap Tudur has child Owen Tudor
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Louis I Duke of Bourbon, Louis I Duke of Bourbon has child Peter I Duke of Bourbon
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Louis I Duke of Bourbon, Louis I Duke of Bourbon has child James I Count of La Marche
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Robert of Courtenay Lord of Champignelles, Robert of Courtenay Lord of Champignelles has child Peter of Courtenay Lord of Conches
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Philip III of France, Philip III of France has child Philip IV of France
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Philip III of France, Philip III of France has child Louis Count of  vreux
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Charles Count of Valois has successor Philip VI of France, Charles Count of Valois has child Philip VI of France
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Charles Count of Valois, Charles Count of Valois has child Isabella of Valois Duchess of Bourbon
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Charles Count of Valois, Charles Count of Valois has child Joan of Valois Countess of Hainaut
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Louis Dauphin of France son of Louis XIV, Louis Dauphin of France son of Louis XIV has child Philip V of Spain
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Louis Dauphin of France son of Louis XIV, Louis Dauphin of France son of Louis XIV has child Louis Duke of Burgundy
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Louis VI of France, Louis VI of France has child Philip of France 1116 1131
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Louis VI of France, Louis VI of France has child Robert I Count of Dreux
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Louis VI of France has successor Louis VII of France, Louis VI of France has child Louis VII of France
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+John II of France has successor Philip the Bold, John II of France has child Philip the Bold
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+John II of France, John II of France has child Marie of France Duchess of Bar
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+John II of France has successor Charles V of France, John II of France has child Charles V of France
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+John II of France, John II of France has child Louis I of Anjou
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+John the Fearless, John the Fearless has child Philip the Good
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+John the Fearless, John the Fearless has child Mary of Burgundy Duchess of Cleves
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+William I Count of Hainaut, William I Count of Hainaut has child Philippa of Hainault
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Lorenzo the Elder, Lorenzo the Elder has child Pierfrancesco the Elder
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Cosimo de Medici has successor Piero di Cosimo de Medici, Cosimo de Medici has child Piero di Cosimo de Medici
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Lorenzo de Medici has successor Piero the Unfortunate, Lorenzo de Medici has child Piero the Unfortunate
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Ramon Berenguer II Count of Barcelona, Ramon Berenguer II Count of Barcelona has child Ramon Berenguer III Count of Barcelona
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Ramon Berenguer I Count of Barcelona, Ramon Berenguer I Count of Barcelona has child Ramon Berenguer II Count of Barcelona
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Berenguer Ramon I Count of Barcelona, Berenguer Ramon I Count of Barcelona has child Ramon Berenguer I Count of Barcelona
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Borrell II Count of Barcelona, Borrell II Count of Barcelona has child Ramon Borrell Count of Barcelona
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Otto William Count of Burgundy, Otto William Count of Burgundy has child Reginald I Count of Burgundy
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Reginar II Count of Hainaut, Reginar II Count of Hainaut has child Reginar III Count of Hainaut
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Reginar Longneck, Reginar Longneck has child Reginar II Count of Hainaut
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Bivin of Gorze, Bivin of Gorze has child Richard Duke of Burgundy
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Robert II Count of Hesbaye, Robert II Count of Hesbaye has child Robert III of Worms
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Robert III of Worms, Robert III of Worms has child Robert the Strong
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Albert III Count of Habsburg, Albert III Count of Habsburg has child Rudolf II Count of Habsburg
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Richard Duke of Burgundy, Richard Duke of Burgundy has child Rudolph of France
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Amaury I de Montfort has successor Simon I de Montfort, Amaury I de Montfort has child Simon I de Montfort
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Augustus Duke of Saxe Weissenfels, Augustus Duke of Saxe Weissenfels has child Sophia of Saxe Weissenfels Princess of Anhalt Zerbst
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Theobald III Count of Blois, Theobald III Count of Blois has child Stephen Count of Blois
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Stephen II Duke of Bavaria, Stephen II Duke of Bavaria has child Stephen III Duke of Bavaria
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Stephen II of Auxonne, Stephen II of Auxonne has child Stephen III of Auxonne
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+William III of M con, William III of M con has child Stephen II of Auxonne
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Wilfred the Hairy, Wilfred the Hairy has child Sunyer Count of Barcelona
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Odo II Count of Blois, Odo II Count of Blois has child Theobald III Count of Blois
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Henry I Count of Champagne, Henry I Count of Champagne has child Theobald III Count of Champagne
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Stephen Count of Blois, Stephen Count of Blois has child Theobald II Count of Champagne
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Theobald the Elder, Theobald the Elder has child Theobald I Count of Blois
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+James Stewart 5th High Steward of Scotland, James Stewart 5th High Steward of Scotland has child Walter Stewart 6th High Steward of Scotland
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Albert Azzo II Margrave of Milan, Albert Azzo II Margrave of Milan has child Welf I Duke of Bavaria
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Otto II Count of Habsburg, Otto II Count of Habsburg has child Werner II Count of Habsburg
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Radbot of Klettgau, Radbot of Klettgau has child Werner I Count of Klettgau
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Sunifred Count of Barcelona, Sunifred Count of Barcelona has child Wilfred the Hairy
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Ebalus Duke of Aquitaine, Ebalus Duke of Aquitaine has child William III Duke of Aquitaine
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Stephen I Count of Burgundy, Stephen I Count of Burgundy has child William III of M con
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+William III Duke of Aquitaine, William III Duke of Aquitaine has child William IV Duke of Aquitaine
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+William III Duke of Aquitaine, William III Duke of Aquitaine has child Adelaide of Aquitaine
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+William VIII Duke of Aquitaine, William VIII Duke of Aquitaine has child William IX Duke of Aquitaine
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Reginald I Count of Burgundy, Reginald I Count of Burgundy has child William I Count of Burgundy
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+John II Count of Holland, John II Count of Holland has child William I Count of Hainaut
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+William V Duke of Aquitaine, William V Duke of Aquitaine has child William VIII Duke of Aquitaine
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+William IV Duke of Aquitaine, William IV Duke of Aquitaine has child William V Duke of Aquitaine
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Henry the Lion, Henry the Lion has child William of Winchester Lord of Lunenburg
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Robert III Count of Dreux, Robert III Count of Dreux has child Yolande of Dreux Duchess of Burgundy
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Henry the Fowler, Henry the Fowler has child Gerberga of Saxony
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Henry the Fowler, Henry the Fowler has child Hedwig of Saxony
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Boso II of Italy, Boso II of Italy has child Boso the Elder
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Francis II Duke of Brittany has successor Anne of Brittany, Francis II Duke of Brittany has child Anne of Brittany
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Louis Rudolph Duke of Brunswic L neburg, Louis Rudolph Duke of Brunswic L neburg has child Elisabeth Christine of Brunswic Wolfenb ttel
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Philip III of Navarre, Philip III of Navarre has child Blanche of Navarre Queen of France
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Alfonso VIII of Castile, Alfonso VIII of Castile has child Blanche of Castile
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Theobald of Arles, Theobald of Arles has child Hugh of Italy
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Maximilian I Holy Roman Emperor, Maximilian I Holy Roman Emperor has child Philip I of Castile
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Alfonso XI of Castile, Alfonso XI of Castile has child Henry II of Castile
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Francis I of France, Francis I of France has child Henry II of France
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Edward III of England, Edward III of England has child John of Gaunt
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Arthur II Duke of Brittany, Arthur II Duke of Brittany has child John of Montfort
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Theodoric II Duke of Lorraine has successor Simon I Duke of Lorraine, Theodoric II Duke of Lorraine has child Simon I Duke of Lorraine
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Francis I Holy Roman Emperor, Francis I Holy Roman Emperor has child Marie Antoinette
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Francis I Holy Roman Emperor, Francis I Holy Roman Emperor has child Maria Carolina of Austria
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Francis I Holy Roman Emperor, Francis I Holy Roman Emperor has child Ferdinand Karl Archduke of Austria Este
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Francis I Holy Roman Emperor has successor Leopold II Holy Roman Emperor, Francis I Holy Roman Emperor has child Leopold II Holy Roman Emperor
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Charles VI of France, Charles VI of France has child Catherine of Valois
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Charles VI of France, Charles VI of France has child Charles VII of France
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Ramon Berenguer IV Count of Provence, Ramon Berenguer IV Count of Provence has child Eleanor of Provence
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Ramon Berenguer IV Count of Provence, Ramon Berenguer IV Count of Provence has child Margaret of Provence
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Odo III Duke of Burgundy has successor Hugh IV Duke of Burgundy, Odo III Duke of Burgundy has child Hugh IV Duke of Burgundy
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Odo I Duke of Burgundy, Odo I Duke of Burgundy has child Hugh II Duke of Burgundy
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Victor Amadeus I Duke of Savoy, Victor Amadeus I Duke of Savoy has child Charles Emmanuel II Duke of Savoy
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Afonso III of Portugal has successor Denis of Portugal, Afonso III of Portugal has child Denis of Portugal
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Hugh III Duke of Burgundy has successor Odo III Duke of Burgundy, Hugh III Duke of Burgundy has child Odo III Duke of Burgundy
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Ramon Berenguer IV Count of Barcelona has successor Alfonso II of Aragon, Ramon Berenguer IV Count of Barcelona has child Alfonso II of Aragon
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Ecgberht King of Wessex has successor  thelwulf King of Wessex, Ecgberht King of Wessex has child  thelwulf King of Wessex
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Leopold II Holy Roman Emperor, Leopold II Holy Roman Emperor has child Francis II Holy Roman Emperor
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Philip I of France has successor Louis VI of France, Philip I of France has child Louis VI of France
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Alfonso VII of Le n and Castile has successor Sancho III of Castile, Alfonso VII of Le n and Castile has child Sancho III of Castile
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Alfonso VII of Le n and Castile, Alfonso VII of Le n and Castile has child Constance of Castile
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Alfonso VII of Le n and Castile has successor Ferdinand II of Le n, Alfonso VII of Le n and Castile has child Ferdinand II of Le n
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Louis Duke of Savoy, Louis Duke of Savoy has child Philip II Duke of Savoy
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Louis Duke of Savoy, Louis Duke of Savoy has child Charlotte of Savoy
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Louis Duke of Savoy, Louis Duke of Savoy has child Bona of Savoy
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Louis Duke of Savoy, Louis Duke of Savoy has child Margaret of Savoy Countess of Saint Pol
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Frederick V Burgrave of Nuremberg, Frederick V Burgrave of Nuremberg has child Elisabeth of Nuremberg
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+John II of Aragon has successor Ferdinand II of Aragon, John II of Aragon has child Ferdinand II of Aragon
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Ferdinand I of Aragon, Ferdinand I of Aragon has child Eleanor of Aragon Queen of Portugal
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Ferdinand I of Aragon, Ferdinand I of Aragon has child John II of Aragon
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Francis Count of Vend me, Francis Count of Vend me has child Antoinette of Bourbon
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Francis Count of Vend me, Francis Count of Vend me has child Charles Duke of Vend me
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Ansegisel, Ansegisel has child Pepin of Herstal
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Ferdinand II of Le n, Ferdinand II of Le n has child Alfonso IX of Le n
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Volodar Glebovich Prince of Minsk, Volodar Glebovich Prince of Minsk has child Sophia of Minsk
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Louis VIII of France has successor Louis IX of France, Louis VIII of France has child Louis IX of France
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Humbert II Count of Savoy, Humbert II Count of Savoy has child Adelaide of Maurienne
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Theobald II Duke of Lorraine, Theobald II Duke of Lorraine has child Frederick IV Duke of Lorraine
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Charles Duke of Vend me, Charles Duke of Vend me has child Antoine of Navarre
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Rudolph Duke of Lorraine, Rudolph Duke of Lorraine has child John I Duke of Lorraine
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Louis Duke of Orl ans 1703 1752 has successor Louis Philippe I Duke of Orl ans, Louis Duke of Orl ans 1703 1752 has child Louis Philippe I Duke of Orl ans
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Francis I Duke of Lorraine has successor Charles III Duke of Lorraine, Francis I Duke of Lorraine has child Charles III Duke of Lorraine
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Sancho Alfonso, Sancho Alfonso has child Eleanor of Alburquerque
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Olof Sk tkonung, Olof Sk tkonung has child Ingegerd Olofsdotter of Sweden
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+John IV Duke of Brittany, John IV Duke of Brittany has child Richard Count of  tampes
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Denis of Portugal, Denis of Portugal has child Afonso IV of Portugal
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Louis XV, Louis XV has child Louise  lisabeth of France
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Louis the German has successor Charles the Fat, Louis the German has child Charles the Fat
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Philippe II Duke of Orl ans, Philippe II Duke of Orl ans has child Charlotte Agla  d Orl ans
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Philippe II Duke of Orl ans has successor Louis Duke of Orl ans 1703 1752, Philippe II Duke of Orl ans has child Louis Duke of Orl ans 1703 1752
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+John I of Aragon, John I of Aragon has child Yolande of Aragon
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Vladimir the Great, Vladimir the Great has child Yaroslav the Wise
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Louis IX of France, Louis IX of France has child Agnes of France Duchess of Burgundy
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Louis IX of France has successor Philip III of France, Louis IX of France has child Philip III of France
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Louis IX of France, Louis IX of France has child Robert Count of Clermont
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Henry 3rd Earl of Lancaster, Henry 3rd Earl of Lancaster has child Eleanor of Lancaster
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Rurik, Rurik has child Igor of Kiev
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Charles Martel of Anjou, Charles Martel of Anjou has child Clementia of Hungary
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Afonso I of Portugal has successor Sancho I of Portugal, Afonso I of Portugal has child Sancho I of Portugal
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Simon I de Montfort, Simon I de Montfort has child Bertrade of Montfort
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Robert II Duke of Burgundy, Robert II Duke of Burgundy has child Joan the Lame
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Robert II Duke of Burgundy, Robert II Duke of Burgundy has child Margaret of Burgundy Queen of France
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Robert II Duke of Burgundy, Robert II Duke of Burgundy has child Odo IV Duke of Burgundy
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+John I of Castile, John I of Castile has child Ferdinand I of Aragon
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Alfonso II Count of Provence has successor Ramon Berenguer IV Count of Provence, Alfonso II Count of Provence has child Ramon Berenguer IV Count of Provence
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Francesco III d Este Duke of Modena, Francesco III d Este Duke of Modena has child Maria Teresa Felicitas d Este
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Francis I of the Two Sicilies, Francis I of the Two Sicilies has child Marie Caroline of Bourbo Two Sicilies Duchess of Berry
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Francis I of the Two Sicilies, Francis I of the Two Sicilies has child Maria Christina of the Two Sicilies
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Berengar II of Italy, Berengar II of Italy has child Rozala of Italy
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Christian III Count Palatine of Zweibr cken, Christian III Count Palatine of Zweibr cken has child Countess Palatine Caroline of Zweibr cken
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Peter I of Portugal, Peter I of Portugal has child John I of Portugal
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Sviatoslav I has successor Vladimir the Great, Sviatoslav I has child Vladimir the Great
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Francis II Holy Roman Emperor, Francis II Holy Roman Emperor has child Marie Louise Duchess of Parma
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Louis XIV, Louis XIV has child Fran oise Marie de Bourbon
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Louis XIV, Louis XIV has child Louis Dauphin of France son of Louis XIV
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Walter Stewart 6th High Steward of Scotland, Walter Stewart 6th High Steward of Scotland has child Robert II of Scotland
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Alexandre de Beauharnais, Alexandre de Beauharnais has child Hortense de Beauharnais
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Louis Count of  vreux, Louis Count of  vreux has child Joan of  vreux
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Louis Count of  vreux, Louis Count of  vreux has child Philip III of Navarre
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Henry V Count of Luxembourg has successor Henry VI Count of Luxembourg, Henry V Count of Luxembourg has child Henry VI Count of Luxembourg
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+William I of Provence, William I of Provence has child Constance of Arles
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+James III of Scotland, James III of Scotland has child James IV of Scotland
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Charlemagne has successor Louis the Pious, Charlemagne has child Louis the Pious
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Henry VII of England, Henry VII of England has child Mary Tudor Queen of France
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Theobald III Count of Champagne, Theobald III Count of Champagne has child Theobald I of Navarre
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Ferdinand III of Castile, Ferdinand III of Castile has child Eleanor of Castile
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Ferdinand III of Castile, Ferdinand III of Castile has child Alfonso X of Castile
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+George Duke of Brunswic Calenberg, George Duke of Brunswic Calenberg has child Ernest Augustus Elector of Hanover
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Charles II of Naples has successor Margaret Countess of Anjou, Charles II of Naples has child Margaret Countess of Anjou
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Henry IV of France has successor Louis XIII, Henry IV of France has child Louis XIII
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Henry IV of France, Henry IV of France has child Henrietta Maria
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Henry IV of France, Henry IV of France has child Elisabeth of France 1602 1644
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Louis IX Landgrave of Hesse Darmstadt, Louis IX Landgrave of Hesse Darmstadt has child Princess Louise of Hesse Darmstadt 1757 1830
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Pepin of Herstal has successor Charles Martel, Pepin of Herstal has child Charles Martel
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Giovanni delle Bande Nere, Giovanni delle Bande Nere has child Cosimo I de Medici Grand Duke of Tuscany
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Frederick IV Duke of Lorraine, Frederick IV Duke of Lorraine has child Rudolph Duke of Lorraine
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Louis XIII, Louis XIII has child Philippe I Duke of Orl ans
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Louis XIII has successor Louis XIV, Louis XIII has child Louis XIV
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Philippe I Duke of Orl ans, Philippe I Duke of Orl ans has child Philippe II Duke of Orl ans
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Philippe I Duke of Orl ans, Philippe I Duke of Orl ans has child Anne Marie d Orl ans
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Charles V of France, Charles V of France has child Louis I Duke of Orl ans
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Ferdinand Karl Archduke of Austria Este, Ferdinand Karl Archduke of Austria Este has child Francis IV Duke of Modena
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Alfonso X of Castile has successor Sancho IV of Castile, Alfonso X of Castile has child Sancho IV of Castile
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Rudolf I of Germany, Rudolf I of Germany has child Clemence of Austria
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Rudolf I of Germany, Rudolf I of Germany has child Judith of Habsburg
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Rudolf I of Germany, Rudolf I of Germany has child Albert I of Germany
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Stephen V of Hungary, Stephen V of Hungary has child Mary of Hungary Queen of Naples
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Wenceslaus II of Bohemia, Wenceslaus II of Bohemia has child Elizabeth of Bohemia 1292 1330
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Henry II of England, Henry II of England has child Eleanor of England Queen of Castile
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+James V of Scotland has successor Mary Queen of Scots, James V of Scotland has child Mary Queen of Scots
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Philip II Duke of Savoy, Philip II Duke of Savoy has child Louise of Savoy
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Philip II Duke of Savoy, Philip II Duke of Savoy has child Charles III Duke of Savoy
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Peter II of Courtenay, Peter II of Courtenay has child Yolanda of Courtenay
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Robert I Count of Artois, Robert I Count of Artois has child Blanche of Artois
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Manuel I of Portugal, Manuel I of Portugal has child Isabella of Portugal
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Afonso V of Portugal, Afonso V of Portugal has child John II of Portugal
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Frederick III Holy Roman Emperor has successor Maximilian I Holy Roman Emperor, Frederick III Holy Roman Emperor has child Maximilian I Holy Roman Emperor
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Ingerman Count of Hesbaye, Ingerman Count of Hesbaye has child Ermengarde of Hesbaye
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Gerard Duke of Lorraine, Gerard Duke of Lorraine has child Theodoric II Duke of Lorraine
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Andrew II of Hungary, Andrew II of Hungary has child Violant of Hungary
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Matthew Stewart 4th Earl of Lennox, Matthew Stewart 4th Earl of Lennox has child Henry Stuart Lord Darnley
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Edward the Elder, Edward the Elder has child Eadgifu of Wessex
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Charles IV of Spain, Charles IV of Spain has child Mar a Isabella of Spain
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Charles Emmanuel II Duke of Savoy has successor Victor Amadeus II of Sardinia, Charles Emmanuel II Duke of Savoy has child Victor Amadeus II of Sardinia
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Bolko I the Strict, Bolko I the Strict has child Beatrice of Silesia
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Sancho IV of Castile has successor Ferdinand IV of Castile, Sancho IV of Castile has child Ferdinand IV of Castile
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+John Frederick Duke of Brunswic Calenberg, John Frederick Duke of Brunswic Calenberg has child Wilhelmine Amalie of Brunswick
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Thomas Count of Savoy, Thomas Count of Savoy has child Beatrice of Savoy
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Frederick II Count of Vaud mont, Frederick II Count of Vaud mont has child Ren  II Duke of Lorraine
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Igor of Kiev, Igor of Kiev has child Sviatoslav I
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Dirk II Count of Holland has successor Arnulf Count of Holland, Dirk II Count of Holland has child Arnulf Count of Holland
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Rupert King of the Romans, Rupert King of the Romans has child Margaret of the Palatinate
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Antoine Duke of Montpensier, Antoine Duke of Montpensier has child Princess Marie Isabelle of Orl ans
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Albert II of Germany, Albert II of Germany has child Elizabeth of Austria 1436 1505
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Hugh of Tours, Hugh of Tours has child Adelaide of Tours
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Burkhard V Count of Hohenberg, Burkhard V Count of Hohenberg has child Gertrude of Hohenberg
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Louis I of Brzeg, Louis I of Brzeg has child Margaret of Brieg
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Amadeus VIII Duke of Savoy has successor Louis Duke of Savoy, Amadeus VIII Duke of Savoy has child Louis Duke of Savoy
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Fulk King of Jerusalem, Fulk King of Jerusalem has child Sibylla of Anjou
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Fulk King of Jerusalem has successor Geoffrey Plantagenet Count of Anjou, Fulk King of Jerusalem has child Geoffrey Plantagenet Count of Anjou
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Cosimo I de Medici Grand Duke of Tuscany has successor Francesco I de Medici Grand Duke of Tuscany, Cosimo I de Medici Grand Duke of Tuscany has child Francesco I de Medici Grand Duke of Tuscany
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Augustus III of Poland, Augustus III of Poland has child Maria Josepha of Saxony Dauphine of France
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Augustus III of Poland, Augustus III of Poland has child Maria Amalia of Saxony
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Philip IV of France, Philip IV of France has child Isabella of France
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Odo I Count of Orl ans, Odo I Count of Orl ans has child Ermentrude of Orl ans
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Ernest Frederick I Duke of Saxe Hildburghausen, Ernest Frederick I Duke of Saxe Hildburghausen has child Princess Elisabeth Albertine of Saxe Hildburghausen
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Victor Amadeus II of Sardinia, Victor Amadeus II of Sardinia has child Marie Ad la de of Savoy
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Victor Amadeus II of Sardinia has successor Charles Emmanuel III of Sardinia, Victor Amadeus II of Sardinia has child Charles Emmanuel III of Sardinia
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Frederick Louis Hereditary Grand Duke of Mecklenburg Schwerin, Frederick Louis Hereditary Grand Duke of Mecklenburg Schwerin has child Duchess Helene of Mecklenburg Schwerin
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Adalbert I of Ivrea, Adalbert I of Ivrea has child Berengar II of Italy
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Sancho III of Castile has successor Alfonso VIII of Castile, Sancho III of Castile has child Alfonso VIII of Castile
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+William XII Count of Auvergne has successor Joan I Countess of Auvergne, William XII Count of Auvergne has child Joan I Countess of Auvergne
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Edward the Exile, Edward the Exile has child Saint Margaret of Scotland
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Philip VI of France has successor John II of France, Philip VI of France has child John II of France
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Albert I of Germany, Albert I of Germany has child Albert II Duke of Austria
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Peter I Count of Saint Pol, Peter I Count of Saint Pol has child Jacquetta of Luxembourg
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Alfonso II of Aragon, Alfonso II of Aragon has child Peter II of Aragon
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Charles VII of France has successor Louis XI, Charles VII of France has child Louis XI
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Floris I Count of Holland, Floris I Count of Holland has child Bertha of Holland
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Robert Duke of Bar, Robert Duke of Bar has child Violant of Bar
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Antoine Duke of Lorraine, Antoine Duke of Lorraine has child Francis I Duke of Lorraine
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Antoine Duke of Lorraine, Antoine Duke of Lorraine has child Nicolas Duke of Merc ur
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Louis Jean Marie de Bourbon Duke of Penthi vre, Louis Jean Marie de Bourbon Duke of Penthi vre has child Louise Marie Ad la de de Bourbon Duchess of Orl ans
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Louis VII of France has successor Philip II of France, Louis VII of France has child Philip II of France
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Louis VII of France, Louis VII of France has child Alys of France Countess of Vexin
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Sigismund Holy Roman Emperor, Sigismund Holy Roman Emperor has child Elizabeth of Luxembourg
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Frederick II Margrave of Meissen, Frederick II Margrave of Meissen has child Elisabeth of Meissen
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Baldwin V Count of Hainaut, Baldwin V Count of Hainaut has child Isabella of Hainault
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+John of Bohemia, John of Bohemia has child Bonne of Luxembourg
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+James I of Aragon, James I of Aragon has child Isabella of Aragon Queen of France
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Robert III of Scotland has successor James I of Scotland, Robert III of Scotland has child James I of Scotland
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Charles II Archduke of Austria, Charles II Archduke of Austria has child Margaret of Austria Queen of Spain
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Charles V Holy Roman Emperor, Charles V Holy Roman Emperor has child Maria of Austria Holy Roman Empress
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Charles V Holy Roman Emperor has successor Philip II of Spain, Charles V Holy Roman Emperor has child Philip II of Spain
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Odoardo Farnese Hereditary Prince of Parma, Odoardo Farnese Hereditary Prince of Parma has child Elisabeth Farnese
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Henry son of Robert I of Burgundy, Henry son of Robert I of Burgundy has child Henry Count of Portugal
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Henry son of Robert I of Burgundy, Henry son of Robert I of Burgundy has child Odo I Duke of Burgundy
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Gerard de Bouzonville, Gerard de Bouzonville has child Gerard Duke of Lorraine
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Vladislaus II of Hungary, Vladislaus II of Hungary has child Anne of Bohemia and Hungary
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Charles Martel has successor Pepin the Short, Charles Martel has child Pepin the Short
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Alfonso IX of Le n has successor Ferdinand III of Castile, Alfonso IX of Le n has child Ferdinand III of Castile
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Peter I Duke of Bourbon, Peter I Duke of Bourbon has child Joanna of Bourbon
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Charles III Duke of Lorraine, Charles III Duke of Lorraine has child Francis II Duke of Lorraine
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Ernest Augustus Elector of Hanover has successor George I of Great Britain, Ernest Augustus Elector of Hanover has child George I of Great Britain
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Robert Count of Clermont, Robert Count of Clermont has child Louis I Duke of Bourbon
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+William IX Duke of Aquitaine, William IX Duke of Aquitaine has child William X Duke of Aquitaine
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Antoine of Navarre, Antoine of Navarre has child Henry IV of France
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Richard Woodville 1st Earl Rivers, Richard Woodville 1st Earl Rivers has child Elizabeth Woodville
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Albert V Duke of Bavaria, Albert V Duke of Bavaria has child Maria Anna of Bavaria born 1551
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Peter I Duke of Brittany has successor John I Duke of Brittany, Peter I Duke of Brittany has child John I Duke of Brittany
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Gaston de Foix Count of Candale, Gaston de Foix Count of Candale has child Anne of Foix Candale
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Philip William Elector Palatine, Philip William Elector Palatine has child Countess Palatine Dorothea Sophie of Neuburg
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Ernest I Duke of Brunswic L neburg has successor William the Younger Duke of Brunswic L neburg, Ernest I Duke of Brunswic L neburg has child William the Younger Duke of Brunswic L neburg
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Joseph I Holy Roman Emperor, Joseph I Holy Roman Emperor has child Maria Josepha of Austria
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Ferdinand II of Aragon, Ferdinand II of Aragon has child Maria of Aragon Queen of Portugal
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Leopold Duke of Lorraine has successor Francis I Holy Roman Emperor, Leopold Duke of Lorraine has child Francis I Holy Roman Emperor
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Adolphus Frederick I Duke of Mecklenburg Schwerin, Adolphus Frederick I Duke of Mecklenburg Schwerin has child Adolphus Frederick II Duke of Mecklenburg Strelitz
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Adolphus Frederick I Duke of Mecklenburg Schwerin, Adolphus Frederick I Duke of Mecklenburg Schwerin has child Anna Maria of Mecklenburg Schwerin
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Louis II Duke of Bavaria, Louis II Duke of Bavaria has child Louis IV Holy Roman Emperor
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+William X Duke of Aquitaine has successor Eleanor of Aquitaine, William X Duke of Aquitaine has child Eleanor of Aquitaine
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Ferdinand Philippe Duke of Orl ans, Ferdinand Philippe Duke of Orl ans has child Prince Philippe Count of Paris
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Louis I of Anjou has successor Louis II of Anjou, Louis I of Anjou has child Louis II of Anjou
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Casimir IV Jagiellon, Casimir IV Jagiellon has child Barbara Jagiellon
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Adolph I Duke of Cleves, Adolph I Duke of Cleves has child Marie of Cleves Duchess of Orl ans
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Francesco I de Medici Grand Duke of Tuscany, Francesco I de Medici Grand Duke of Tuscany has child Marie de Medici
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Louis II of Anjou, Louis II of Anjou has child Marie of Anjou
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Philip the Bold has successor John the Fearless, Philip the Bold has child John the Fearless
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Boso Margrave of Tuscany, Boso Margrave of Tuscany has child Willa of Tuscany
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Rudolph II of Burgundy, Rudolph II of Burgundy has child Conrad I of Burgundy
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Adolphus Frederick II Duke of Mecklenburg Strelitz, Adolphus Frederick II Duke of Mecklenburg Strelitz has child Duke Charles Louis Frederick of Mecklenburg
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Hugh of Italy has successor Lothair II of Italy, Hugh of Italy has child Lothair II of Italy
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+John King of England has successor Henry III of England, John King of England has child Henry III of England
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Charles II Duke of Lorraine, Charles II Duke of Lorraine has child Isabella Duchess of Lorraine
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Dirk I Count of Holland has successor Dirk II Count of Holland, Dirk I Count of Holland has child Dirk II Count of Holland
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Victor Emmanuel I of Sardinia, Victor Emmanuel I of Sardinia has child Maria Beatrice of Savoy
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Alfred the Great has successor Edward the Elder, Alfred the Great has child Edward the Elder
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Geoffrey II Count of G tinais, Geoffrey II Count of G tinais has child Fulk IV Count of Anjou
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Louis Bonaparte, Louis Bonaparte has child Napoleon III
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Albert IV Count of Habsburg, Albert IV Count of Habsburg has child Rudolf I of Germany
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Francis II Duke of Lorraine, Francis II Duke of Lorraine has child Nicholas Francis Duke of Lorraine
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Henry II of Castile has successor John I of Castile, Henry II of Castile has child John I of Castile
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Hugh II Duke of Burgundy, Hugh II Duke of Burgundy has child Odo II Duke of Burgundy
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Henry III of England, Henry III of England has child Edward I of England
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Charles V Duke of Lorraine, Charles V Duke of Lorraine has child Leopold Duke of Lorraine
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Berthold Duke of Merania, Berthold Duke of Merania has child Agnes of Merania
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Edward I of England, Edward I of England has child Edward II of England
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Louis IV of France, Louis IV of France has child Lothair of France
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Louis IV of France, Louis IV of France has child Matilda of France
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Ferdinand I of the Two Sicilies, Ferdinand I of the Two Sicilies has child Maria Theresa of Naples and Sicily
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Charles Emmanuel III of Sardinia has successor Victor Amadeus III of Sardinia, Charles Emmanuel III of Sardinia has child Victor Amadeus III of Sardinia
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Hugh Capet, Hugh Capet has child Robert II of France
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Philip the Good, Philip the Good has child Charles the Bold
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+James II of Scotland, James II of Scotland has child James III of Scotland
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Bartholomew de L Isle Bouchard, Bartholomew de L Isle Bouchard has child Dangereuse de l Isle Bouchard
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Louis the Pious has successor Louis the German, Louis the Pious has child Louis the German
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Louis the Pious, Louis the Pious has child Charles the Bald
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+George I of Great Britain has successor George II of Great Britain, George I of Great Britain has child George II of Great Britain
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Louis XII, Louis XII has child Claude of France
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+ thelwulf King of Wessex,  thelwulf King of Wessex has child Alfred the Great
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Robert I Count of Dreux has successor Robert II Count of Dreux, Robert I Count of Dreux has child Robert II Count of Dreux
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Malcolm III of Scotland, Malcolm III of Scotland has child Matilda of Scotland
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Ercole III d Este Duke of Modena, Ercole III d Este Duke of Modena has child Maria Beatrice d Este Duchess of Massa
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+George Duke of Saxony, George Duke of Saxony has child Christine of Saxony
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Matthias II Duke of Lorraine, Matthias II Duke of Lorraine has child Frederick III Duke of Lorraine
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Ealhmund of Kent, Ealhmund of Kent has child Ecgberht King of Wessex
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Charles Duke of Orl ans has successor Louis XII, Charles Duke of Orl ans has child Louis XII
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Charles I Gonzaga Duke of Mantua, Charles I Gonzaga Duke of Mantua has child Anne Gonzaga
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Charles Prince of Anhalt Zerbst, Charles Prince of Anhalt Zerbst has child Princess Magdalena Augusta of Anhalt Zerbst
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Philip II of France has successor Louis VIII of France, Philip II of France has child Louis VIII of France
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Henry V of England has successor Henry VI of England, Henry V of England has child Henry VI of England
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Henry X Duke of Bavaria, Henry X Duke of Bavaria has child Henry the Lion
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+John I of Portugal has successor Edward King of Portugal, John I of Portugal has child Edward King of Portugal
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Henry IV of England has successor Henry V of England, Henry IV of England has child Henry V of England
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Charles III of Spain, Charles III of Spain has child Ferdinand I of the Two Sicilies
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Charles III Duke of Savoy, Charles III Duke of Savoy has child Emmanuel Philibert Duke of Savoy
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+John George I Elector of Saxony, John George I Elector of Saxony has child Sophia Eleonore of Saxony
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Sancho I of Portugal has successor Afonso II of Portugal, Sancho I of Portugal has child Afonso II of Portugal
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: yes
+
+Henry I of England, Henry I of England has child Empress Matilda
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Afonso IV of Portugal, Afonso IV of Portugal has child Peter I of Portugal
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Albert I Duke of Bavaria, Albert I Duke of Bavaria has child Margaret of Bavaria
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+Henry III Duke of Brabant, Henry III Duke of Brabant has child Marie of Brabant Queen of France
+The path is classified as NEGATIVE (PCA conf. 0.1969 < 0.5)
+Answer: no
+
+
+Rule Metrics:
+	PCA Confidence: 0.1969
+	Standard Confidence: 0.0842
+	Rule Classification: NEGATIVE (PCA conf. 0.1969 < 0.5)
+	Positive Examples: 127.0000
+	Head Coverage: 0.3588

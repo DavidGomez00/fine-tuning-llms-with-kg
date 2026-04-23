@@ -1,28 +1,20 @@
+"""File for managing KG related functions."""
+# TODO: fix docstrings
+
+import logging
 from collections import defaultdict
 from pathlib import Path
 
 from rdflib import Graph
+
+logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
 # Load KG from files
 # ---------------------------------------------------------------------------
 
 
-def load_kg_to_rdflib(kg_file: Path) -> Graph:
-    """Load a Graph to RDFlib from a file.
-
-    Args:
-        kg_file: Path to the KG file.
-
-    Returns:
-        The Graph object.
-    """
-    format = "nt" if kg_file.name.endswith(".nt") else "turtle"
-
-    return Graph().parse(kg_file, format=format)
-
-
-def load_knowledge_graph(
+def deprecated_load_knowledge_graph(
     file_path: str | Path,
 ) -> tuple[dict[str, dict[str, int]], list[str]]:
     """Loads a Knowledge Graph from a specifically formatted text file.
@@ -52,9 +44,9 @@ def load_knowledge_graph(
         try:
             _ = int(f.readline().strip())
         except ValueError:
-            # TODO log warning
-            print(
-                f"Warning: First line of {file_path} is not a valid integer. Proceeding anywat."
+            logger.warning(
+                "First line of '%s' is not a valid integer. Proceeding anyway.",
+                file_path.name,
             )
 
         for line_num, line in enumerate(f, start=2):
@@ -71,18 +63,27 @@ def load_knowledge_graph(
                 try:
                     graph[node1][node2] = int(relation_str)
                 except ValueError:
-                    # TODO: Logger implementation.
-                    print(
-                        f"Error: Invalid relation ID in line {line_num}: '{relation_str}' is not an integer."
+                    logger.warning(
+                        "Invalid ID in line %d: '%s' is not an integer. Skipping."
                     )
             else:
-                # TODO: impl logger
-                print(
-                    f"Warning: Malformed triple on line {line_num}. Expected 3 parts, got {len(parts)}."
+                logger.warning(
+                    "Malformed triple on line %d. Expected 3 parts, got %d.",
+                    line_num,
+                    len(parts),
                 )
+
     # Convert the defaultdict back to a standard dict before returning
     # to prevent accidental empty key creations later.
     return dict(graph), list(nodes)
+
+
+def load_knowledge_graph(kg_file: Path) -> Graph:
+    """Loads a knowledge graph from file."""
+    format = "nt" if kg_file.name.endswith(".nt") else "turtle"
+    graph = Graph().parse(kg_file, format=format)
+    logger.debug("Loaded %s knowledge grapth file.", kg_file.name)
+    return graph
 
 
 def parse_kg(input_file: Path, output_file: Path) -> int:
@@ -92,9 +93,8 @@ def parse_kg(input_file: Path, output_file: Path) -> int:
     result is saved in `output_file`.
 
     Args:
-        input_file (Union[str, Path]): Absoulute or relative path to the document to parse.
-        output_file (Union[str, Path]): Absolute or relative path to the file where the
-            parsed document is saved.
+        input_file: Path to the document to parse.
+        output_file: Path to the file where the document is saved.
 
     Returns:
         int: The number of valid triples successfully processed and written.
@@ -161,30 +161,35 @@ def create_relation_mapping(kg_file_path: Path, relations_file_path: Path) -> No
         try:
             expected_triples = int(first_line)
         except ValueError:
-            raise ValueError(
-                f"The first line of {kg_file_path} must be the integer count of triples."
+            logger.error(
+                "The first line of %s must be the integer count of triples.",
+                kg_file_path.name,
             )
+            raise
 
         for line_num, line in enumerate(f, start=2):
             parts = line.strip().split()
             if len(parts) == 3:
                 relations.add(parts[2])
             elif parts:
-                # TODO: Implement logger
-                print(
-                    f"Warning: Malformed triple at line {line_num} in {kg_file_path}: {line.strip()}"
+                logger.warning(
+                    "Malformed triple at line %d in %s: %s",
+                    line_num,
+                    kg_file_path,
+                    line.strip(),
                 )
 
     # Save the triples
     relations_file_path.parent.mkdir(parents=True, exist_ok=True)
     with open(relations_file_path, "w", encoding="utf-8") as f:
         f.write(f"{len(relations)}\n")
-        for rel_id, rel in enumerate(sorted(relations)):
+        for _, rel in enumerate(sorted(relations)):
             f.write(f"relation_{rel}\t{rel}\n")
 
-    # TODO: Implement logger
-    print(f"Processed {expected_triples} expected triples.")
-    print(f"Found and saved {len(relations)} unique relations to {relations_file_path}")
+    logger.info("Processed %d expected triples.", expected_triples)
+    logger.info(
+        "Found and saved %d unique relations to %s", len(relations), relations_file_path
+    )
 
 
 def load_id2relation_mapping(file_path: str | Path) -> dict[int, str]:
@@ -221,14 +226,15 @@ def load_id2relation_mapping(file_path: str | Path) -> dict[int, str]:
                 try:
                     id2relation[int(relation_id)] = relation
                 except ValueError:
-                    # TODO: logger
-                    print(
-                        f"Warning: Line {line_num}: Could not parse ID '{relation_id}' as integer. Skipping."
+                    logger.warning(
+                        "Line %d: Could not parse ID '%s' as integer. Skipping.",
+                        line_num,
+                        relation_id,
                     )
             else:
-                # TODO: Logger
-                print(
-                    f"Warning: Line {line_num}: Invalid formal, expected 2 separated parts. Skipping."
+                logger.warning(
+                    "Line %d: Invalid format, expected 2 separated parts. Skipping.",
+                    line_num,
                 )
 
     return id2relation

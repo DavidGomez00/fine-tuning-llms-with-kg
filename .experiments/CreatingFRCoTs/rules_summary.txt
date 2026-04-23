@@ -1,0 +1,13 @@
+FRENCH_ROYALTY CoT2 RULES — SUMMARY
+	Total Rules        : 312
+	Output Directory   : /home/master/GitHub/fine-tuning-llms-with-kg/.experiments/CreatingFRCoTs
+	KG Triples         : 12265
+	PCA Threshold      : 0.5
+	Namespace          : http://FrenchRoaylty.org/
+	Namespace Prefix   : fr
+
+	Positive (>= 0.5)  : 155
+	Negative (<  0.5)  : 157
+	Missing PCA        : 0
+
+	Total time: 1.81 s

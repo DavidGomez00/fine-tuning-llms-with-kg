@@ -4,17 +4,19 @@
 # TODO: Are there any expected formats or standards for the rules in the .csv files?
 # TODO: Docstrings
 
+import logging
 import random
 import re
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
+from typing import Any, Protocol
 
 import pandas as pd
 import rdflib
 
-from config import RunConfig
-from sparql import build_sparql_query
+from config import KGConfig, RunConfig
+
+logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
 # Dataclasses
@@ -39,55 +41,69 @@ class Atom:
     obj: str
 
     def __str__(self) -> str:
-        """Returns a string of the atom as '(subject predicate object)'."""
-        return f"({self.subject} {self.predicate} {self.obj})"
+        """Returns a string of the atom as 'subject predicate object' string."""
+        return f"{self.subject} {self.predicate} {self.obj}"
 
-    def to_natural_language(self) -> str:
-        """Returns a string with a natural language description of the atom."""
-        nl_pred = self.predicate_to_nl()
-        nl_obj = self.entity_to_nl()
-        return f"{nl_pred} {nl_obj}"
+    def __lt__(self, other: "Atom") -> bool:
+        """Enables native sorting of Atoms by their string representation."""
+        if not isinstance(other, Atom):
+            return NotImplemented
+        return str(self) < str(other)
 
-    def predicate_to_nl(self) -> str:
+    def get_predicate_desc(self) -> str:
         """Return the camelCase predicate to spaced lower-case natural language."""
         nl_pred = re.sub(r"([A-Z])", r" \1", self.predicate).strip().lower()
         if nl_pred.startswith("has "):
             nl_pred = nl_pred[4:]
         return nl_pred
 
-    def entity_to_nl(self) -> str:
+    def get_obj_desc(self) -> str:
         """Return "-" spaced entity to " " spaced natural language."""
         return self.obj.replace("_", " ")
+
+    def get_description(self) -> str:
+        """Returns a natural language description of the atom."""
+        nl_pred = self.get_predicate_desc()
+        nl_obj = self.get_obj_desc()
+        return f"{nl_pred} {nl_obj}"
 
 
 @dataclass(frozen=True, slots=True)
 class RuleSignature:
-    """Signature of a rule.
-
-    Represents the rule as a body -> head.
-
-    Attributes:
-        body: The body of a rule is a set of atoms.
-        head: The head of a rule is a single atom.
-    """
+    """Signature of a Horn Rule."""
 
     body: frozenset[Atom]
     head: Atom
 
     def __str__(self) -> str:
-        """Returns the rule signature as a string '(atom), ... ,(atom) -> head'."""
-        body_str = " AND ".join(f"{atom}" for atom in self.body)
-        return f"{body_str} -> {str(self.head)}"
+        """Returns the formal representation of the rule as 'atom AND ... -> head'."""
+        body_desc = " AND ".join(f"{atom}" for atom in sorted(self.body))
+        return f"{body_desc} -> {self.head}"
 
-    def to_natural_language(self) -> str:
-        """Returns a string with a natural language description of the rule."""
-        nl_body = " AND ".join(b.to_natural_language() for b in self.body)
-        nl_head = self.head.to_natural_language()
-        rule_desc = (
-            f"If {nl_body}, then {nl_head}.\n\n"
-            f"Formal Rule:\nHead: {self.head}\nBody: {self.body}"
+    def get_description(self) -> str:
+        """Returns a natural language description of the rule."""
+        sorted_body = sorted(self.body)
+
+        body_desc = " AND ".join(atom.get_description() for atom in sorted_body)
+        head_desc = self.head.get_description()
+
+        body_formal = " AND ".join(f"{atom}" for atom in sorted_body)
+
+        return (
+            f"If {body_desc}, then {head_desc}.\n\n"
+            f"Formal Rule:\n\tHead: {self.head}\n\tBody: {body_formal}"
         )
-        return rule_desc
+
+    def get_variables(self) -> str:
+        """Return all the variables present in the rule as 'var ... var'."""
+        all_atoms = {self.head} | self.body
+
+        return " ".join(
+            term
+            for atom in sorted(all_atoms)
+            for term in (atom.subject, atom.obj)
+            if term.startswith("?")
+        )
 
 
 @dataclass(slots=True)
@@ -104,10 +120,10 @@ class HornRule:
 
     rule_id: str
     signature: RuleSignature
-    std_confidence: float = 0.0
-    pca_confidence: float = 0.0
     support: int = 0
     head_coverage: float = 0.0
+    std_confidence: float = 0.0
+    pca_confidence: float | None = None
     classification: str = "UNKNOWN"
 
     @property
@@ -139,17 +155,7 @@ ATOM_PATTERN = re.compile(r"(\?\w+)\s+(\S+)\s+(\S+)")
 
 
 def parse_body(body_str: str) -> frozenset[Atom]:
-    """Parse body string containing one or more atoms.
-
-    # TODO: Define how body strings are expected.
-
-    Args:
-        body_str: String representing one or more atoms separated by whitespace.
-
-    Returns:
-        A frozenset of parsed Atom objects. Returns an empty frozenset
-        if the input string is empty or falsy.
-    """
+    """Parse body string containing one or more atoms."""
     if not body_str:
         return frozenset()
 
@@ -160,26 +166,12 @@ def parse_body(body_str: str) -> frozenset[Atom]:
 
 
 def parse_head(head_str: str) -> Atom:
-    """Parse head string containing one atom.
-
-    # TODO: Define how body strings are expected.
-
-    Args:
-        head_str: String representing the head atom.
-
-    Returns:
-        The parsed Atom object, or None if the string does not contain
-        enough valid components.
-
-    Raises:
-        ValueError: If the string format is not valid.
-    """
+    """Parse a head string into an Atom based on the first three whitespace-separated
+    components."""
     if not head_str:
         raise ValueError("Head string format is not valid: Empty string.")
 
-    parts = head_str.strip().split()
-
-    # TODO: Consider if rules should have strictly 3 components.
+    parts = head_str.split()
     if len(parts) < 3:
         raise ValueError("Head string format is not valid: Too few components.")
 
@@ -229,6 +221,65 @@ def parse_rule_csv(rule_csv: Path) -> pd.DataFrame:
     return clean_df
 
 
+# ---------------------------------------------------------------------------
+# Build SPARQL query from rules
+# ---------------------------------------------------------------------------
+
+
+def build_sparql_query(
+    rule_signature: RuleSignature, ns_prefix: str, namespace: str
+) -> str:
+    """Builds a SPARQL SELECT query from a rule signature.
+
+    Body atoms map to required triple patterns.
+    The head atom maps to an OPTIONAL triple pattern to determine a boolean answer.
+
+    Args:
+        rule: The signature containing the body and head atoms.
+        ns_prefix: The short prefix alias for the RDF namespace (e.g., 'ex').
+        namespace: The full URI string of the RDF namespace.
+
+    Returns:
+        A formatted SPARQL SELECT query string.
+    """
+
+    def format_term(term: str) -> str:
+        """Format a term: variables stay as-is, constants get the namespace prefix"""
+        return term if term.startswith("?") else f"{ns_prefix}:{term}"
+
+    def format_atom(atom: Atom) -> str:
+        """Format an entire atom into a SPARQL triple pattern."""
+        # NOTE: This assumes predicates NEVER contain variables
+        subject = format_term(atom.subject)
+        obj = format_term(atom.obj)
+        return f"\t{subject} {ns_prefix}:{atom.predicate} {obj} ."
+
+    select_vars = rule_signature.get_variables()
+
+    def term(t: str) -> str:
+        """Format a term for SPARQL: variable stays as-is, constants get prefix."""
+        return t if t.startswith("?") else f"{ns_prefix}:{t}"
+
+    body_lines = "\n".join(format_atom(atom) for atom in rule_signature.body)
+    head_line = f"{format_atom(rule_signature.head)}"
+
+    return (
+        f"PREFIX {ns_prefix}: <{namespace}>\n"
+        f"SELECT DISTINCT {select_vars} ?_head_exists WHERE {{\n"
+        f"\t{body_lines}\n"
+        f"\tOPTIONAL {{\n"
+        f"\t{head_line}\n"
+        f"\t\tBIND(true AS ?_head_exists)\n"
+        f"\t}}\n"
+        f"}}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# Transform rules to natural language
+# ---------------------------------------------------------------------------
+
+
 def _get_local_name(uri: str) -> str:
     """Extract the name of a resource from a URI string.
 
@@ -238,180 +289,145 @@ def _get_local_name(uri: str) -> str:
     """
     if "#" in uri:
         return uri.rpartition("#")[-1]
-    return uri.rpartition("/")[-1]
+    return uri.rpartition("/")[-1].replace("_", " ")
 
 
-def results_to_natural_language(
-    config: RunConfig,
-    results: rdflib.query.Result,
+def _build_grounding_text(
+    result: rdflib.query.Result, rule: HornRule, pca_threshold: str, operator: str
+) -> str:
+    """Helper function to generate natural language descriptions for each grounding from
+    a retrieved query result."""
+
+    pca_text = (
+        f"The path is classified as {rule.classification} "
+        f"(PCA conf. {rule.pca_confidence:.4f} {operator} {pca_threshold})"
+    )
+
+    instances: list[str] = []
+    for row in result:
+        row_dict = row.asdict()
+
+        # Varaible ?_head_exists only has values bound if a head is found, else is None
+        answer = "yes" if row_dict.get("_head_exists") is not None else "no"
+
+        # Head: Show full head if exists, else show just the subject value
+        subject_key = rule.signature.head.subject.removeprefix("?")
+        subject = _get_local_name(row_dict.get(subject_key))
+        head_text = f"{subject}"
+        if answer == "yes":
+            obj_key = rule.signature.head.obj.removeprefix("?")
+            obj = _get_local_name(
+                row_dict.get(obj_key, rule.signature.head.get_obj_desc())
+            )
+            predicate = _get_local_name(rule.signature.head.get_predicate_desc())
+            head_text = f"{subject} has {predicate} {obj}"
+
+        # Body: rendered with their correct bound subject
+        body_facts_str: list[str] = []
+        for atom in rule.signature.body:
+            subject_key = atom.subject.removeprefix("?")
+            obj_key = atom.obj.removeprefix("?")
+            subject = _get_local_name(row_dict.get(subject_key, subject_key))
+            obj = _get_local_name(row_dict.get(obj_key, obj_key))
+            body_facts_str.append(f"{subject} has {atom.predicate} {obj}")
+
+        facts_str = "\n".join(fact_str for fact_str in body_facts_str)
+        row_text = f"{head_text}, {facts_str}\n{pca_text}\nAnswer: {answer}\n"
+        instances.append(row_text)
+
+    return "\n".join(instance_str for instance_str in instances)
+
+
+def result_to_natural_language(
+    kg_config: KGConfig,
+    result: rdflib.query.Result,
     rule: HornRule,
 ) -> str:
-    """Generate a description in natural language for a rule and all of its groundings.
+    """Generate natural language description for a rule and its groundings from a query
+    result."""
 
-    Args:
-        rules_df: Pandas dataframe with the rule info.
-        rule_idx: Index of the rule.
+    operator_mapping = {"POSITIVE": ">=", "NEGATIVE": "<", "UNKNOWN": "?"}
+    operator = operator_mapping.get(rule.classification, "?")
 
-    Returns:
-        A string ?
-    """
-
-    if rule.classification == "POSITIVE":
-        operator = ">="
-    elif rule.classification == "NEGATIVE":
-        operator = "<"
-    else:
-        operator = "?"
-
-    rule_metrics_text = (
-        f"\nRule Statistics:\n- PCA Confidence: {rule.pca_confidence:.4f}\n"
-        f"- Rule Classification: {rule.classification}"
-        f"(PCA Confidence {rule.pca_confidence:.4f} {operator})"
-        f"threshold {config.rules.pca_threshold})\n"
-        f"- Standard Confidence: {rule.std_confidence:.4f}\n"
-        f"- Positive Examples: {rule.support:.4f}\n"
-        f"- Head Coverage: {rule.head_coverage:.4f}\n"
+    # Description header (rule information)
+    desc_header = (
+        f"{rule.signature.get_description()}\n\n"
+        f"Real Instances from Knowledge Graph ({len(result)} found):"
     )
 
-    # Header: Rule information
-    rule_text = (
-        f"{rule.signature.to_natural_language()}\n\n"
-        f"Real Instances from Knowledge Graph ({len(results)} found):\n\n"
-    )
-
-    # Body: Rule groundings information
-    if len(results) == 0:
-        groundings_text = "No matching instances found in the Knowledge Graph.\n"
+    # Description body (rule groundings)
+    if len(result) == 0:
+        desc_body = "No matching instances found in the Knowledge Graph."
     else:
-        pca_text = (
-            f"The path is classified as {rule.classification} "
-            f"(PCA Confidence {rule.pca_confidence:.4f} {operator} "
-            f"threshold {config.rules.pca_threshold})"
+        desc_body = _build_grounding_text(
+            result=result,
+            rule=rule,
+            pca_threshold=kg_config.pca_threshold,
+            operator=operator,
         )
-        instances: list[str] = []
-        # Check if the head exists in the answers
-        for row in results:
-            row_dict = row.asdict()
 
-            # Get the answer
-            answer = "yes" if row_dict.get("_head_exists") == "true" else "no"
+    # Desciption footer
+    _footer_title = "Rule Metrics:"
+    _rule_classification_text = (
+        f"Rule Classification: {rule.classification} "
+        f"(PCA conf. {rule.pca_confidence:.4f} {operator} {kg_config.pca_threshold})"
+    )
+    desc_footer = (
+        f"{_footer_title}\n"
+        f"\tPCA Confidence: {rule.pca_confidence:.4f}\n"
+        f"\tStandard Confidence: {rule.std_confidence:.4f}\n"
+        f"\t{_rule_classification_text}\n"
+        f"\tPositive Examples: {rule.support:.4f}\n"
+        f"\tHead Coverage: {rule.head_coverage:.4f}"
+    )
 
-            # Head: Show full head if exists, else show just the variable
-            head_string = (
-                f"{row_dict.get(rule.signature.head.subject)} has "
-                f"{rule.signature.head.predicate_to_nl()}"
-                f"{rule.signature.head.entity_to_nl()}"
-                if answer == "yes"
-                else f"{row_dict.get(rule.signature.head.subject)}"
-            )
-
-            # Body: rendered with their correct bound subject
-            body_facts_str: list[str] = []
-            for atom in rule.signature.body:
-                subject_str = (
-                    row_dict.get(atom.subject.lstrip("?"), "")
-                    if atom.subject.startswith("?")
-                    else atom.subject
-                )
-                obj_str = (
-                    row_dict.get(atom.obj.lstrip("?"), "")
-                    if atom.obj.startswith("?")
-                    else atom.obj
-                )
-                body_facts_str.append(f"{subject_str} has {atom.predicate} {obj_str}")
-
-            facts_str = "\n".join(fact_str for fact_str in body_facts_str)
-            row_text = f"{head_string}\n{facts_str} {pca_text} Answer: {answer}"
-            instances.append(row_text)
-
-        groundings_text = "\n".join(instance_str for instance_str in instances)
-
-    final_text = f"{rule_text}{groundings_text}{rule_metrics_text}"
+    final_text = f"{desc_header}\n\n{desc_body}\n\n{desc_footer}"
 
     return final_text
 
 
-def convert_all_rules_to_natural_language(
-    config: RunConfig, graph: rdflib.Graph, rules_df: pd.DataFrame
-) -> None:
-    """Creates a natural language description of all rules and groundings for each rule
-    in the rules_csv file and stores them in separate files.
+class RuleRow(Protocol):
+    """Protocol defining the expected structure of a rules DataFrame row."""
 
-    TODO: Complete docs.
+    Head: Any
+    Body: Any
+    Std_Confidence: Any
+    Positive_Examples: Any
+    Head_Coverage: Any
+
+
+def parse_horn_rule(row: RuleRow, rule_id: str, pca_threshold: float) -> HornRule:
+    """Extracts a HornRule object from a pandas DataFrame row.
+
+    Args:
+        row: A named tuple representing a row form the rules DataFrame.
+        rule_id: The assigned string identifier for the rule.
+        pca_threshold: The threshold for clarifying a rule as POSITIVE.
+
+    Returns:
+        A populated HornRule instance.
     """
-    for rule_idx, row in enumerate(rules_df.itertuples(index=False)):
-        # Build a HornRule object
-        rule_id = str(rule_idx + 1)
 
-        rule_signature = RuleSignature(
+    pca_raw = getattr(row, "PCA_Confidence", None)
+    pca_conf: float | None = None if pd.isna(pca_raw) else float(pca_raw)
+
+    if pca_conf is None:
+        classification = "UNKNOWN"
+    else:
+        classification = "POSITIVE" if pca_conf >= pca_threshold else "NEGATIVE"
+
+    return HornRule(
+        rule_id=rule_id,
+        signature=RuleSignature(
             head=parse_head(str(row.Head)),
             body=parse_body(str(row.Body)),
-        )
-
-        std_confidence = float(rules_df["Std_Confidence"][rule_idx])
-
-        pca_confidence = rules_df["pca_confidence"]
-        if pca_confidence is None:
-            pca_confidence = "Not available"
-            classification = "UNKNOWN"
-        elif float(pca_confidence) >= config.rules.pca_threshold:
-            classification = "POSITIVE"
-        else:
-            classification = "NEGATIVE"
-
-        support = int(rules_df["Positive Examples"][rule_idx])
-
-        head_coverage = float(rules_df["Head Coverage"][rule_idx])
-
-        rule = HornRule(
-            rule_id=rule_id,
-            signature=rule_signature,
-            std_confidence=std_confidence,
-            pca_confidence=float(pca_confidence),
-            support=support,
-            head_coverage=head_coverage,
-            classification=classification,
-        )
-
-        # Retrieve groundings of the HornRule from the KG
-        query_str = build_sparql_query(
-            rule, config.kg.namespace_prefix, config.kg.namespace
-        )
-        results = graph.query(query_str)
-
-        # Generate a rule + groundings natural language description
-        natural_language_results: str = results_to_natural_language(
-            config=config, results=results, rule=rule
-        )
-
-        # Save the rule + groundings natural language description as a file
-        fpath = config.output_dir / f"rule_{rule_idx + 1}.txt"
-        fpath.write_text(natural_language_results, encoding="utf-8")
-
-
-def create_summary(
-    config: RunConfig, graph: rdflib.Graph, rules_df: pd.DataFrame
-) -> None:
-    """TODO: work on docs"""
-    summary_path = config.data.output_dir / "rules_summary.txt"
-    with open(summary_path, "w", encoding="utf-8") as f:
-        f.write("=" * 80 + "\n")
-        f.write(f"{config.kg.kg_name.upper()} CoT2 RULES — SUMMARY\n")
-        f.write("=" * 80 + "\n\n")
-        f.write(f"Total Rules        : {len(rules_df)}\n")
-        f.write(f"Output Directory   : {config.data.output_dir.absolute()}\n")
-        f.write(f"KG Triples         : {len(graph)}\n")
-        f.write(f"PCA Threshold      : {config.rules.pca_threshold}\n")
-        f.write(f"Namespace          : {config.kg.namespace}\n")
-        f.write(f"Namespace Prefix   : {config.kg.namespace_prefix}\n\n")
-        valid_pca = rules_df["PCA Confidence"].dropna()
-        pos = (valid_pca >= config.rules.pca_threshold).sum()
-        f.write(f"  Positive (>= {config.rules.pca_threshold}) : {pos}\n")
-        neg = (valid_pca < config.rules.pca_threshold).sum()
-        nan = rules_df["PCA Confidence"].isna().sum()
-        f.write(f"  Negative (<  {config.rules.pca_threshold}) : {neg}\n")
-        f.write(f"  Missing PCA                   : {nan}\n")
-    print(f"Summary saved to: {summary_path}")
+        ),
+        std_confidence=float(row.Std_Confidence),
+        pca_confidence=pca_conf if pca_conf is not None else None,
+        support=int(row.Positive_Examples),
+        head_coverage=float(row.Head_Coverage),
+        classification=classification,
+    )
 
 
 def load_rules_from_path(rules_directory: Path) -> list[RuleSignature]:
@@ -435,14 +451,11 @@ def load_rules_from_path(rules_directory: Path) -> list[RuleSignature]:
             rules.append(rule_info)
 
         except ValueError as e:
-            # TODO: implement logging
-            print(f"Warning: Skipping malformed file {file_path.name}: {e}")
+            logger.warning("Warning: Skipping malformed file %s: %s", file_path.name, e)
 
         except FileNotFoundError as e:
-            # TODO: Implement logging
-            print(f"Cannot find file {file_path.name}: {e}")
+            logger.error("Cannot find file %s: %s", file_path.name, e)
 
-    # TODO: Logger maybe
     return rules
 
 
@@ -591,7 +604,11 @@ def generate_cots(
             }
         )
 
-    print(
-        f"Generated {len(data)} samples: {neg_count} negative and {pos_count} positive."
-    )  # TODO: add logger
+    logger.info(
+        "Generated %d samples: %d negative and %d positive.",
+        len(data),
+        neg_count,
+        pos_count,
+    )
+
     return pd.DataFrame(data)

@@ -1,6 +1,8 @@
 """Configuration classes for the experiment and preprocessing settings."""
 
 # TODO: Arreglar documentación
+# TODO: Is DirConfig.rules_dir used?
+# TODO: Mix rules and KG?
 
 import json
 import logging
@@ -11,16 +13,36 @@ from typing import Any, Literal
 import torch
 from typing_extensions import Self
 
+logger = logging.getLogger(__name__)
+
 
 @dataclass
 class FineTuningConfig:
     """Configuration for the training loop and hyperparameters."""
+
+    # Fine-tuning experiment behavior
+    skip_base_eval: bool = False
+    skip_baseline: bool = False
+    save_predictions: bool = True
+    generate_plots: bool = True
+    generate_table: bool = True
 
     # Generated outputs
     resuts_json_file: str = "results.json"
     summary_csv_file: str = "summary.csv"
     summary_plot_file: str = "experiment_plot.png"
     summary_table_file: str = "experiment_table.png"
+
+    # Dataset generation for fine-tuning
+    generate_datasets: bool = False
+    train_samples: int = 2000
+    eval_samples: int = 2000
+    test_samples: int = 1000
+
+    # Base model configuration
+    model_name: str = "meta-llama/Llama-3.2-1B-Instruct"
+    model_alias: str = "LLaMA-3.2-1B"
+    context_window: int = 512
 
     # Training loop parameters
     per_device_batch_size: int = 1
@@ -32,24 +54,6 @@ class FineTuningConfig:
     gradient_accumulation_steps: int = 4
     logging_steps: int = 50
     save_steps: int = 100
-
-    # Base model configuration
-    model_name: str = "meta-llama/Llama-3.2-1B-Instruct"
-    model_alias: str = "LLaMA-3.2-1B"
-    context_window: int = 512
-
-    # Generate datasets for fine-tuning
-    generate_datasets: bool = False
-    train_samples: int = 2000
-    eval_samples: int = 2000
-    test_samples: int = 1000
-
-    # Fine-tuning experiment behavior
-    skip_base_eval: bool = False
-    skip_baseline: bool = False
-    save_predictions: bool = True
-    generate_plots: bool = True
-    generate_table: bool = True
 
     # LoRA Config
     lora_r: int = 16
@@ -76,9 +80,28 @@ class CoTGenerationConfig:
 class DirConfig:
     """Configuration for base directories and output files."""
 
-    input_dir: Path = Path("/.data/")
-    output_dir: Path = Path("/.experiments/")
-    rules_dir: Path = Path("rules")  # TODO: determine if this is relevant
+    input_dir: Path = Path(".data/")
+    output_dir: Path = Path(".experiments/")
+    rules_dir: Path = input_dir / "rules"
+
+    def __post_init__(self) -> None:
+        self.input_dir = Path(self.input_dir)
+        self.output_dir = Path(self.output_dir)
+        self.rules_dir = Path(self.rules_dir)
+
+        self._validate_path(self.input_dir, "input_dir")
+        self.output_dir.mkdir(parents=True, exist_ok=True)
+
+    @staticmethod
+    def _validate_path(path: Path, field_name: str) -> None:
+        if not path.exists():
+            raise FileNotFoundError(
+                f"Configuration Error: The {field_name} does not exist at {path}"
+            )
+        if not path.is_dir():
+            raise NotADirectoryError(
+                f"Configuration Error: The {field_name} at {path} is not a directory."
+            )
 
 
 @dataclass
@@ -96,7 +119,7 @@ class HardwareConfig:
     device: Literal["gpu", "cpu"] = field(
         default_factory=lambda: "gpu" if torch.cuda.is_available() else "cpu"
     )
-    precision: torch.dtype = torch.float16
+    precision: str = "float16"
     max_memory_mb: int = 40960
 
 
@@ -110,15 +133,10 @@ class KGConfig:
     relation_file: str = "relation2id"
     namespace: str = "example.org"
     namespace_prefix: str = "ex"
-
-
-@dataclass
-class RulesConfig:
-    """Configuration for rule files and paths."""
-
     rules_csv: Path = Path("rules.csv")
     pca_threshold: float = 0.5
     max_rules: int | None = None
+    rule_summary_file: str = "rules_summary.txt"
 
 
 @dataclass
@@ -129,7 +147,6 @@ class RunConfig:
     cot_generation: CoTGenerationConfig | None
     data: DirConfig = field(default_factory=DirConfig)
     hardware: HardwareConfig = field(default_factory=HardwareConfig)
-    rules: RulesConfig = field(default_factory=RulesConfig)
     kg: KGConfig = field(default_factory=KGConfig)
 
     @classmethod
@@ -147,56 +164,45 @@ class RunConfig:
             logging.error(f"Invalid JSON format in {path_obj.name}: {e}")
             raise
 
-        _precision_mapping: dict[str, torch.dtype] = {
-            "float16": torch.float16,
-            "float32": torch.float32,
-            "bfloat16": torch.bfloat16,
-        }
+        def _get_config_section(key: str) -> dict[str, Any]:
+            """Fetches a section from JSON or returns an empty dict with logging."""
+            if key not in data:
+                logger.debug(
+                    "Configuration section '%s' not found; using defaults.", key
+                )
+                return {}
 
-        data_cfg = data.get("data", {})
-        hw_cfg = data.get("hardware", {})
-        rules_cfg = data.get("rules", {})
+            section = data[key]
+            if not isinstance(section, dict):
+                raise ValueError(
+                    f"Expected '{key}' to be a mapping, got {type(section).__name__}"
+                )
+            return section
 
-        # --- Non-optional attributes ---
-        # TODO: error if missing!
-        kg_config = KGConfig(**data["kg"])
-
-        dir_config = DirConfig(
-            input_dir=Path(data_cfg.get("input_dir", "/.data/")),
-            output_dir=Path(data_cfg.get("output_dir", "/.experiments/")),
-            rules_dir=Path(data_cfg.get("rules_dir", "rules")),
-        )
-
-        hardware_config = HardwareConfig(
-            n_gpus=hw_cfg.get("n_gpus", torch.cuda.device_count()),
-            device=hw_cfg.get("device", "gpu" if torch.cuda.is_available() else "cpu"),
-            precision=_precision_mapping.get(
-                hw_cfg.get("precision", ""), torch.float16
-            ),
-            max_memory_mb=hw_cfg.get("max_memory_mb", 40960),
-        )
-
-        rules_config = RulesConfig(
-            rules_csv=Path(rules_cfg.get("rules_csv", "rules.csv")),
-            pca_threshold=rules_cfg.get("pca_threshold", 0.5),
-            max_rules=rules_cfg.get("max_rules"),
-        )
+        kg_config = KGConfig(**_get_config_section("kg"))
+        dir_config = DirConfig(**_get_config_section("data"))
+        hardware_config = HardwareConfig(**_get_config_section("hardware"))
 
         # --- Optional attributes ---
-        cot_config = (
-            CoTGenerationConfig(**data["cot_generation"])
-            if "cot_generation" in data
-            else None
-        )
-        fine_tuning = (
-            FineTuningConfig(**data["fine_tuning"]) if "fine_tuning" in data else None
-        )
+        if "cot_generation" in data:
+            cot_config = CoTGenerationConfig(**data["cot_generation"])
+        else:
+            logger.debug("Optional section 'cot_generation' omitted.")
+            cot_config = None
+
+        if "fine_tuning" in data:
+            fine_tuning = FineTuningConfig(**data["fine_tuning"])
+        else:
+            logger.debug("Optional section 'fine_tuning' omitted.")
+            fine_tuning = None
 
         return cls(
             fine_tuning=fine_tuning,
             cot_generation=cot_config,
             data=dir_config,
             hardware=hardware_config,
-            rules=rules_config,
             kg=kg_config,
         )
+
+    def __post_init__(self) -> None:
+        logger.debug("Confifuration correctly instantiated.")

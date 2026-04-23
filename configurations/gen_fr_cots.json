@@ -8,21 +8,19 @@
     "attempts_multiplier": 10
   },
   "data": {
-    "input_dir": "/.data/",
-    "output_dir": "/.experiments/",
+    "input_dir": ".data/FrenchRoyalty/",
+    "output_dir": ".experiments/CreatingFRCoTs/",
     "rules_dir": "rules"
   },
-  "rules": {
+  "kg": {
+    "kg_name": "french_royalty",
+    "raw_kg_file": "french_royalty.nt",
+    "kg_file": "french_royalty.nt",
+    "relation_file": "relation2id",
+    "namespace": "http://FrenchRoaylty.org/",
+    "namespace_prefix": "fr",
     "rules_csv": "french_royalty.csv",
     "pca_threshold": 0.5,
     "max_rules": null
-  },
-  "kg": {
-    "kg_name": "KG",
-    "raw_kg_file": "train2id.txt",
-    "kg_file": "train2id_processed.txt",
-    "relation_file": "relation2id",
-    "namespace": "example.org",
-    "namespace_prefix": "ex"
   }
 }
