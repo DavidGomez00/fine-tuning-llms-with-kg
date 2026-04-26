@@ -1,16 +1,18 @@
 {
   "cot_generation": {
-    "max_samples": 100,
-    "max_path_length": 10,
-    "include_reasoning": true,
-    "use_rules": true,
-    "max_rules_in_context": 3,
-    "attempts_multiplier": 10
+    "max_rules": 100,
+    "max_samples_per_rule": 100,
+    "rule_summary_file": "rules_summary.txt"
   },
   "data": {
-    "input_dir": ".data/FrenchRoyalty/",
-    "output_dir": ".experiments/CreatingFRCoTs/",
-    "rules_dir": "rules"
+    "input_dir": ".data/",
+    "output_dir": ".experiments/"
+  },
+  "hardware": {
+    "n_gpus": 1,
+    "device": "gpu",
+    "precision": "float16",
+    "max_memory_mb": 40960
   },
   "kg": {
     "kg_name": "French Royalty",

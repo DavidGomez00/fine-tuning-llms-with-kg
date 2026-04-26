@@ -1,0 +1,1447 @@
+If father ?b, then predecessor ?b.
+
+Formal Rule:
+	Head: ?a predecessor ?b
+	Body: ?a father ?b
+
+Real Instances from Knowledge Graph (358 found):
+
+Willa of Tuscany, Willa of Tuscany has father Adelaide of Italy
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Willa of Tuscany has predecessor Gerberga of M con, Willa of Tuscany has father Gerberga of M con
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Philippe I Duke of Orl ans, Philippe I Duke of Orl ans has father Philippe II Duke of Orl ans
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Louis the German has predecessor Louis the Younger, Louis the German has father Louis the Younger
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Louis the German has predecessor Charles the Fat, Louis the German has father Charles the Fat
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Fulk IV Count of Anjou has predecessor Fulk King of Jerusalem, Fulk IV Count of Anjou has father Fulk King of Jerusalem
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Louis I of Spain, Louis I of Spain has father Philip V of Spain
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Ramon Berenguer III Count of Barcelona has predecessor Ramon Berenguer IV Count of Barcelona, Ramon Berenguer III Count of Barcelona has father Ramon Berenguer IV Count of Barcelona
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Ferdinand I Holy Roman Emperor has predecessor Maximilian II Holy Roman Emperor, Ferdinand I Holy Roman Emperor has father Maximilian II Holy Roman Emperor
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Ferdinand I Holy Roman Emperor has predecessor Charles II Archduke of Austria, Ferdinand I Holy Roman Emperor has father Charles II Archduke of Austria
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Ferdinand I Holy Roman Emperor has predecessor Ferdinand II Archduke of Austria, Ferdinand I Holy Roman Emperor has father Ferdinand II Archduke of Austria
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Yaroslav the Wise, Yaroslav the Wise has father Iziaslav I of Kiev
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Conrad I of Germany has predecessor Henry the Fowler, Conrad I of Germany has father Henry the Fowler
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+John I of Castile has predecessor Henry III of Castile, John I of Castile has father Henry III of Castile
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Alfonso IX of Le n has predecessor Ferdinand III of Castile, Alfonso IX of Le n has father Ferdinand III of Castile
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Henry II of France has predecessor Francis II of France, Henry II of France has father Francis II of France
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Theobald II of Navarre has predecessor Henry I of Navarre, Theobald II of Navarre has father Henry I of Navarre
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Alix Duchess of Brittany, Alix Duchess of Brittany has father Peter I Duke of Brittany
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Alix Duchess of Brittany has predecessor John I Duke of Brittany, Alix Duchess of Brittany has father John I Duke of Brittany
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Joan II Countess of Burgundy has predecessor Joan III Countess of Burgundy, Joan II Countess of Burgundy has father Joan III Countess of Burgundy
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Afonso III of Portugal has predecessor Denis of Portugal, Afonso III of Portugal has father Denis of Portugal
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Hugh of Italy has predecessor Lothair II of Italy, Hugh of Italy has father Lothair II of Italy
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Guillaume de Montfort of Hainaut has predecessor Amaury I de Montfort, Guillaume de Montfort of Hainaut has father Amaury I de Montfort
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Louis Duke of Orl ans 1703 1752 has predecessor Louis Philippe I Duke of Orl ans, Louis Duke of Orl ans 1703 1752 has father Louis Philippe I Duke of Orl ans
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Mary Queen of Scots has predecessor James VI and I, Mary Queen of Scots has father James VI and I
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+John III Duke of Brittany has predecessor John of Montfort, John III Duke of Brittany has father John of Montfort
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Charles the Fat, Charles the Fat has father Odo of France
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Charles the Fat has predecessor Berengar I of Italy, Charles the Fat has father Berengar I of Italy
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Charles the Fat, Charles the Fat has father Guy III of Spoleto
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Charles the Fat, Charles the Fat has father Arnulf of Carinthia
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Alfonso X of Castile has predecessor Sancho IV of Castile, Alfonso X of Castile has father Sancho IV of Castile
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Ecgberht King of Wessex has predecessor  thelwulf King of Wessex, Ecgberht King of Wessex has father  thelwulf King of Wessex
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Napoleon has predecessor Louis XVIII, Napoleon has father Louis XVIII
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Napoleon has predecessor Napoleon II, Napoleon has father Napoleon II
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Sancho IV of Castile has predecessor Ferdinand IV of Castile, Sancho IV of Castile has father Ferdinand IV of Castile
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Edward III of England, Edward III of England has father Richard II of England
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Louis Duke of Savoy, Louis Duke of Savoy has father Amadeus IX Duke of Savoy
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Princess Marie Isabelle of Orl ans has predecessor Archduchess Maria Dorothea of Austria, Princess Marie Isabelle of Orl ans has father Archduchess Maria Dorothea of Austria
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Leopold II Holy Roman Emperor has predecessor Ferdinand III Grand Duke of Tuscany, Leopold II Holy Roman Emperor has father Ferdinand III Grand Duke of Tuscany
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Ermengarde of Tuscany has predecessor Willa of Tuscany, Ermengarde of Tuscany has father Willa of Tuscany
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Ferdinand II of Aragon has predecessor Joanna of Castile, Ferdinand II of Aragon has father Joanna of Castile
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Robert II Count of Dreux has predecessor Robert III Count of Dreux, Robert II Count of Dreux has father Robert III Count of Dreux
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Henry the Lion has predecessor Otto I Duke of Bavaria, Henry the Lion has father Otto I Duke of Bavaria
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Henry the Lion has predecessor Bernhard Count of Anhalt, Henry the Lion has father Bernhard Count of Anhalt
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Alfonso VII of Le n and Castile has predecessor Sancho III of Castile, Alfonso VII of Le n and Castile has father Sancho III of Castile
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Alfonso VII of Le n and Castile has predecessor Ferdinand II of Le n, Alfonso VII of Le n and Castile has father Ferdinand II of Le n
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Louis Count of Vend me has predecessor John VIII Count of Vend me, Louis Count of Vend me has father John VIII Count of Vend me
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Philip II Duke of Savoy, Philip II Duke of Savoy has father Philibert II Duke of Savoy
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+John King of England has predecessor Henry III of England, John King of England has father Henry III of England
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+John King of England has predecessor Louis VIII of France, John King of England has father Louis VIII of France
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Louis III of Anjou, Louis III of Anjou has father Ren  of Anjou
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Charles X, Charles X has father Louis Antoine Duke of Angoul me
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Charles X has predecessor Henri Count of Chambord, Charles X has father Henri Count of Chambord
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Charles X has predecessor Louis Philippe I, Charles X has father Louis Philippe I
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Valdemar I of Denmark has predecessor Canute VI of Denmark, Valdemar I of Denmark has father Canute VI of Denmark
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Odo IV Duke of Burgundy has predecessor Philip I Duke of Burgundy, Odo IV Duke of Burgundy has father Philip I Duke of Burgundy
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+William the Younger Duke of Brunswic L neburg has predecessor Ernest II Duke of Brunswic L neburg, William the Younger Duke of Brunswic L neburg has father Ernest II Duke of Brunswic L neburg
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+James I of Aragon has predecessor Peter III of Aragon, James I of Aragon has father Peter III of Aragon
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Lothair of France has predecessor Louis V of France, Lothair of France has father Louis V of France
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Charles IV of France, Charles IV of France has father Philip VI of France
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Charles IV of France has predecessor Philip III of Navarre, Charles IV of France has father Philip III of Navarre
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Simon I de Montfort has predecessor Amaury II de Montfort, Simon I de Montfort has father Amaury II de Montfort
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Louis Philippe I has predecessor Jacques Charles Dupont de l Eure, Louis Philippe I has father Jacques Charles Dupont de l Eure
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Louis Philippe I, Louis Philippe I has father Prince Philippe Count of Paris
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Mahaut Countess of Artois has predecessor Joan II Countess of Burgundy, Mahaut Countess of Artois has father Joan II Countess of Burgundy
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Philip III of Navarre has predecessor Joan II of Navarre, Philip III of Navarre has father Joan II of Navarre
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Ferdinand II of Le n, Ferdinand II of Le n has father Alfonso IX of Le n
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Francis II Holy Roman Emperor has predecessor Ferdinand I of Austria, Francis II Holy Roman Emperor has father Ferdinand I of Austria
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Maria Theresa has predecessor Charles VII Holy Roman Emperor, Maria Theresa has father Charles VII Holy Roman Emperor
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Maria Theresa has predecessor Joseph II Holy Roman Emperor, Maria Theresa has father Joseph II Holy Roman Emperor
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Maria Theresa has predecessor Francis I Holy Roman Emperor, Maria Theresa has father Francis I Holy Roman Emperor
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+John the Fearless, John the Fearless has father Philip the Good
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Edward II of England has predecessor Edward III of England, Edward II of England has father Edward III of England
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Eleanor of Aquitaine has predecessor John King of England, Eleanor of Aquitaine has father John King of England
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Louis III of France, Louis III of France has father Carloman II
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Ercole III d Este Duke of Modena, Ercole III d Este Duke of Modena has father Francis IV Duke of Modena
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Sviatoslav I, Sviatoslav I has father Yaropolk I of Kiev
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Sviatoslav I has predecessor Vladimir the Great, Sviatoslav I has father Vladimir the Great
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Marie of Bade Sponheim, Marie of Bade Sponheim has father Archduchess Anna of Austria
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Maria Teresa Cybo Malaspina Duchess of Massa has predecessor Maria Beatrice d Este Duchess of Massa, Maria Teresa Cybo Malaspina Duchess of Massa has father Maria Beatrice d Este Duchess of Massa
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+1383 1385 Portuguese interregnum has predecessor John I of Portugal, 1383 1385 Portuguese interregnum has father John I of Portugal
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Golden Ambrosian Republic has predecessor Francesco I Sforza, Golden Ambrosian Republic has father Francesco I Sforza
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Henri Jules Prince of Cond  has predecessor Louis Duke of Orl ans 1703 1752, Henri Jules Prince of Cond  has father Louis Duke of Orl ans 1703 1752
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Arnulf Count of Holland has predecessor Dirk III Count of Holland, Arnulf Count of Holland has father Dirk III Count of Holland
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Ernest Duke of Austria has predecessor Frederick III Holy Roman Emperor, Ernest Duke of Austria has father Frederick III Holy Roman Emperor
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Mary I of England has predecessor Philip II of Spain, Mary I of England has father Philip II of Spain
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+John I of France has predecessor Philip V of France, John I of France has father Philip V of France
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Ferdinand I of the Two Sicilies has predecessor Francis I of the Two Sicilies, Ferdinand I of the Two Sicilies has father Francis I of the Two Sicilies
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Ferdinand Philippe Duke of Orl ans, Ferdinand Philippe Duke of Orl ans has father Prince Philippe Count of Paris
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+George II of Great Britain has predecessor George III, George II of Great Britain has father George III
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Victor Amadeus II of Sardinia has predecessor Charles Emmanuel III of Sardinia, Victor Amadeus II of Sardinia has father Charles Emmanuel III of Sardinia
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Victor Amadeus II of Sardinia, Victor Amadeus II of Sardinia has father Charles VI Holy Roman Emperor
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Albert the Bear, Albert the Bear has father Henry the Lion
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Alfonso II Count of Provence has predecessor Ramon Berenguer IV Count of Provence, Alfonso II Count of Provence has father Ramon Berenguer IV Count of Provence
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Pepin of Herstal has predecessor Grimoald the Younger, Pepin of Herstal has father Grimoald the Younger
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Pepin of Herstal has predecessor Charles Martel, Pepin of Herstal has father Charles Martel
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Pepin of Herstal has predecessor Theudoald, Pepin of Herstal has father Theudoald
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Pepin of Herstal has predecessor Drogo of Champagne, Pepin of Herstal has father Drogo of Champagne
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Henry V Count of Luxembourg has predecessor Henry VI Count of Luxembourg, Henry V Count of Luxembourg has father Henry VI Count of Luxembourg
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Henry VII Holy Roman Emperor has predecessor John of Bohemia, Henry VII Holy Roman Emperor has father John of Bohemia
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Henry VII Holy Roman Emperor has predecessor Louis IV Holy Roman Emperor, Henry VII Holy Roman Emperor has father Louis IV Holy Roman Emperor
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Philip II of Spain, Philip II of Spain has father Elizabeth I
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Philip II of Spain has predecessor Philip III of Spain, Philip II of Spain has father Philip III of Spain
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Odo I Duke of Burgundy, Odo I Duke of Burgundy has father Hugh II Duke of Burgundy
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Prince Philippe Count of Paris has predecessor French Revolution of 1848, Prince Philippe Count of Paris has father French Revolution of 1848
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Prince Philippe Count of Paris, Prince Philippe Count of Paris has father Jacques Charles Dupont de l Eure
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+John of Gaunt has predecessor Henry IV of England, John of Gaunt has father Henry IV of England
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+John of Gaunt, John of Gaunt has father John IV Duke of Brittany
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Peter I of Portugal has predecessor Ferdinand I of Portugal, Peter I of Portugal has father Ferdinand I of Portugal
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Sancho Count of Provence, Sancho Count of Provence has father Alfonso II Count of Provence
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Philip II of France has predecessor Louis VIII of France, Philip II of France has father Louis VIII of France
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+John II of Aragon has predecessor Ferdinand II of Aragon, John II of Aragon has father Ferdinand II of Aragon
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+John II of Aragon has predecessor Eleanor of Navarre, John II of Aragon has father Eleanor of Navarre
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Antoine Duke of Montpensier has predecessor Prince Ferdinand Duke of Montpensier, Antoine Duke of Montpensier has father Prince Ferdinand Duke of Montpensier
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Louis II of Hungary has predecessor Ferdinand I Holy Roman Emperor, Louis II of Hungary has father Ferdinand I Holy Roman Emperor
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Louis the Stammerer has predecessor Louis III of France, Louis the Stammerer has father Louis III of France
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Louis the Stammerer has predecessor Carloman II, Louis the Stammerer has father Carloman II
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Maximilian I Holy Roman Emperor has predecessor Charles V Holy Roman Emperor, Maximilian I Holy Roman Emperor has father Charles V Holy Roman Emperor
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Antoine of Navarre has predecessor Jeanne d Albret, Antoine of Navarre has father Jeanne d Albret
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Sviatopolk I of Kiev has predecessor Yaroslav the Wise, Sviatopolk I of Kiev has father Yaroslav the Wise
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Charles V of France has predecessor Charles VI of France, Charles V of France has father Charles VI of France
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Louis Bonaparte has predecessor Napol on Louis Bonaparte, Louis Bonaparte has father Napol on Louis Bonaparte
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Carloman II, Carloman II has father Charles the Fat
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Bernard of Gothia has predecessor Wilfred the Hairy, Bernard of Gothia has father Wilfred the Hairy
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Afonso I of Portugal has predecessor Sancho I of Portugal, Afonso I of Portugal has father Sancho I of Portugal
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Francis I Duke of Lorraine has predecessor Charles III Duke of Lorraine, Francis I Duke of Lorraine has father Charles III Duke of Lorraine
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Berenguer Ramon I Count of Barcelona, Berenguer Ramon I Count of Barcelona has father Ramon Berenguer I Count of Barcelona
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Philip III of Spain has predecessor Philip IV of Spain, Philip III of Spain has father Philip IV of Spain
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Philippe II Duke of Orl ans has predecessor Louis Duke of Orl ans 1703 1752, Philippe II Duke of Orl ans has father Louis Duke of Orl ans 1703 1752
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Victor Amadeus I Duke of Savoy has predecessor Francis Hyacinth Duke of Savoy, Victor Amadeus I Duke of Savoy has father Francis Hyacinth Duke of Savoy
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Philip IV of France has predecessor Louis X of France, Philip IV of France has father Louis X of France
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Louis the Pious has predecessor Lothair I, Louis the Pious has father Lothair I
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Louis the Pious has predecessor Louis the German, Louis the Pious has father Louis the German
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Louis the Pious has predecessor Pepin I of Aquitaine, Louis the Pious has father Pepin I of Aquitaine
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Charles VI of France, Charles VI of France has father Charles VII of France
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Charles VI of France, Charles VI of France has father Henry VI of England
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Francis II Duke of Brittany has predecessor Anne of Brittany, Francis II Duke of Brittany has father Anne of Brittany
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Antoine Duke of Lorraine, Antoine Duke of Lorraine has father Francis I Duke of Lorraine
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Cosimo I de Medici Grand Duke of Tuscany has predecessor Francesco I de Medici Grand Duke of Tuscany, Cosimo I de Medici Grand Duke of Tuscany has father Francesco I de Medici Grand Duke of Tuscany
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Cosimo de Medici has predecessor Piero di Cosimo de Medici, Cosimo de Medici has father Piero di Cosimo de Medici
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Charles VI Holy Roman Emperor has predecessor Charles III of Spain, Charles VI Holy Roman Emperor has father Charles III of Spain
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Louis VIII of France has predecessor Louis IX of France, Louis VIII of France has father Louis IX of France
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+John II of Portugal has predecessor Manuel I of Portugal, John II of Portugal has father Manuel I of Portugal
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+James I of Scotland, James I of Scotland has father James II of Scotland
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Dirk IV Count of Holland has predecessor Floris I Count of Holland, Dirk IV Count of Holland has father Floris I Count of Holland
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Hugh Magnus has predecessor Henry I of France, Hugh Magnus has father Henry I of France
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Joanna II of Naples has predecessor Ren  of Anjou, Joanna II of Naples has father Ren  of Anjou
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Ernest I Duke of Brunswic L neburg has predecessor William the Younger Duke of Brunswic L neburg, Ernest I Duke of Brunswic L neburg has father William the Younger Duke of Brunswic L neburg
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Philip VI of France has predecessor John II of France, Philip VI of France has father John II of France
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Yaropolk I of Kiev has predecessor Vladimir the Great, Yaropolk I of Kiev has father Vladimir the Great
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+John of Montfort has predecessor John IV Duke of Brittany, John of Montfort has father John IV Duke of Brittany
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Charles V Holy Roman Emperor, Charles V Holy Roman Emperor has father Ferdinand I Holy Roman Emperor
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Charles V Holy Roman Emperor has predecessor Philip II of Spain, Charles V Holy Roman Emperor has father Philip II of Spain
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Isabella Duchess of Lorraine has predecessor John II Duke of Lorraine, Isabella Duchess of Lorraine has father John II Duke of Lorraine
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Gerolf of Holland, Gerolf of Holland has father Dirk I Count of Holland
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Beorhtric of Wessex has predecessor Ecgberht King of Wessex, Beorhtric of Wessex has father Ecgberht King of Wessex
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Henri Count of Chambord has predecessor Prince Philippe Count of Paris, Henri Count of Chambord has father Prince Philippe Count of Paris
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Henri Count of Chambord has predecessor Louis Philippe I, Henri Count of Chambord has father Louis Philippe I
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Philip V of France has predecessor Charles IV of France, Philip V of France has father Charles IV of France
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Peter I Duke of Brittany has predecessor John I Duke of Brittany, Peter I Duke of Brittany has father John I Duke of Brittany
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+John II Duke of Brittany has predecessor Arthur II Duke of Brittany, John II Duke of Brittany has father Arthur II Duke of Brittany
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Louis VI of France has predecessor Louis VII of France, Louis VI of France has father Louis VII of France
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Louis XVI, Louis XVI has father Louis XVII
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Alfred the Great has predecessor Edward the Elder, Alfred the Great has father Edward the Elder
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Joanna of Castile has predecessor Philip I of Castile, Joanna of Castile has father Philip I of Castile
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Joanna of Castile has predecessor Charles V Holy Roman Emperor, Joanna of Castile has father Charles V Holy Roman Emperor
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Louis X of France has predecessor John I of France, Louis X of France has father John I of France
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Simon II Duke of Lorraine has predecessor Frederick I Duke of Lorraine, Simon II Duke of Lorraine has father Frederick I Duke of Lorraine
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Antonio Farnese Duke of Parma has predecessor Charles III of Spain, Antonio Farnese Duke of Parma has father Charles III of Spain
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Jeanne d Albret has predecessor Henry IV of France, Jeanne d Albret has father Henry IV of France
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Rudolf IV Duke of Austria, Rudolf IV Duke of Austria has father Leopold III Duke of Austria
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Louis IV of France, Louis IV of France has father Lothair of France
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Emmanuel Philibert Duke of Savoy has predecessor Charles Emmanuel I Duke of Savoy, Emmanuel Philibert Duke of Savoy has father Charles Emmanuel I Duke of Savoy
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Robert II of France has predecessor Henry I of France, Robert II of France has father Henry I of France
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Floris I Count of Holland has predecessor Dirk V Count of Holland, Floris I Count of Holland has father Dirk V Count of Holland
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Joseph II Holy Roman Emperor has predecessor Leopold II Holy Roman Emperor, Joseph II Holy Roman Emperor has father Leopold II Holy Roman Emperor
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Louis Philippe II Duke of Orl ans has predecessor Louis Philippe I, Louis Philippe II Duke of Orl ans has father Louis Philippe I
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Sancho VII of Navarre, Sancho VII of Navarre has father Theobald I of Navarre
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Henry of Bohemia has predecessor John of Bohemia, Henry of Bohemia has father John of Bohemia
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Henry of Bohemia has predecessor Albert II Duke of Austria, Henry of Bohemia has father Albert II Duke of Austria
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Charles III Duke of Lorraine has predecessor Henry II Duke of Lorraine, Charles III Duke of Lorraine has father Henry II Duke of Lorraine
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Philip IV of Spain has predecessor John IV of Portugal, Philip IV of Spain has father John IV of Portugal
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Philip IV of Spain has predecessor Charles II of Spain, Philip IV of Spain has father Charles II of Spain
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Louis XII has predecessor Maximilian Sforza, Louis XII has father Maximilian Sforza
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Louis XII has predecessor Ferdinand II of Aragon, Louis XII has father Ferdinand II of Aragon
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Peter II of Aragon, Peter II of Aragon has father James I of Aragon
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Conrad I of Burgundy has predecessor Rudolph III of Burgundy, Conrad I of Burgundy has father Rudolph III of Burgundy
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Blanche I of Navarre has predecessor John II of Aragon, Blanche I of Navarre has father John II of Aragon
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Hugh IV Duke of Burgundy has predecessor Robert II Duke of Burgundy, Hugh IV Duke of Burgundy has father Robert II Duke of Burgundy
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Sigismund II Augustus, Sigismund II Augustus has father Henry III of France
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Charles Martel, Charles Martel has father Carloman mayor of the palace
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Charles Martel has predecessor Pepin the Short, Charles Martel has father Pepin the Short
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Charles III Duke of Savoy, Charles III Duke of Savoy has father Emmanuel Philibert Duke of Savoy
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Anne Queen of Great Britain has predecessor George I of Great Britain, Anne Queen of Great Britain has father George I of Great Britain
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Henry VI of England, Henry VI of England has father Edward IV of England
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Henry VI of England, Henry VI of England has father Charles VII of France
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Eleanor of Castile, Eleanor of Castile has father Edward II of England
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Wulfoald has predecessor Pepin of Herstal, Wulfoald has father Pepin of Herstal
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Albert I of Germany, Albert I of Germany has father Henry VII Holy Roman Emperor
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Margaret Countess of Anjou has predecessor Philip VI of France, Margaret Countess of Anjou has father Philip VI of France
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Rudolph II of Burgundy has predecessor Hugh of Italy, Rudolph II of Burgundy has father Hugh of Italy
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Rudolph II of Burgundy, Rudolph II of Burgundy has father Conrad I of Burgundy
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Alderano I Cybo Malaspina has predecessor Maria Teresa Cybo Malaspina Duchess of Massa, Alderano I Cybo Malaspina has father Maria Teresa Cybo Malaspina Duchess of Massa
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Afonso V of Portugal, Afonso V of Portugal has father John II of Portugal
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+John II of France has predecessor Charles V of France, John II of France has father Charles V of France
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Lorenzo de Medici has predecessor Piero the Unfortunate, Lorenzo de Medici has father Piero the Unfortunate
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Frederick II Duke of Lorraine has predecessor Theobald I Duke of Lorraine, Frederick II Duke of Lorraine has father Theobald I Duke of Lorraine
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+James V of Scotland has predecessor Mary Queen of Scots, James V of Scotland has father Mary Queen of Scots
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Richard I of England has predecessor John King of England, Richard I of England has father John King of England
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Francesco I de Medici Grand Duke of Tuscany has predecessor Ferdinando I de Medici Grand Duke of Tuscany, Francesco I de Medici Grand Duke of Tuscany has father Ferdinando I de Medici Grand Duke of Tuscany
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Francis I of France, Francis I of France has father Henry II of France
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Theudoald has predecessor Charles Martel, Theudoald has father Charles Martel
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Frederick of Naples has predecessor Louis XII, Frederick of Naples has father Louis XII
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Louis V of France has predecessor Hugh Capet, Louis V of France has father Hugh Capet
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Lorenzo de Medici Duke of Urbino has predecessor Pope Clement VII, Lorenzo de Medici Duke of Urbino has father Pope Clement VII
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Charles Emmanuel III of Sardinia has predecessor Victor Amadeus III of Sardinia, Charles Emmanuel III of Sardinia has father Victor Amadeus III of Sardinia
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Maria Amalia of Naples and Sicily has predecessor Princess Marie Isabelle of Orl ans, Maria Amalia of Naples and Sicily has father Princess Marie Isabelle of Orl ans
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Philibert II Duke of Savoy has predecessor Charles III Duke of Savoy, Philibert II Duke of Savoy has father Charles III Duke of Savoy
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Joan Countess of Ponthieu has predecessor Eleanor of Castile, Joan Countess of Ponthieu has father Eleanor of Castile
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Joan Countess of Ponthieu has predecessor John I Count of Aumale, Joan Countess of Ponthieu has father John I Count of Aumale
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Gaston Duke of Orl ans has predecessor Philippe I Duke of Orl ans, Gaston Duke of Orl ans has father Philippe I Duke of Orl ans
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Gian Gastone de Medici Grand Duke of Tuscany has predecessor Francis I Holy Roman Emperor, Gian Gastone de Medici Grand Duke of Tuscany has father Francis I Holy Roman Emperor
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Charlemagne has predecessor Louis the Pious, Charlemagne has father Louis the Pious
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Louis IX of France has predecessor Philip III of France, Louis IX of France has father Philip III of France
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Peter II Count of Savoy has predecessor John I Duke of Brittany, Peter II Count of Savoy has father John I Duke of Brittany
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Petronilla of Aragon has predecessor Alfonso II of Aragon, Petronilla of Aragon has father Alfonso II of Aragon
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+James IV of Scotland has predecessor James V of Scotland, James IV of Scotland has father James V of Scotland
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Theodoric II Duke of Lorraine has predecessor Simon I Duke of Lorraine, Theodoric II Duke of Lorraine has father Simon I Duke of Lorraine
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Denis of Portugal, Denis of Portugal has father Afonso IV of Portugal
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Arthur III Duke of Brittany has predecessor Francis II Duke of Brittany, Arthur III Duke of Brittany has father Francis II Duke of Brittany
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Sancho III of Castile has predecessor Alfonso VIII of Castile, Sancho III of Castile has father Alfonso VIII of Castile
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Carloman of Bavaria has predecessor Charles the Fat, Carloman of Bavaria has father Charles the Fat
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Philip III of France, Philip III of France has father Philip IV of France
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Nuno Mendes count has predecessor Raymond of Burgundy, Nuno Mendes count has father Raymond of Burgundy
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Robert III of Scotland has predecessor James I of Scotland, Robert III of Scotland has father James I of Scotland
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Philip V of Spain, Philip V of Spain has father Victor Amadeus II of Sardinia
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Philip V of Spain has predecessor Ferdinand VI of Spain, Philip V of Spain has father Ferdinand VI of Spain
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Philip V of Spain has predecessor Louis I of Spain, Philip V of Spain has father Louis I of Spain
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Charles III of Spain has predecessor Charles IV of Spain, Charles III of Spain has father Charles IV of Spain
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Charles III of Spain, Charles III of Spain has father Charles VI Holy Roman Emperor
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Francis Hyacinth Duke of Savoy has predecessor Charles Emmanuel II Duke of Savoy, Francis Hyacinth Duke of Savoy has father Charles Emmanuel II Duke of Savoy
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Albert II Duke of Austria, Albert II Duke of Austria has father Rudolf IV Duke of Austria
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Amadeus VIII Duke of Savoy has predecessor Louis Duke of Savoy, Amadeus VIII Duke of Savoy has father Louis Duke of Savoy
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Ren  of Anjou has predecessor Charles IV of Anjou, Ren  of Anjou has father Charles IV of Anjou
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Charles II of Spain has predecessor Philip V of Spain, Charles II of Spain has father Philip V of Spain
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Henry V of England has predecessor Henry VI of England, Henry V of England has father Henry VI of England
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+John IV Duke of Brittany has predecessor John V Duke of Brittany, John IV Duke of Brittany has father John V Duke of Brittany
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Louis II of Italy has predecessor Charles the Bald, Louis II of Italy has father Charles the Bald
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Charles VII Holy Roman Emperor has predecessor Francis I Holy Roman Emperor, Charles VII Holy Roman Emperor has father Francis I Holy Roman Emperor
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Charles VII Holy Roman Emperor has predecessor Maria Theresa, Charles VII Holy Roman Emperor has father Maria Theresa
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Henry III of England, Henry III of England has father Edward I of England
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Amadeus II Count of Savoy has predecessor Humbert II Count of Savoy, Amadeus II Count of Savoy has father Humbert II Count of Savoy
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Alfonso II of Aragon, Alfonso II of Aragon has father Peter II of Aragon
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Joan I of Navarre has predecessor Louis X of France, Joan I of Navarre has father Louis X of France
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Giuliano de Medici Duke of Nemours, Giuliano de Medici Duke of Nemours has father Lorenzo de Medici Duke of Urbino
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Rudolf I Duke of Bavaria has predecessor Louis IV Holy Roman Emperor, Rudolf I Duke of Bavaria has father Louis IV Holy Roman Emperor
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Sancho I of Portugal has predecessor Afonso II of Portugal, Sancho I of Portugal has father Afonso II of Portugal
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+John Stewart of Darnley has predecessor John Stewart 3rd Lord of Aubigny, John Stewart of Darnley has father John Stewart 3rd Lord of Aubigny
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Odo II Duke of Burgundy has predecessor Hugh III Duke of Burgundy, Odo II Duke of Burgundy has father Hugh III Duke of Burgundy
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Philip the Bold has predecessor John the Fearless, Philip the Bold has father John the Fearless
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Charles IX of France has predecessor Henry III of France, Charles IX of France has father Henry III of France
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Alessandro de Medici Duke of Florence has predecessor Cosimo I de Medici Grand Duke of Tuscany, Alessandro de Medici Duke of Florence has father Cosimo I de Medici Grand Duke of Tuscany
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Stephen King of England has predecessor Geoffrey Plantagenet Count of Anjou, Stephen King of England has father Geoffrey Plantagenet Count of Anjou
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Antoine Philippe Duke of Montpensier, Antoine Philippe Duke of Montpensier has father Antoine Duke of Montpensier
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Edward King of Portugal has predecessor Afonso V of Portugal, Edward King of Portugal has father Afonso V of Portugal
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Childeric III has predecessor Pepin the Short, Childeric III has father Pepin the Short
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Charles II Duke of Savoy has predecessor Philip II Duke of Savoy, Charles II Duke of Savoy has father Philip II Duke of Savoy
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Robert I Duke of Burgundy has predecessor Hugh I Duke of Burgundy, Robert I Duke of Burgundy has father Hugh I Duke of Burgundy
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+William XII Count of Auvergne has predecessor Joan I Countess of Auvergne, William XII Count of Auvergne has father Joan I Countess of Auvergne
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Adolphus Frederick II Duke of Mecklenburg Strelitz has predecessor Adolphus Frederick III Duke of Mecklenburg Strelitz, Adolphus Frederick II Duke of Mecklenburg Strelitz has father Adolphus Frederick III Duke of Mecklenburg Strelitz
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Theobald I Duke of Lorraine has predecessor Matthias II Duke of Lorraine, Theobald I Duke of Lorraine has father Matthias II Duke of Lorraine
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Carloman mayor of the palace has predecessor Pepin the Short, Carloman mayor of the palace has father Pepin the Short
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Piero di Cosimo de Medici, Piero di Cosimo de Medici has father Lorenzo de Medici
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Ferdinand III of Castile, Ferdinand III of Castile has father Alfonso X of Castile
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+David II of Scotland has predecessor Robert II of Scotland, David II of Scotland has father Robert II of Scotland
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Judith of Bavaria died 843, Judith of Bavaria died 843 has father Hemma
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Adelaide of Italy has predecessor Willa of Tuscany, Adelaide of Italy has father Willa of Tuscany
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Olga of Kiev has predecessor Sviatoslav I, Olga of Kiev has father Sviatoslav I
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Baldred of Kent has predecessor Ecgberht King of Wessex, Baldred of Kent has father Ecgberht King of Wessex
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Igor of Kiev has predecessor Olga of Kiev, Igor of Kiev has father Olga of Kiev
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+George III, George III has father George IV
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Hugh III Duke of Burgundy has predecessor Odo III Duke of Burgundy, Hugh III Duke of Burgundy has father Odo III Duke of Burgundy
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Alfonso V of Aragon, Alfonso V of Aragon has father John II of Aragon
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Matthias I Duke of Lorraine, Matthias I Duke of Lorraine has father Simon II Duke of Lorraine
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Theresa Countess of Portugal has predecessor Afonso I of Portugal, Theresa Countess of Portugal has father Afonso I of Portugal
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Frederick the Fair has predecessor Albert II Duke of Austria, Frederick the Fair has father Albert II Duke of Austria
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Walter Stewart 3rd High Steward of Scotland, Walter Stewart 3rd High Steward of Scotland has father Alexander Stewart 4th High Steward of Scotland
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Geoffrey Plantagenet Count of Anjou has predecessor Henry II of England, Geoffrey Plantagenet Count of Anjou has father Henry II of England
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Desiderius has predecessor Charlemagne, Desiderius has father Charlemagne
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Ludovico Sforza has predecessor Louis XII, Ludovico Sforza has father Louis XII
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+James II of Scotland, James II of Scotland has father James III of Scotland
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Ramon Berenguer IV Count of Provence has predecessor Beatrice of Provence, Ramon Berenguer IV Count of Provence has father Beatrice of Provence
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Afonso IV of Portugal, Afonso IV of Portugal has father Peter I of Portugal
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Adalbert Duke of Lorraine, Adalbert Duke of Lorraine has father Gerard Duke of Lorraine
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Ramon Berenguer IV Count of Barcelona has predecessor Alfonso II of Aragon, Ramon Berenguer IV Count of Barcelona has father Alfonso II of Aragon
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Yolanda Latin Empress has predecessor Robert I Latin Emperor, Yolanda Latin Empress has father Robert I Latin Emperor
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Richard III of England, Richard III of England has father Henry VII of England
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Fulk King of Jerusalem has predecessor Geoffrey Plantagenet Count of Anjou, Fulk King of Jerusalem has father Geoffrey Plantagenet Count of Anjou
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Afonso II of Portugal, Afonso II of Portugal has father Sancho II of Portugal
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Hugh V Duke of Burgundy has predecessor Odo IV Duke of Burgundy, Hugh V Duke of Burgundy has father Odo IV Duke of Burgundy
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Philip I of Castile, Philip I of Castile has father Joanna of Castile
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Otto I Duke of Brunswic L neburg has predecessor Albert I Duke of Brunswic L neburg, Otto I Duke of Brunswic L neburg has father Albert I Duke of Brunswic L neburg
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Vladimir the Great has predecessor Yaropolk I of Kiev, Vladimir the Great has father Yaropolk I of Kiev
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Vladimir the Great has predecessor Sviatopolk I of Kiev, Vladimir the Great has father Sviatopolk I of Kiev
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Odo III Duke of Burgundy has predecessor Hugh IV Duke of Burgundy, Odo III Duke of Burgundy has father Hugh IV Duke of Burgundy
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Simon I Duke of Lorraine, Simon I Duke of Lorraine has father Matthias I Duke of Lorraine
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Charles Duke of Orl ans has predecessor Louis XII, Charles Duke of Orl ans has father Louis XII
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Joan III Countess of Burgundy has predecessor Philip I Duke of Burgundy, Joan III Countess of Burgundy has father Philip I Duke of Burgundy
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Sigismund Holy Roman Emperor, Sigismund Holy Roman Emperor has father Frederick III Holy Roman Emperor
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Hugh II Duke of Burgundy, Hugh II Duke of Burgundy has father Odo II Duke of Burgundy
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Hemma, Hemma has father Liutgard of Saxony died 885
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Louis I of Anjou has predecessor Louis II of Anjou, Louis I of Anjou has father Louis II of Anjou
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Henry I of France has predecessor Philip I of France, Henry I of France has father Philip I of France
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Francesco I Sforza, Francesco I Sforza has father Galeazzo Maria Sforza
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Berengar I of Italy has predecessor Rudolph II of Burgundy, Berengar I of Italy has father Rudolph II of Burgundy
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Francis II of France has predecessor Charles IX of France, Francis II of France has father Charles IX of France
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Marozia has predecessor Willa of Burgundy, Marozia has father Willa of Burgundy
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Victor Amadeus III of Sardinia, Victor Amadeus III of Sardinia has father Charles Emmanuel IV of Sardinia
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Ladislaus the Posthumous, Ladislaus the Posthumous has father Frederick III Holy Roman Emperor
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Henry I of Navarre has predecessor Joan I of Navarre, Henry I of Navarre has father Joan I of Navarre
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Ferdinand I of Aragon has predecessor Alfonso V of Aragon, Ferdinand I of Aragon has father Alfonso V of Aragon
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Simon Count of Ponthieu has predecessor Joan Countess of Ponthieu, Simon Count of Ponthieu has father Joan Countess of Ponthieu
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Rurik has predecessor Oleg of Novgorod, Rurik has father Oleg of Novgorod
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Agnes de Baudemont has predecessor Robert II Count of Dreux, Agnes de Baudemont has father Robert II Count of Dreux
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Peter II of Courtenay has predecessor Yolanda Latin Empress, Peter II of Courtenay has father Yolanda Latin Empress
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Maximilian II Holy Roman Emperor has predecessor Rudolf II Holy Roman Emperor, Maximilian II Holy Roman Emperor has father Rudolf II Holy Roman Emperor
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+John Frederick Duke of Brunswic Calenberg has predecessor Ernest Augustus Elector of Hanover, John Frederick Duke of Brunswic Calenberg has father Ernest Augustus Elector of Hanover
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Ren  II Duke of Lorraine has predecessor Antoine Duke of Lorraine, Ren  II Duke of Lorraine has father Antoine Duke of Lorraine
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Philip the Good, Philip the Good has father Charles the Bold
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Berengar II of Italy has predecessor Otto I Holy Roman Emperor, Berengar II of Italy has father Otto I Holy Roman Emperor
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Archduchess Anna of Austria, Archduchess Anna of Austria has father Renata of Lorraine
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Sweyn III of Denmark has predecessor Valdemar I of Denmark, Sweyn III of Denmark has father Valdemar I of Denmark
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Robert II of Scotland, Robert II of Scotland has father Robert III of Scotland
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Marie Countess of Ponthieu has predecessor Joan Countess of Ponthieu, Marie Countess of Ponthieu has father Joan Countess of Ponthieu
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Frederick III Holy Roman Emperor has predecessor Maximilian I Holy Roman Emperor, Frederick III Holy Roman Emperor has father Maximilian I Holy Roman Emperor
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Frederick I Duke of Lorraine has predecessor Frederick II Duke of Lorraine, Frederick I Duke of Lorraine has father Frederick II Duke of Lorraine
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Geoffrey III Count of Anjou has predecessor Fulk IV Count of Anjou, Geoffrey III Count of Anjou has father Fulk IV Count of Anjou
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Henry II of Navarre, Henry II of Navarre has father Antoine of Navarre
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Francis I Holy Roman Emperor has predecessor Joseph II Holy Roman Emperor, Francis I Holy Roman Emperor has father Joseph II Holy Roman Emperor
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Alfonso XI of Castile has predecessor Peter of Castile, Alfonso XI of Castile has father Peter of Castile
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Raymond of Burgundy, Raymond of Burgundy has father Henry Count of Portugal
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Louis Philippe I Duke of Orl ans has predecessor Louis Philippe II Duke of Orl ans, Louis Philippe I Duke of Orl ans has father Louis Philippe II Duke of Orl ans
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Robert II Count of Artois has predecessor Mahaut Countess of Artois, Robert II Count of Artois has father Mahaut Countess of Artois
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+John of Bohemia has predecessor Charles IV Holy Roman Emperor, John of Bohemia has father Charles IV Holy Roman Emperor
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Henry the Fowler, Henry the Fowler has father Otto I Holy Roman Emperor
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Henry VII of England has predecessor Henry VIII, Henry VII of England has father Henry VIII
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+George I of Great Britain has predecessor George II of Great Britain, George I of Great Britain has father George II of Great Britain
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Humbert II Count of Savoy has predecessor Amadeus III Count of Savoy, Humbert II Count of Savoy has father Amadeus III Count of Savoy
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Louis XIV, Louis XIV has father Louis XV
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Hugh I Duke of Burgundy has predecessor Odo I Duke of Burgundy, Hugh I Duke of Burgundy has father Odo I Duke of Burgundy
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Galeazzo Maria Sforza has predecessor Gian Galeazzo Sforza, Galeazzo Maria Sforza has father Gian Galeazzo Sforza
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Dirk II Count of Holland has predecessor Arnulf Count of Holland, Dirk II Count of Holland has father Arnulf Count of Holland
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Conrad IV of Germany has predecessor Henry VII Holy Roman Emperor, Conrad IV of Germany has father Henry VII Holy Roman Emperor
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Louis XVII has predecessor Louis XVIII, Louis XVII has father Louis XVIII
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Rudolph of France, Rudolph of France has father Louis IV of France
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Matthias II Duke of Lorraine, Matthias II Duke of Lorraine has father Frederick III Duke of Lorraine
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Lothair II of Italy has predecessor Berengar II of Italy, Lothair II of Italy has father Berengar II of Italy
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Rudolf I of Germany has predecessor Adolf King of the Romans, Rudolf I of Germany has father Adolf King of the Romans
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+
+Rule Metrics:
+	PCA Confidence: 0.4907
+	Standard Confidence: 0.1889
+	Rule Classification: NEGATIVE (PCA conf. 0.4907 < 0.5)
+	Positive Examples: 106.0000
+	Head Coverage: 0.2961

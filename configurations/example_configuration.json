@@ -35,7 +35,7 @@
   },
   "kg": {
     "kg_name": "KnowledgeGraph_v1",
-    "raw_kg_file": "train2id.txt",
+    "raw_kg": "train2id.txt",
     "kg_file": "train2id_processed.txt",
     "relation_file": "relation2id",
     "namespace": "example.org",

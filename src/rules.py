@@ -5,18 +5,30 @@
 # TODO: Docstrings
 
 import logging
-import random
 import re
 from dataclasses import dataclass
-from pathlib import Path
 from typing import Any, Protocol
 
 import pandas as pd
 import rdflib
 
-from config import KGConfig, RunConfig
+from config import KGConfig
+
+# ---------------------------------------------------------------------------
+# Logging
+# ---------------------------------------------------------------------------
 
 logger = logging.getLogger(__name__)
+
+
+def setup_logging() -> None:
+    """Configures the root logger to output to the console."""
+    logging.basicConfig(
+        level=logging.DEBUG,
+        format="%(asctime)s | %(name)-12s | %(levelname)-8s | %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+    )
+
 
 # ---------------------------------------------------------------------------
 # Dataclasses
@@ -27,8 +39,8 @@ logger = logging.getLogger(__name__)
 class Atom:
     """Represents a triple composed of subject predicate object.
 
-    The values of the each of these attributes are strings that represent either a
-    variable (e.g., ?a), a resource (e.g., ex:Patient), or a literal.
+    The values of the each of these attributes are strings that represent a variable
+    (e.g., ?a), a resource (e.g., ex:Patient), or a literal (e.g., 10.0).
 
     Attributes:
         subject: Subject of the triple.
@@ -97,13 +109,19 @@ class RuleSignature:
     def get_variables(self) -> str:
         """Return all the variables present in the rule as 'var ... var'."""
         all_atoms = {self.head} | self.body
-
-        return " ".join(
+        variables = {
             term
             for atom in sorted(all_atoms)
             for term in (atom.subject, atom.obj)
             if term.startswith("?")
-        )
+        }
+
+        return " ".join(var for var in variables)
+
+    def get_predicates(self) -> set[str]:
+        """Return the set of unique predicates in the rule."""
+        all_atoms = {self.head} | self.body
+        return {atom.predicate for atom in sorted(all_atoms)}
 
 
 @dataclass(slots=True)
@@ -112,17 +130,17 @@ class HornRule:
 
     Attributes:
         rule_id: String representing the ID of the rule.
-        signature: The representation of the rule, containing rule's head and body.
-        pca_confidence: The PCA confidence score of this rule.
-        support: The support of this rule.
-        head_coverage: The head coverage of the rule
+        signature: Representation of the rule that contains head and body.
+        pca_confidence: PCA confidence score of this rule.
+        support: Support of this rule.
+        head_coverage: Head coverage of the rule.
     """
 
     rule_id: str
     signature: RuleSignature
-    support: int = 0
-    head_coverage: float = 0.0
-    std_confidence: float = 0.0
+    support: int | float | None = None
+    head_coverage: float | None = None
+    std_confidence: float | None = None
     pca_confidence: float | None = None
     classification: str = "UNKNOWN"
 
@@ -154,8 +172,18 @@ class HornRule:
 ATOM_PATTERN = re.compile(r"(\?\w+)\s+(\S+)\s+(\S+)")
 
 
+class RuleRow(Protocol):
+    """Definines the expected structure of a rule DataFrame row."""
+
+    Head: Any
+    Body: Any
+    Std_Confidence: Any
+    Positive_Examples: Any
+    Head_Coverage: Any
+
+
 def parse_body(body_str: str) -> frozenset[Atom]:
-    """Parse body string containing one or more atoms."""
+    """Parses a body string containing one or more atoms into a frozen set of atoms."""
     if not body_str:
         return frozenset()
 
@@ -166,8 +194,7 @@ def parse_body(body_str: str) -> frozenset[Atom]:
 
 
 def parse_head(head_str: str) -> Atom:
-    """Parse a head string into an Atom based on the first three whitespace-separated
-    components."""
+    """Parses a head string into an Atom."""
     if not head_str:
         raise ValueError("Head string format is not valid: Empty string.")
 
@@ -178,47 +205,49 @@ def parse_head(head_str: str) -> Atom:
     return Atom(*parts[:3])
 
 
-def parse_rule_file(file: Path) -> RuleSignature:
-    """To implement"""
-    raise NotImplementedError()
-
-
-def parse_rule_csv(rule_csv: Path) -> pd.DataFrame:
-    """Parse a CSV containing a set of Horn Rules.
+def parse_horn_rule(
+    row: RuleRow,
+    rule_id: str,
+    pca_threshold: float | None = None,
+) -> HornRule:
+    """Extracts a HornRule object from a pandas DataFrame row.
 
     Args:
-        rule_csv: Path to the CSV file.
+        row: A named tuple representing a row form the rules DataFrame.
+        rule_id: Assigned string identifier for the rule.
+        pca_threshold: Threshold for classificating a rule as POSITIVE.
 
     Returns:
-        A pandas DataFrame with the parsed and cleaned rules.
-
-    Raises:
-        ValueError: If the CSV does not contain 'Body' and 'Head' columns.
-        FileNotFoundError: If the CSV path does not exist.
+        A populated HornRule instance.
     """
-    rules_df = pd.read_csv(rule_csv)
 
-    # Ensure expected schema
-    required_cols = {"Body", "Head"}
-    if not required_cols.issubset(rules_df.columns):
-        raise ValueError(
-            f"CSV is missing required columns. "
-            f"Expected {required_cols}, got {set(rules_df.columns)}"
-        )
+    def _fetch_attr(row: RuleRow, key: str) -> Any:
+        """Returns an attribute from a RuleRow or None if it's nan."""
+        value_raw = getattr(row, key, None)
+        return None if pd.isna(value_raw) else float(value_raw)
 
-    # Clean the DF
-    mask_body = rules_df["Body"].str.strip().str.startswith("?", na=False)
-    mask_head = rules_df["Head"].str.strip().str.startswith("?", na=False)
-    mask = mask_body & mask_head
+    support = _fetch_attr(row, "Positive_Examples")
+    head_coverage = _fetch_attr(row, "Head_Coverage")
+    std_conf = _fetch_attr(row, "Std_Confidence")
+    pca_conf = _fetch_attr(row, "PCA_Confidence")
 
-    clean_df = rules_df[mask].reset_index(drop=True)
-    removed = len(rules_df) - len(clean_df)
+    if pca_conf is None or pca_threshold is None:
+        classification = "UNKNOWN"
+    else:
+        classification = "POSITIVE" if pca_conf >= pca_threshold else "NEGATIVE"
 
-    if removed:
-        # TODO: Implement logger
-        print(f"Removed {removed} invalid rows from rules dataframe")
-
-    return clean_df
+    return HornRule(
+        rule_id=rule_id,
+        signature=RuleSignature(
+            head=parse_head(str(row.Head)),
+            body=parse_body(str(row.Body)),
+        ),
+        support=support,
+        head_coverage=head_coverage,
+        std_confidence=std_conf,
+        pca_confidence=pca_conf,
+        classification=classification,
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -231,47 +260,42 @@ def build_sparql_query(
 ) -> str:
     """Builds a SPARQL SELECT query from a rule signature.
 
-    Body atoms map to required triple patterns.
-    The head atom maps to an OPTIONAL triple pattern to determine a boolean answer.
+    Body atoms map to required triple patterns. The head atom maps to an OPTIONAL triple
+    pattern to determine a boolean answer. This method assumes that predicates never
+    contain variables.
 
     Args:
-        rule: The signature containing the body and head atoms.
-        ns_prefix: The short prefix alias for the RDF namespace (e.g., 'ex').
-        namespace: The full URI string of the RDF namespace.
+        rule_signature: Signature containing the body and head atoms.
+        ns_prefix: Short prefix alias for the RDF namespace (e.g., 'ex').
+        namespace: Full URI string of the RDF namespace.
 
     Returns:
         A formatted SPARQL SELECT query string.
     """
 
     def format_term(term: str) -> str:
-        """Format a term: variables stay as-is, constants get the namespace prefix"""
+        """Formats terms: variables stay as-is, constants get the namespace prefix"""
         return term if term.startswith("?") else f"{ns_prefix}:{term}"
 
     def format_atom(atom: Atom) -> str:
-        """Format an entire atom into a SPARQL triple pattern."""
+        """Formats an entire atom into a SPARQL triple pattern."""
         # NOTE: This assumes predicates NEVER contain variables
         subject = format_term(atom.subject)
         obj = format_term(atom.obj)
-        return f"\t{subject} {ns_prefix}:{atom.predicate} {obj} ."
+        return f"{subject} {ns_prefix}:{atom.predicate} {obj} ."
 
     select_vars = rule_signature.get_variables()
-
-    def term(t: str) -> str:
-        """Format a term for SPARQL: variable stays as-is, constants get prefix."""
-        return t if t.startswith("?") else f"{ns_prefix}:{t}"
-
-    body_lines = "\n".join(format_atom(atom) for atom in rule_signature.body)
+    body_lines = "\n\t".join(format_atom(atom) for atom in rule_signature.body)
     head_line = f"{format_atom(rule_signature.head)}"
 
     return (
         f"PREFIX {ns_prefix}: <{namespace}>\n"
-        f"SELECT DISTINCT {select_vars} ?_head_exists WHERE {{\n"
-        f"\t{body_lines}\n"
+        f"SELECT DISTINCT {select_vars} ?_head_exists WHERE {{\n\t"
+        f"{body_lines}\n"
         f"\tOPTIONAL {{\n"
-        f"\t{head_line}\n"
+        f"\t\t{head_line}\n"
         f"\t\tBIND(true AS ?_head_exists)\n"
-        f"\t}}\n"
-        f"}}"
+        f"\t}}\n}}"
     )
 
 
@@ -281,22 +305,20 @@ def build_sparql_query(
 
 
 def _get_local_name(uri: str) -> str:
-    """Extract the name of a resource from a URI string.
-
-    rpartition searches from the right end of the string, stops at the first match, and
-    always returns a 3-tuple: (before, separator, after). If a match is not found, the
-    whole string is returned in "after".
-    """
+    """Extracts the name of a resource from a URI string."""
     if "#" in uri:
         return uri.rpartition("#")[-1]
     return uri.rpartition("/")[-1].replace("_", " ")
 
 
 def _build_grounding_text(
-    result: rdflib.query.Result, rule: HornRule, pca_threshold: str, operator: str
+    result: rdflib.query.Result,
+    rule: HornRule,
+    pca_threshold: float | None,
+    operator: str,
+    max_groundings: int | None,
 ) -> str:
-    """Helper function to generate natural language descriptions for each grounding from
-    a retrieved query result."""
+    """Helper function to generate natural language descriptions of a query result."""
 
     pca_text = (
         f"The path is classified as {rule.classification} "
@@ -304,7 +326,11 @@ def _build_grounding_text(
     )
 
     instances: list[str] = []
-    for row in result:
+    for row_idx, row in enumerate(result):
+        # TODO: Implement something more efficient
+        if max_groundings is not None and row_idx >= max_groundings:
+            break
+
         row_dict = row.asdict()
 
         # Varaible ?_head_exists only has values bound if a head is found, else is None
@@ -326,8 +352,8 @@ def _build_grounding_text(
         body_facts_str: list[str] = []
         for atom in rule.signature.body:
             subject_key = atom.subject.removeprefix("?")
-            obj_key = atom.obj.removeprefix("?")
             subject = _get_local_name(row_dict.get(subject_key, subject_key))
+            obj_key = atom.obj.removeprefix("?")
             obj = _get_local_name(row_dict.get(obj_key, obj_key))
             body_facts_str.append(f"{subject} has {atom.predicate} {obj}")
 
@@ -342,9 +368,9 @@ def query_result_to_natural_language(
     kg_config: KGConfig,
     result: rdflib.query.Result,
     rule: HornRule,
+    max_groundings: int | None,
 ) -> str:
-    """Generate natural language description for a rule and its groundings from a query
-    result."""
+    """Generates natural language description for a rule and its query results."""
 
     operator_mapping = {"POSITIVE": ">=", "NEGATIVE": "<", "UNKNOWN": "?"}
     operator = operator_mapping.get(rule.classification, "?")
@@ -364,6 +390,7 @@ def query_result_to_natural_language(
             rule=rule,
             pca_threshold=kg_config.pca_threshold,
             operator=operator,
+            max_groundings=max_groundings,
         )
 
     # Desciption footer
@@ -386,229 +413,30 @@ def query_result_to_natural_language(
     return final_text
 
 
-class RuleRow(Protocol):
-    """Protocol defining the expected structure of a rules DataFrame row."""
+# ---------------------------------------------------------------------------
+# Testing
+# ---------------------------------------------------------------------------
 
-    Head: Any
-    Body: Any
-    Std_Confidence: Any
-    Positive_Examples: Any
-    Head_Coverage: Any
+if __name__ == "__main__":
+    # Setup logging
+    setup_logging()
 
-
-def parse_horn_rule(row: RuleRow, rule_id: str, pca_threshold: float) -> HornRule:
-    """Extracts a HornRule object from a pandas DataFrame row.
-
-    Args:
-        row: A named tuple representing a row form the rules DataFrame.
-        rule_id: The assigned string identifier for the rule.
-        pca_threshold: The threshold for clarifying a rule as POSITIVE.
-
-    Returns:
-        A populated HornRule instance.
-    """
-
-    pca_raw = getattr(row, "PCA_Confidence", None)
-    pca_conf: float | None = None if pd.isna(pca_raw) else float(pca_raw)
-
-    if pca_conf is None:
-        classification = "UNKNOWN"
-    else:
-        classification = "POSITIVE" if pca_conf >= pca_threshold else "NEGATIVE"
-
-    return HornRule(
-        rule_id=rule_id,
+    # Test SAPRQL generation
+    rule = HornRule(
+        rule_id="Test_rule",
         signature=RuleSignature(
-            head=parse_head(str(row.Head)),
-            body=parse_body(str(row.Body)),
+            head=parse_head("?a hasSuccesor ?b"),
+            body=parse_body("?a hasChild ?b"),
         ),
-        std_confidence=float(row.Std_Confidence),
-        pca_confidence=pca_conf if pca_conf is not None else None,
-        support=int(row.Positive_Examples),
-        head_coverage=float(row.Head_Coverage),
-        classification=classification,
+        std_confidence=0.9,
+        pca_confidence=0.8,
+        support=345,
+        head_coverage=0.7,
+        classification="POSITIVE",
     )
-
-
-def load_rules_from_path(rules_directory: Path) -> list[RuleSignature]:
-    """TODO: docs"""
-    if not rules_directory.is_dir():
-        raise NotADirectoryError(f"The directory '{rules_directory}' was not found.")
-
-    rules: list[RuleSignature] = []
-
-    rule_files = list(rules_directory.glob("rule_*.txt"))
-
-    def extract_rule_number(file_path: Path) -> int:
-        match = re.search(r"\d+", file_path.name)
-        return int(match.group()) if match else 0
-
-    rule_files.sort(key=extract_rule_number)
-
-    for file_path in rule_files:
-        try:
-            rule_info = parse_rule_file(file_path)
-            rules.append(rule_info)
-
-        except ValueError as e:
-            logger.warning("Warning: Skipping malformed file %s: %s", file_path.name, e)
-
-        except FileNotFoundError as e:
-            logger.error("Cannot find file %s: %s", file_path.name, e)
-
-    return rules
-
-
-def create_rule_context(rules: list[RuleSignature], max_rules: int = 3) -> str:
-    """TODO: docs and logic"""
-    raise NotImplementedError
-
-
-# TODO: Move to main
-def generate_cots(
-    config: RunConfig,
-    graph: dict[Any, dict[Any, Any]],
-    node_list: list[Any],
-    id2relation: dict[Any, str],
-    rules: list[RuleSignature],
-) -> pd.DataFrame:
-    """TODO: docs and logic or DELETE"""
-    data: list[dict[str, Any]] = []
-    unique_paths: set[str] = set()
-    pos_count = 0
-    neg_count = 0
-
-    # Initialize Context
-    rule_context = ""
-    if config.cot_generation.use_rules and rules:
-        rule_context = create_rule_context(
-            rules, max_rules=config.cot_generation.max_rules_in_context
-        )
-
-    has_active_rules = bool(rule_context)  # See if there are rules in context
-
-    max_attempts = (
-        config.cot_generation.max_samples * config.cot_generation.attempts_multiplier
+    query = build_sparql_query(
+        rule_signature=rule.signature,
+        ns_prefix="ex",
+        namespace="http://www.example.org/",
     )
-    attempts = 0
-    half_samples = config.cot_generation.max_samples // 2
-
-    # CoT generation loop
-    while len(data) < config.cot_generation.max_samples and attempts < max_attempts:
-        attempts += 1
-
-        path_length = random.randint(2, config.cot_generation.max_path_length)
-        first_node = random.choice(node_list)
-        visited = {first_node}
-
-        path_text = ""
-        reasoning_text = ""
-        previous_node = first_node
-
-        # Build the path
-        for _ in range(path_length - 1):
-            if previous_node not in graph or not graph[previous_node]:
-                # Disconnected node logic
-                node = random.choice(node_list)
-                safety = 0
-                while node in visited and safety < 100:
-                    node = random.choice(node_list)
-                    safety += 1
-
-                path_text += f"node_{previous_node} not connected with node_{node}. "
-                if config.cot_generation.include_reasoning:
-                    reasoning_text += f"node_{previous_node} not connected with node_{node} means there is no relationship. "
-
-                visited.add(node)
-                previous_node = node
-
-            else:
-                # Connected node logic
-                next_node = random.choice(list(graph[previous_node].keys()))
-                safety = 0
-                while next_node in visited and safety < 100:
-                    next_node = random.choice(list(graph[previous_node].keys()))
-                    safety += 1
-
-                relation = graph[previous_node][next_node]
-                rel_name = id2relation.get(relation, f"relation_{relation}")
-
-                path_text += (
-                    f"node_{previous_node} has {rel_name} with node_{next_node}. "
-                )
-                if config.cot_generation.include_reasoning:
-                    reasoning_text += (
-                        f"node_{previous_node} has {rel_name} with node_{next_node}. "
-                    )
-
-                visited.add(next_node)
-                previous_node = next_node
-
-        last_node = previous_node
-
-        # Filter duplicates
-        if path_text in unique_paths:
-            continue
-        unique_paths.add(path_text)
-
-        # Check connectivity and balance dataset
-        question = f"Is node_{first_node} connected with node_{last_node}?"
-        is_connected = (first_node in graph and last_node in graph[first_node]) or (
-            last_node in graph and first_node in graph[last_node]
-        )
-
-        if is_connected and pos_count >= half_samples:
-            continue
-        if not is_connected and neg_count >= half_samples:
-            continue
-
-        # Construct answer logic
-        answer = reasoning_text if config.cot_generation.include_reasoning else ""
-        if has_active_rules and config.cot_generation.include_reasoning:
-            context_phrase = "Applying symbolic rules and path analysis together: "
-            answer += context_phrase
-        answer += "The answer is yes." if is_connected else "The answer is no."
-
-        if is_connected:
-            pos_count += 1
-        else:
-            neg_count += 1
-
-        # Construct prompt
-        instruction = ""
-        if config.cot_generation.include_reasoning:
-            instruction = "###Instruction:\nAnswer the following yes/no question by reasoning step-by-step."
-            if has_active_rules:
-                instruction += " Use the symbolic rules as additional context along with the path information."
-            instruction += "\n"
-
-        prompt_parts = filter(
-            None,
-            [
-                instruction,
-                rule_context if has_active_rules else "",
-                f"###Input:\n{path_text}{question}",
-                f"###Response:\n{answer}",
-            ],
-        )
-        prompt = "\n".join(prompt_parts)
-
-        # Append data
-        data.append(
-            {
-                "Prompt": prompt,
-                "input_text": path_text + question,
-                "output_text": answer,
-                "has_rule_context": has_active_rules,
-                "is_connected": is_connected,
-            }
-        )
-
-    logger.info(
-        "Generated %d samples: %d negative and %d positive.",
-        len(data),
-        neg_count,
-        pos_count,
-    )
-
-    return pd.DataFrame(data)
+    print(query)

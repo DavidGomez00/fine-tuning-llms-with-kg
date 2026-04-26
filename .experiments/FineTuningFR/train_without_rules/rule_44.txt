@@ -1,0 +1,615 @@
+If name ?f AND successor ?b, then successor ?b.
+
+Formal Rule:
+	Head: ?a successor ?b
+	Body: ?a name ?f AND ?f successor ?b
+
+Real Instances from Knowledge Graph (120 found):
+
+Marged ferch Tomos, Maredudd ap Tudur has successor Maredudd ap Tudur
+Marged ferch Tomos has name Maredudd ap Tudur
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Giovanni di Bicci de Medici, Lorenzo the Elder has successor Lorenzo the Elder
+Giovanni di Bicci de Medici has name Lorenzo the Elder
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Piccarda Bueri, Lorenzo the Elder has successor Lorenzo the Elder
+Piccarda Bueri has name Lorenzo the Elder
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Joanna of Austria Grand Duchess of Tuscany, Marie de Medici has successor Marie de Medici
+Joanna of Austria Grand Duchess of Tuscany has name Marie de Medici
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Arthur II Duke of Brittany, John of Montfort has successor John of Montfort
+Arthur II Duke of Brittany has name John of Montfort
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Liudolf Margrave of Frisia, Matilda of Frisia has successor Matilda of Frisia
+Liudolf Margrave of Frisia has name Matilda of Frisia
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Mahaut Countess of Artois, Blanche of Burgundy has successor Blanche of Burgundy
+Mahaut Countess of Artois has name Blanche of Burgundy
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Otto IV Count of Burgundy, Blanche of Burgundy has successor Blanche of Burgundy
+Otto IV Count of Burgundy has name Blanche of Burgundy
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+John II Duke of Brittany, Blanche of Brittany has successor Blanche of Brittany
+John II Duke of Brittany has name Blanche of Brittany
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Burkhard V Count of Hohenberg, Gertrude of Hohenberg has successor Gertrude of Hohenberg
+Burkhard V Count of Hohenberg has name Gertrude of Hohenberg
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+John I of Aragon, Yolande of Aragon has successor Yolande of Aragon
+John I of Aragon has name Yolande of Aragon
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Antoinette of Bourbon, Mary of Guise has successor Mary of Guise
+Antoinette of Bourbon has name Mary of Guise
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Elisabeth of Nuremberg, Margaret of the Palatinate has successor Margaret of the Palatinate
+Elisabeth of Nuremberg has name Margaret of the Palatinate
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Rupert King of the Romans, Margaret of the Palatinate has successor Margaret of the Palatinate
+Rupert King of the Romans has name Margaret of the Palatinate
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Lothair II of Italy, Emma of Italy has successor Emma of Italy
+Lothair II of Italy has name Emma of Italy
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Adelaide of Italy, Emma of Italy has successor Emma of Italy
+Adelaide of Italy has name Emma of Italy
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Henry the Fowler, Gerberga of Saxony has successor Gerberga of Saxony
+Henry the Fowler has name Gerberga of Saxony
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Matilda of Ringelheim, Gerberga of Saxony has successor Gerberga of Saxony
+Matilda of Ringelheim has name Gerberga of Saxony
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Philip I Landgrave of Hesse, Christine of Hesse has successor Christine of Hesse
+Philip I Landgrave of Hesse has name Christine of Hesse
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Christine of Saxony, Christine of Hesse has successor Christine of Hesse
+Christine of Saxony has name Christine of Hesse
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Margaret of Bourbon 1438 1483, Louise of Savoy has successor Louise of Savoy
+Margaret of Bourbon 1438 1483 has name Louise of Savoy
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Poppa of Bayeux, Gerloc has successor Gerloc
+Poppa of Bayeux has name Gerloc
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Fulk II Count of Anjou, Adelaide Blanche of Anjou has successor Adelaide Blanche of Anjou
+Fulk II Count of Anjou has name Adelaide Blanche of Anjou
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Tribal chief, Estrid of the Obotrites has successor Estrid of the Obotrites
+Tribal chief has name Estrid of the Obotrites
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Eilika of Schweinfurt, Gertrude of Saxony has successor Gertrude of Saxony
+Eilika of Schweinfurt has name Gertrude of Saxony
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Margaret of Brieg, Margaret of Bavaria has successor Margaret of Bavaria
+Margaret of Brieg has name Margaret of Bavaria
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Malusha, Vladimir the Great has successor Vladimir the Great
+Malusha has name Vladimir the Great
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Sviatoslav I has successor Vladimir the Great, Vladimir the Great has successor Vladimir the Great
+Sviatoslav I has name Vladimir the Great
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: yes
+
+Countess Palatine Dorothea Sophie of Neuburg, Elisabeth Farnese has successor Elisabeth Farnese
+Countess Palatine Dorothea Sophie of Neuburg has name Elisabeth Farnese
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Odoardo Farnese Hereditary Prince of Parma, Elisabeth Farnese has successor Elisabeth Farnese
+Odoardo Farnese Hereditary Prince of Parma has name Elisabeth Farnese
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+John I Duke of Brabant, Margaret of Brabant has successor Margaret of Brabant
+John I Duke of Brabant has name Margaret of Brabant
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Margaret of Flanders Duchess of Brabant, Margaret of Brabant has successor Margaret of Brabant
+Margaret of Flanders Duchess of Brabant has name Margaret of Brabant
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Conrad I of Burgundy, Bertha of Burgundy has successor Bertha of Burgundy
+Conrad I of Burgundy has name Bertha of Burgundy
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Matilda of France, Bertha of Burgundy has successor Bertha of Burgundy
+Matilda of France has name Bertha of Burgundy
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+K ten, Elizabeth the Cuman has successor Elizabeth the Cuman
+K ten has name Elizabeth the Cuman
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Cumans, Elizabeth the Cuman has successor Elizabeth the Cuman
+Cumans has name Elizabeth the Cuman
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Anna Maria of Ostfriesland, Anna Maria of Mecklenburg Schwerin has successor Anna Maria of Mecklenburg Schwerin
+Anna Maria of Ostfriesland has name Anna Maria of Mecklenburg Schwerin
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Adolphus Frederick I Duke of Mecklenburg Schwerin, Anna Maria of Mecklenburg Schwerin has successor Anna Maria of Mecklenburg Schwerin
+Adolphus Frederick I Duke of Mecklenburg Schwerin has name Anna Maria of Mecklenburg Schwerin
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Waldrada of Worms, Rudolph I of Burgundy has successor Rudolph I of Burgundy
+Waldrada of Worms has name Rudolph I of Burgundy
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Conrad II Duke of Transjurane Burgundy, Rudolph I of Burgundy has successor Rudolph I of Burgundy
+Conrad II Duke of Transjurane Burgundy has name Rudolph I of Burgundy
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Beatrice Regina della Scala, Taddea Visconti has successor Taddea Visconti
+Beatrice Regina della Scala has name Taddea Visconti
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Bernab  Visconti, Taddea Visconti has successor Taddea Visconti
+Bernab  Visconti has name Taddea Visconti
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Thomas Count of Savoy, Beatrice of Savoy has successor Beatrice of Savoy
+Thomas Count of Savoy has name Beatrice of Savoy
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Margaret of Geneva, Beatrice of Savoy has successor Beatrice of Savoy
+Margaret of Geneva has name Beatrice of Savoy
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Gaston IV Count of Foix, Margaret of Foix has successor Margaret of Foix
+Gaston IV Count of Foix has name Margaret of Foix
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Eleanor of Navarre, Margaret of Foix has successor Margaret of Foix
+Eleanor of Navarre has name Margaret of Foix
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Charibert of Laon, Bertrada of Laon has successor Bertrada of Laon
+Charibert of Laon has name Bertrada of Laon
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Engelbert Duke of Carinthia, Matilda of Carinthia has successor Matilda of Carinthia
+Engelbert Duke of Carinthia has name Matilda of Carinthia
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Leonor de Alvim, Beatriz Pereira de Alvim has successor Beatriz Pereira de Alvim
+Leonor de Alvim has name Beatriz Pereira de Alvim
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Nuno  lvares Pereira, Beatriz Pereira de Alvim has successor Beatriz Pereira de Alvim
+Nuno  lvares Pereira has name Beatriz Pereira de Alvim
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Amaury I de Montfort has successor Simon I de Montfort, Simon I de Montfort has successor Simon I de Montfort
+Amaury I de Montfort has name Simon I de Montfort
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: yes
+
+Maud FitzJohn Countess of Warwick, Isabella de Beauchamp has successor Isabella de Beauchamp
+Maud FitzJohn Countess of Warwick has name Isabella de Beauchamp
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+ lffl d wife of Edward the Elder, Eadgifu of Wessex has successor Eadgifu of Wessex
+ lffl d wife of Edward the Elder has name Eadgifu of Wessex
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Edward the Elder, Eadgifu of Wessex has successor Eadgifu of Wessex
+Edward the Elder has name Eadgifu of Wessex
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Anne of Cyprus, Charlotte of Savoy has successor Charlotte of Savoy
+Anne of Cyprus has name Charlotte of Savoy
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Louis Duke of Savoy, Charlotte of Savoy has successor Charlotte of Savoy
+Louis Duke of Savoy has name Charlotte of Savoy
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Sigismund Holy Roman Emperor, Elizabeth of Luxembourg has successor Elizabeth of Luxembourg
+Sigismund Holy Roman Emperor has name Elizabeth of Luxembourg
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Richeza of Poland Queen of Sweden, Sophia of Minsk has successor Sophia of Minsk
+Richeza of Poland Queen of Sweden has name Sophia of Minsk
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Mar a Isabella of Spain, Maria Christina of the Two Sicilies has successor Maria Christina of the Two Sicilies
+Mar a Isabella of Spain has name Maria Christina of the Two Sicilies
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Francis I of the Two Sicilies, Maria Christina of the Two Sicilies has successor Maria Christina of the Two Sicilies
+Francis I of the Two Sicilies has name Maria Christina of the Two Sicilies
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Yolanda of Courtenay, Violant of Hungary has successor Violant of Hungary
+Yolanda of Courtenay has name Violant of Hungary
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Odo I Count of Orl ans, Ermentrude of Orl ans has successor Ermentrude of Orl ans
+Odo I Count of Orl ans has name Ermentrude of Orl ans
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Engeltrude de F zensac, Ermentrude of Orl ans has successor Ermentrude of Orl ans
+Engeltrude de F zensac has name Ermentrude of Orl ans
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Willa of Tuscany, Rozala of Italy has successor Rozala of Italy
+Willa of Tuscany has name Rozala of Italy
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Berengar II of Italy, Rozala of Italy has successor Rozala of Italy
+Berengar II of Italy has name Rozala of Italy
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Robert II of France, Hugh Magnus has successor Hugh Magnus
+Robert II of France has name Hugh Magnus
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Dedi III Margrave of Lusatia, Agnes of Rochlitz has successor Agnes of Rochlitz
+Dedi III Margrave of Lusatia has name Agnes of Rochlitz
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Alfonso VII of Le n and Castile, Constance of Castile has successor Constance of Castile
+Alfonso VII of Le n and Castile has name Constance of Castile
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Beatrice of Portugal died 1381, Eleanor of Alburquerque has successor Eleanor of Alburquerque
+Beatrice of Portugal died 1381 has name Eleanor of Alburquerque
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Sancho Alfonso, Eleanor of Alburquerque has successor Eleanor of Alburquerque
+Sancho Alfonso has name Eleanor of Alburquerque
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Matilda of Brabant Countess of Artois, Blanche of Artois has successor Blanche of Artois
+Matilda of Brabant Countess of Artois has name Blanche of Artois
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Hugh of Tours, Adelaide of Tours has successor Adelaide of Tours
+Hugh of Tours has name Adelaide of Tours
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Maria Josepha of Austria, Maria Amalia of Saxony has successor Maria Amalia of Saxony
+Maria Josepha of Austria has name Maria Amalia of Saxony
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Augustus III of Poland, Maria Amalia of Saxony has successor Maria Amalia of Saxony
+Augustus III of Poland has name Maria Amalia of Saxony
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Empress Jos phine, Hortense de Beauharnais has successor Hortense de Beauharnais
+Empress Jos phine has name Hortense de Beauharnais
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Alexandre de Beauharnais, Hortense de Beauharnais has successor Hortense de Beauharnais
+Alexandre de Beauharnais has name Hortense de Beauharnais
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Gerberga of Saxony, Matilda of France has successor Matilda of France
+Gerberga of Saxony has name Matilda of France
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Louis IV of France, Matilda of France has successor Matilda of France
+Louis IV of France has name Matilda of France
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Agnes of France Duchess of Burgundy, Joan the Lame has successor Joan the Lame
+Agnes of France Duchess of Burgundy has name Joan the Lame
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Francis of Baux, Margaret of Baux has successor Margaret of Baux
+Francis of Baux has name Margaret of Baux
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Henry III of England, Beatrice of England has successor Beatrice of England
+Henry III of England has name Beatrice of England
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Elisabeth Farnese, Maria Antonia Ferdinanda of Spain has successor Maria Antonia Ferdinanda of Spain
+Elisabeth Farnese has name Maria Antonia Ferdinanda of Spain
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Philip V of Spain, Maria Antonia Ferdinanda of Spain has successor Maria Antonia Ferdinanda of Spain
+Philip V of Spain has name Maria Antonia Ferdinanda of Spain
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Nicolas Duke of Merc ur, Louise of Lorraine has successor Louise of Lorraine
+Nicolas Duke of Merc ur has name Louise of Lorraine
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Pepin of Herstal has successor Charles Martel, Charles Martel has successor Charles Martel
+Pepin of Herstal has name Charles Martel
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: yes
+
+Alpaida, Charles Martel has successor Charles Martel
+Alpaida has name Charles Martel
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Philip Duke of Parma, Maria Luisa of Parma has successor Maria Luisa of Parma
+Philip Duke of Parma has name Maria Luisa of Parma
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Louise  lisabeth of France, Maria Luisa of Parma has successor Maria Luisa of Parma
+Louise  lisabeth of France has name Maria Luisa of Parma
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Maria Amalia of Saxony, Maria Luisa of Spain has successor Maria Luisa of Spain
+Maria Amalia of Saxony has name Maria Luisa of Spain
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Charles III of Spain, Maria Luisa of Spain has successor Maria Luisa of Spain
+Charles III of Spain has name Maria Luisa of Spain
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Henry I Count of Berg, Salomea of Berg has successor Salomea of Berg
+Henry I Count of Berg has name Salomea of Berg
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Lucia da Torsano, Francesco I Sforza has successor Francesco I Sforza
+Lucia da Torsano has name Francesco I Sforza
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Muzio Attendolo Sforza, Francesco I Sforza has successor Francesco I Sforza
+Muzio Attendolo Sforza has name Francesco I Sforza
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Blanche of Brittany, Margaret of Artois has successor Margaret of Artois
+Blanche of Brittany has name Margaret of Artois
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Philip of Artois, Margaret of Artois has successor Margaret of Artois
+Philip of Artois has name Margaret of Artois
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Henry II of France, Margaret of Valois has successor Margaret of Valois
+Henry II of France has name Margaret of Valois
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Catherine de Medici, Margaret of Valois has successor Margaret of Valois
+Catherine de Medici has name Margaret of Valois
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Humbert II Count of Savoy, Adelaide of Maurienne has successor Adelaide of Maurienne
+Humbert II Count of Savoy has name Adelaide of Maurienne
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Gisela of Burgundy Marchioness of Montferrat, Adelaide of Maurienne has successor Adelaide of Maurienne
+Gisela of Burgundy Marchioness of Montferrat has name Adelaide of Maurienne
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Maria Theresa of Austria Este Queen of Sardinia, Maria Beatrice of Savoy has successor Maria Beatrice of Savoy
+Maria Theresa of Austria Este Queen of Sardinia has name Maria Beatrice of Savoy
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Victor Emmanuel I of Sardinia, Maria Beatrice of Savoy has successor Maria Beatrice of Savoy
+Victor Emmanuel I of Sardinia has name Maria Beatrice of Savoy
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Christine of Hesse, Anna of Holstei Gottorp has successor Anna of Holstei Gottorp
+Christine of Hesse has name Anna of Holstei Gottorp
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Adolf Duke of Holstei Gottorp, Anna of Holstei Gottorp has successor Anna of Holstei Gottorp
+Adolf Duke of Holstei Gottorp has name Anna of Holstei Gottorp
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Louis Philippe II Duke of Orl ans, Louis Philippe I has successor Louis Philippe I Duke of Orl ans
+Louis Philippe II Duke of Orl ans has name Louis Philippe I
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Louise Marie Ad la de de Bourbon Duchess of Orl ans, Louis Philippe I has successor Louis Philippe I Duke of Orl ans
+Louise Marie Ad la de de Bourbon Duchess of Orl ans has name Louis Philippe I
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Maria of Aragon Queen of Portugal, Isabella of Portugal has successor Isabella of Portugal Queen of Castile
+Maria of Aragon Queen of Portugal has name Isabella of Portugal
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Manuel I of Portugal, Isabella of Portugal has successor Isabella of Portugal Queen of Castile
+Manuel I of Portugal has name Isabella of Portugal
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+William I of Provence, Constance of Arles has successor Constance of Arles
+William I of Provence has name Constance of Arles
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Adelaide Blanche of Anjou, Constance of Arles has successor Constance of Arles
+Adelaide Blanche of Anjou has name Constance of Arles
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Anna Porphyrogenita, Yaroslav the Wise has successor Yaroslav the Wise
+Anna Porphyrogenita has name Yaroslav the Wise
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Vladimir the Great, Yaroslav the Wise has successor Yaroslav the Wise
+Vladimir the Great has name Yaroslav the Wise
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Rogneda of Polotsk, Yaroslav the Wise has successor Yaroslav the Wise
+Rogneda of Polotsk has name Yaroslav the Wise
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+William X Duke of Aquitaine has successor Eleanor of Aquitaine, Eleanor of Aquitaine has successor Eleanor of Aquitaine
+William X Duke of Aquitaine has name Eleanor of Aquitaine
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: yes
+
+Marie of Brittany Countess of Saint Pol, Mahaut of Ch tillon has successor Mahaut of Ch tillon
+Marie of Brittany Countess of Saint Pol has name Mahaut of Ch tillon
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Lorenzo the Elder, Pierfrancesco the Elder has successor Pierfrancesco the Elder
+Lorenzo the Elder has name Pierfrancesco the Elder
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+James of Avesnes, Bouchard IV of Avesnes has successor Bouchard IV of Avesnes
+James of Avesnes has name Bouchard IV of Avesnes
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Nicholas d Oisy Lord of Avesnes, James of Avesnes has successor James of Avesnes
+Nicholas d Oisy Lord of Avesnes has name James of Avesnes
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Fulk King of Jerusalem, Sibylla of Anjou has successor Sibylla of Anjou
+Fulk King of Jerusalem has name Sibylla of Anjou
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Ermengarde Countess of Maine, Sibylla of Anjou has successor Sibylla of Anjou
+Ermengarde Countess of Maine has name Sibylla of Anjou
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Pepin the Short, Charlemagne has successor Charlemagne
+Pepin the Short has name Charlemagne
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+
+Rule Metrics:
+	PCA Confidence: 0.7647
+	Standard Confidence: 0.7647
+	Rule Classification: POSITIVE (PCA conf. 0.7647 >= 0.5)
+	Positive Examples: 13.0000
+	Head Coverage: 0.0367

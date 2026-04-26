@@ -1,12 +1,4 @@
 {
-  "cot_generation": {
-    "max_samples": 100,
-    "max_path_length": 10,
-    "include_reasoning": true,
-    "use_rules": true,
-    "max_rules_in_context": 3,
-    "attempts_multiplier": 10
-  },
   "data": {
     "input_dir": ".data/FrenchRoyalty/",
     "output_dir": ".experiments/CreatingFRCoTs/",

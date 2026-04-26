@@ -1,9 +1,5 @@
 """Configuration classes for the experiment and preprocessing settings."""
 
-# TODO: Arreglar documentación
-# TODO: Is DirConfig.rules_dir used?
-# TODO: Mix rules and KG?
-
 import json
 import logging
 from dataclasses import dataclass, field
@@ -23,9 +19,6 @@ class FineTuningConfig:
     # Fine-tuning experiment behavior
     skip_base_eval: bool = False
     skip_baseline: bool = False
-    save_predictions: bool = True
-    generate_plots: bool = True
-    generate_table: bool = True
 
     # Generated outputs
     resuts_json_file: str = "results.json"
@@ -68,34 +61,29 @@ class CoTGenerationConfig:
     """Configuration settings for generating CoT from KGs for training."""
 
     # Behavior for generating CoTs
-    max_samples: int = 100
-
-    # TODO: check, unused??
-    max_path_length: int = 10
-    include_reasoning: bool = True
-    use_rules: bool = True
-    max_rules_in_context: int = 3
-    attempts_multiplier: int = 10
+    max_rules: int = 100
+    max_groundings: int = 100
+    rule_summary_file: str = "rules_summary.txt"
 
 
 @dataclass
 class DirConfig:
-    """Configuration for base directories and output files."""
+    """Configuration for base input and output directories."""
 
     input_dir: Path = Path(".data/")
-    output_dir: Path = Path(".experiments/")
-    rules_dir: Path = input_dir / "rules"
+    output_dir: Path = Path(".experiments/new_experiment")
 
     def __post_init__(self) -> None:
+        """Validate input and create output directories."""
         self.input_dir = Path(self.input_dir)
         self.output_dir = Path(self.output_dir)
-        self.rules_dir = Path(self.rules_dir)
 
         self._validate_path(self.input_dir, "input_dir")
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
     @staticmethod
     def _validate_path(path: Path, field_name: str) -> None:
+        """Check wether a path is valid."""
         if not path.exists():
             raise FileNotFoundError(
                 f"Configuration Error: The {field_name} does not exist at {path}"
@@ -108,7 +96,7 @@ class DirConfig:
 
 @dataclass
 class HardwareConfig:
-    """Hardware settings to use in a LLM KG-based fine-tuning experiment.
+    """Hardware settings.
 
     Attributes:
         n_gpus: Number of CUDA ready available GPUs.
@@ -127,48 +115,56 @@ class HardwareConfig:
 
 @dataclass
 class KGConfig:
-    """Configuration for KG related files and paths."""
+    """Knowledge Graph settings.
 
-    kg_name: str = "KG"
-    raw_kg: str = "train2id.txt"
-    kg_file: str = "train2id_processed.txt"
-    relation_file: str = "relation2id"
-    namespace: str = "example.org"
-    namespace_prefix: str = "ex"
-    rules_csv: Path = Path("rules.csv")
-    pca_threshold: float = 0.5
-    max_rules: int | None = None
-    rule_summary_file: str = "rules_summary.txt"
+    Attributes:
+        kg_name: Not formated name of the knowledge graph.
+        namespace: Namespace for the knowledge graph entities.
+        namespace_prefix: Prefix for the knowledge graph entities' namespace.
+        kg_file: Name of the knowledge graph formated file.
+        relation_file: Name of the relation mapping file.
+        rules_csv: Name of the CSV containing rules.
+    """
+
+    kg_name: str
+    namespace: str
+    namespace_prefix: str
+    pca_threshold: float
+    kg_file: str
+    relation_file: str
+    rules_csv: str
 
 
 @dataclass
 class RunConfig:
     """Master configuration object for the experiment run."""
 
+    kg: KGConfig
     fine_tuning: FineTuningConfig | None
     cot_generation: CoTGenerationConfig | None
     data: DirConfig = field(default_factory=DirConfig)
     hardware: HardwareConfig = field(default_factory=HardwareConfig)
-    kg: KGConfig = field(default_factory=KGConfig)
 
     @classmethod
     def from_json(cls, json_path: Path | str) -> Self:
         """Loads a RunConfig from a JSON file."""
-        # Read JSON contents
-        path_obj = Path(json_path)
-        try:
-            with open(path_obj, encoding="utf-8") as f:
-                data: dict[str, Any] = json.load(f)
-        except FileNotFoundError:
-            logging.error(f"Configuration file not found: {path_obj.absolute()}")
-            raise
-        except json.JSONDecodeError as e:
-            logging.error(f"Invalid JSON format in {path_obj.name}: {e}")
-            raise
 
-        def _get_config_section(key: str) -> dict[str, Any]:
-            """Fetches a section from JSON or returns an empty dict with logging."""
+        def _get_config_section(key: str, required: bool = False) -> dict[str, Any]:
+            """Fetches a section from JSON.
+
+            Args:
+                key: The JSON key to fetch.
+                required: If True, raises a KeyError if the section is missing.
+
+            Raises:
+                KeyError: If a required section is missing from the JSON.
+                ValueError: If the section exists but is not a JSON object (mapping).
+            """
             if key not in data:
+                if required:
+                    raise KeyError(
+                        f"Configuratoin Error: Missing mandatory section {key}"
+                    )
                 logger.debug(
                     "Configuration section '%s' not found; using defaults.", key
                 )
@@ -181,7 +177,19 @@ class RunConfig:
                 )
             return section
 
-        kg_config = KGConfig(**_get_config_section("kg"))
+        # Read JSON contents
+        json_path = Path(json_path)
+        try:
+            with open(json_path, encoding="utf-8") as f:
+                data: dict[str, Any] = json.load(f)
+        except FileNotFoundError:
+            logger.error(f"Configuration file not found: {json_path.absolute()}")
+            raise
+        except json.JSONDecodeError as e:
+            logger.error(f"Invalid JSON format in {json_path.name}: {e}")
+            raise
+
+        kg_config = KGConfig(**_get_config_section("kg", required=True))
         dir_config = DirConfig(**_get_config_section("data"))
         hardware_config = HardwareConfig(**_get_config_section("hardware"))
 
@@ -189,13 +197,13 @@ class RunConfig:
         if "cot_generation" in data:
             cot_config = CoTGenerationConfig(**data["cot_generation"])
         else:
-            logger.debug("Optional section 'cot_generation' omitted.")
+            logger.debug("Optional section 'cot_generation' not defined. Skipping.")
             cot_config = None
 
         if "fine_tuning" in data:
             fine_tuning = FineTuningConfig(**data["fine_tuning"])
         else:
-            logger.debug("Optional section 'fine_tuning' omitted.")
+            logger.debug("Optional section 'fine_tuning' not defined. Skipping.")
             fine_tuning = None
 
         return cls(
@@ -207,4 +215,16 @@ class RunConfig:
         )
 
     def __post_init__(self) -> None:
-        logger.debug("Confifuration correctly instantiated.")
+        """Validate paths for input and output files."""
+
+        logger.debug("Confifuration correctly initialized.")
+
+
+if __name__ == "__main__":
+    # Tets many possible errors in the configuration
+    complete_config = Path("configurations/tests/complete.json")
+    missing_cot = Path("configurations/tests/missing_cot.json")
+    missing_data = Path("configurations/tests/missing_data.json")
+    missing_ft = Path("configurations/tests/missing_ft.json")
+    missing_hw = Path("configurations/tests/missing_hw.json")
+    missing_kg = Path("configurations/tests/missing_kg.json")

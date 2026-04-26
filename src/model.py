@@ -1,28 +1,22 @@
-"""File to implement the functionalities that deal with models, like model loading or
-saving and training or evaluating the model performance."""
+"""Implements functionalities for loading, fine-tuning and evaluating models, as well as
+generating summaries and comparison figures from the results."""
 
-# TODO: Improve EvaluationMetrics class
-import json
+import logging
 import time
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
-from pathlib import Path
 from typing import Any
 
 import bitsandbytes as bnb
-import matplotlib.pyplot as plt
 import pandas as pd
 import torch
 from peft import (
     LoraConfig,
     PeftModel,
     get_peft_model,
-    prepare_model_for_kbit_training,
 )
 from transformers import (
     AutoModelForCausalLM,
     AutoTokenizer,
-    BitsAndBytesConfig,
     DataCollatorForLanguageModeling,
     PreTrainedModel,
     PreTrainedTokenizerBase,
@@ -30,7 +24,27 @@ from transformers import (
     TrainingArguments,
 )
 
-from config import RunConfig
+from config import DirConfig, FineTuningConfig, HardwareConfig
+
+# ---------------------------------------------------------------------------
+# Logging
+# ---------------------------------------------------------------------------
+
+logger = logging.getLogger(__name__)
+
+
+def setup_logging() -> None:
+    """Configures the root logger to output to the console."""
+    logging.basicConfig(
+        level=logging.DEBUG,
+        format="%(asctime)s | %(name)-12s | %(levelname)-8s | %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+    )
+
+
+# ---------------------------------------------------------------------------
+# Evaluation
+# ---------------------------------------------------------------------------
 
 
 @dataclass
@@ -135,8 +149,91 @@ class EvaluationMetrics:
         )
 
 
-def _load_model(
-    config: RunConfig,
+def evaluate_model(
+    ft_config: FineTuningConfig,
+    data: pd.DataFrame,
+    model: PreTrainedModel | PeftModel,
+    tokenizer: PreTrainedTokenizerBase,
+    device: str,
+) -> EvaluationMetrics:
+    """
+    Evaluate model with comprehensive metrics.
+
+    Args:
+        config: Experiment configuration
+        data: Data over which evaluate the model.
+        model: Model to be evaluated.
+
+    Returns:
+        EvaluationMetrics object with:
+        - Precision, Recall, F1, Accuracy
+        - Evaluation time in seconds
+
+    """
+    model.eval()
+
+    y_true = []
+    y_pred = []
+
+    samples = min(len(data), ft_config.test_samples)
+    data = data.head(samples)
+
+    original_padding_side = tokenizer.padding_side
+    tokenizer.padding_side = "left"
+
+    start_time = time.time()
+
+    for i in range(0, samples, ft_config.per_device_batch_size):
+        batch_df = data.iloc[i : i + ft_config.per_device_batch_size]
+
+        # Inputs and ground truths for the whole batch
+        # TODO: Modify to build the prompt from data
+        input_texts = ["###Input:\n" + text for text in batch_df["input_text"]]
+        expected_has_yes = ["yes" in text.lower() for text in batch_df["output_text"]]
+
+        # Tokenize the batch (padding=True is required for batches)
+        inputs = tokenizer(input_texts, return_tensors="pt", padding=True).to(device)
+
+        # Get the length of the padded prompts to slice them out later
+        prompt_length = inputs["input_ids"].shape[1]
+
+        with torch.no_grad():
+            outputs = model.generate(  # type: ignore
+                **inputs,  # Passes both input_ids and attention_mask automatically
+                max_new_tokens=150,
+                pad_token_id=tokenizer.eos_token_id,
+                do_sample=False,
+            )
+
+        # Slice out the prompt (take only the newly generated tokens)
+        generated_tokens = outputs[:, prompt_length:]
+
+        # Decode the entire batch at once
+        model_answers = tokenizer.batch_decode(
+            generated_tokens, skip_special_tokens=True
+        )
+
+        # TODO: Modify for new training
+        for expected, answer in zip(expected_has_yes, model_answers, strict=True):
+            y_true.append(expected)
+            y_pred.append("yes" in answer.lower())
+
+    # Restore the original padding side (in case you train/evaluate sequentially)
+    tokenizer.padding_side = original_padding_side
+
+    # End timing
+    eval_time = time.time() - start_time
+
+    return EvaluationMetrics.from_predictions(y_true, y_pred, eval_time=eval_time)
+
+
+# ---------------------------------------------------------------------------
+# Model loading
+# ---------------------------------------------------------------------------
+
+
+def load_model(
+    ft_config: FineTuningConfig, hw_config: HardwareConfig
 ) -> tuple[PreTrainedModel, PreTrainedTokenizerBase]:
     """Loads a causal language model and its tokenizer with 4-bit quantization.
 
@@ -169,23 +266,30 @@ def _load_model(
     # )
 
     # Determine maximum memmory per GPU
-    if config.hardware.n_gpus > 0:
-        max_memory = {i: f"{config.hardware.max_memory_mb}MB" for i in range(config.hardware.n_gpus)}
+    if hw_config.n_gpus > 0:
+        max_memory = {
+            i: f"{hw_config.max_memory_mb}MB" for i in range(hw_config.n_gpus)
+        }
     else:
         max_memory = None
 
     # Load model and tokenizer
     model = AutoModelForCausalLM.from_pretrained(
-        pretrained_model_name_or_path=config.fine_tuning.model_name,
+        pretrained_model_name_or_path=ft_config.model_name,
         # quantization_config=bnb_config,
         device_map="auto",
         max_memory=max_memory,
     )
 
-    tokenizer = AutoTokenizer.from_pretrained(config.fine_tuning.model_name)
+    tokenizer = AutoTokenizer.from_pretrained(ft_config.model_name)
     tokenizer.pad_token = tokenizer.eos_token
 
     return model, tokenizer
+
+
+# ---------------------------------------------------------------------------
+# Model Fine-tuning
+# ---------------------------------------------------------------------------
 
 
 def _get_linear_names(model: PreTrainedModel | torch.nn.Module) -> list[str]:
@@ -208,10 +312,12 @@ def _get_linear_names(model: PreTrainedModel | torch.nn.Module) -> list[str]:
 
 
 def fine_tune(
-    config: RunConfig,
+    ft_config: FineTuningConfig,
+    data_config: DirConfig,
+    hw_config: HardwareConfig,
     train_dataset: pd.DataFrame,
-    model: PreTrainedModel | None = None,
-    tokenizer: PreTrainedTokenizerBase | None = None,
+    model: PreTrainedModel = None,
+    tokenizer: PreTrainedTokenizerBase = None,
 ) -> tuple[PeftModel, float]:
     """
     Fine-tune a large language model using LoRA.
@@ -225,22 +331,17 @@ def fine_tune(
     Returns:
         Tuple containing the fine-tuned model and training time in seconds.
     """
-    if model is None:
-        model, tokenizer = _load_model(config)
-    elif tokenizer is None:
-        _, tokenizer = _load_model(config)  # TODO: custom models and tokenizers?
-
     # Prepare model for LoRA
     model.gradient_checkpointing_enable()
     # peft_prepared_model = prepare_model_for_kbit_training(model)
 
     peft_config = LoraConfig(
-        r=config.fine_tuning.lora.r,
-        lora_alpha=config.fine_tuning.lora.lora_alpha,
+        r=ft_config.lora_r,
+        lora_alpha=ft_config.lora_alpha,
         target_modules=_get_linear_names(model),
-        lora_dropout=config.fine_tuning.lora.lora_dropout,
-        bias=config.fine_tuning.lora.bias,
-        task_type=config.fine_tuning.lora.task_type,
+        lora_dropout=ft_config.lora_dropout,
+        bias=ft_config.lora_bias,
+        task_type=ft_config.lora_task_type,
     )
 
     peft_model = get_peft_model(model, peft_config)
@@ -249,17 +350,17 @@ def fine_tune(
 
     # Configure training
     training_args = TrainingArguments(
-        output_dir=str(config.data.output_dir),
-        per_device_train_batch_size=config.fine_tuning.per_device_batch_size,
-        gradient_accumulation_steps=config.fine_tuning.gradient_accumulation_steps,
-        max_steps=config.fine_tuning.max_steps,
-        learning_rate=config.fine_tuning.learning_rate,
-        warmup_steps=config.fine_tuning.warmup_steps,
-        optim=config.fine_tuning.optim,
-        logging_steps=config.fine_tuning.logging_steps,
-        save_steps=config.fine_tuning.save_steps,
-        fp16=(config.hardware.precision == torch.float16),
-        bf16=(config.hardware.precision == torch.bfloat16),
+        output_dir=str(data_config.output_dir),
+        per_device_train_batch_size=ft_config.per_device_batch_size,
+        gradient_accumulation_steps=ft_config.gradient_accumulation_steps,
+        max_steps=ft_config.max_steps,
+        learning_rate=ft_config.learning_rate,
+        warmup_steps=ft_config.warmup_steps,
+        optim=ft_config.optim,
+        logging_steps=ft_config.logging_steps,
+        save_steps=ft_config.save_steps,
+        fp16=(hw_config.precision == torch.float16),
+        bf16=(hw_config.precision == torch.bfloat16),
     )
 
     trainer = Trainer(
@@ -275,319 +376,14 @@ def fine_tune(
     training_time = time.time() - start_time
 
     # Save and Return
-    config.data.output_dir.mkdir(parents=True, exist_ok=True)
+    data_config.output_dir.mkdir(parents=True, exist_ok=True)
 
     if trainer.model is not None:
         assert isinstance(trainer.model, PeftModel), (
             "Model is not a PeftModel, this might cause a crash."
         )
-        trainer.model.save_pretrained(str(config.data.output_dir))
+        trainer.model.save_pretrained(str(data_config.output_dir))
     else:
         print("Model is None type, something went wrong during fine-tuning.")
 
     return peft_model, training_time
-
-
-def evaluate_model(
-    config: RunConfig,
-    data: pd.DataFrame,
-    model: PreTrainedModel | PeftModel | None = None,
-    tokenizer: PreTrainedTokenizerBase | None = None,
-) -> EvaluationMetrics:
-    """
-    Evaluate model with comprehensive metrics.
-
-    Args:
-        config: Experiment configuration
-        data: Data over which evaluate the model.
-        model: Base model. Defaults to whatever is defined in config
-
-    Returns:
-        EvaluationMetrics object with:
-        - Precision, Recall, F1, Accuracy
-        - Evaluation time in seconds
-
-    """
-    if model is None:
-        model, tokenizer = _load_model(config)
-    elif tokenizer is None:
-        _, tokenizer = _load_model(config)  # TODO: custom models and tokenizers?
-
-    device = config.hardware.device
-    model.eval()
-
-    y_true = []
-    y_pred = []
-
-    samples = min(len(data), config.fine_tuning.test_samples)
-    data_subset = data.head(samples)
-
-    original_padding_side = tokenizer.padding_side
-    tokenizer.padding_side = "left"
-
-    start_time = time.time()
-
-    for i in range(0, samples, config.fine_tuning.batch_size):
-        batch_df = data_subset.iloc[i : i + config.fine_tuning.batch_size]
-
-        # Inputs and ground truths for the whole batch
-        input_texts = ["###Input:\n" + text for text in batch_df["input_text"]]
-        expected_has_yes = ["yes" in text.lower() for text in batch_df["output_text"]]
-
-        # Tokenize the batch (padding=True is required for batches)
-        inputs = tokenizer(input_texts, return_tensors="pt", padding=True).to(device)
-
-        # Get the length of the padded prompts to slice them out later
-        prompt_length = inputs["input_ids"].shape[1]
-
-        with torch.no_grad():
-            outputs = model.generate(  # type: ignore
-                **inputs,  # Passes both input_ids and attention_mask automatically
-                max_new_tokens=150,
-                pad_token_id=tokenizer.eos_token_id,
-                do_sample=False,
-            )
-
-        # Slice out the prompt (take only the newly generated tokens)
-        generated_tokens = outputs[:, prompt_length:]
-
-        # Decode the entire batch at once
-        model_answers = tokenizer.batch_decode(
-            generated_tokens, skip_special_tokens=True
-        )
-
-        # Extract metrics for the batch
-        for expected, answer in zip(expected_has_yes, model_answers):
-            y_true.append(expected)
-            y_pred.append("yes" in answer.lower())
-
-        # Progress tracking
-        processed = min(i + config.fine_tuning.per_device_batch_size, samples)
-        if (
-            processed % (config.fine_tuning.per_device_batch_size * 5) == 0
-            or processed == samples
-        ):
-            elapsed = time.time() - start_time
-            print(
-                f"Processed {processed}/{samples} samples... ({elapsed:.1f}s elapsed)"
-            )
-
-    # Restore the original padding side (in case you train/evaluate sequentially)
-    tokenizer.padding_side = original_padding_side
-
-    # End timing
-    eval_time = time.time() - start_time
-
-    return EvaluationMetrics.from_predictions(y_true, y_pred, eval_time=eval_time)
-
-
-def create_results_table_png(
-    results: dict[str, EvaluationMetrics],
-    output_path: Path,
-) -> None:
-    """
-    Generate a formatted results table and save it as a .png file.
-
-    Args:
-        results: A dictionary containing EvaluationMetrics for each model in the
-                 experiment.
-        filename: Name of the output file.
-    """
-    # 1. Define columns to match your original console output
-    columns = ["Model", "Precision", "Recall", "F1", "Size", "Time (s)", "Train (s)"]
-    cell_text = []
-
-    # 2. Extract and format data
-    for model_name, metrics in results.items():
-        row = [
-            model_name,
-            f"{metrics.precision:.4f}",
-            f"{metrics.recall:.4f}",
-            f"{metrics.f1_score:.4f}",
-            str(metrics.eval_size),
-            f"{metrics.eval_time:.2f}",
-            f"{metrics.train_time:.2f}",
-        ]
-        cell_text.append(row)
-
-    # Matplotlib figure
-    fig_width = 10
-    fig_height = len(cell_text) * 0.5 + 1.5
-
-    fig, ax = plt.subplots(figsize=(fig_width, fig_height))
-    ax.axis("off")
-    ax.axis("tight")
-
-    table = ax.table(
-        cellText=cell_text, colLabels=columns, loc="center", cellLoc="center"
-    )
-    table.auto_set_font_size(False)
-    table.set_fontsize(10)
-    table.scale(1.2, 1.8)
-
-    for (row_idx, _), cell in table.get_celld().items():
-        if row_idx == 0:
-            cell.set_text_props(weight="bold")
-            cell.set_facecolor("#f0f0f0")
-
-    plt.title("EVALUATION RESULTS SUMMARY", weight="bold", size=14, pad=20)
-
-    # Save figure to a file
-    plt.tight_layout()
-    plt.savefig(output_path, dpi=300, bbox_inches="tight")
-    plt.close(fig)
-
-
-def _save_json_results(
-    config: RunConfig,
-    results: dict[str, EvaluationMetrics],
-) -> None:
-    """Helper method to generate and save the JSON payload.
-
-    TODO: Document
-    """
-
-    json_path = config.data.output_dir / config.fine_tuning.resuts_json_file
-
-    results_dict: dict[str, Any] = {
-        "experiment_info": {
-            "timestamp": datetime.now(timezone.utc).isoformat(),
-            "model": config.fine_tuning.model_name,
-            "model_alias": config.fine_tuning.model_alias,
-            "train_samples": config.fine_tuning.train_samples,
-            "training_steps": config.fine_tuning.max_steps,
-            "epochs": config.fine_tuning.num_train_epochs,
-        },
-        "results": results,
-    }
-
-    with open(json_path, "w", encoding="utf-8") as f:
-        json.dump(results_dict, f, indent=2)
-
-    # TODO: implement logger
-    print(f"JSON results saved to {json_path}")
-
-
-def _save_summary_csv(
-    config: RunConfig,
-    results: dict[str, EvaluationMetrics],
-) -> None:
-    """Helper method to generate and save the summary CSV dataframe.
-
-    Args:
-        config: Experiment configuration.
-        results: Evaluaiton metrics of each model in the experiment.
-    """
-    csv_path = config.data.output_dir / config.fine_tuning.summary_csv_file
-    rows = [
-        {
-            "Model": model_name,
-            "Precision": metrics.precision,
-            "Recall": metrics.recall,
-            "F1": metrics.f1_score,
-            "Size": metrics.eval_size,
-            "Time (s)": metrics.eval_time,
-            "Train Time (s)": metrics.train_time,
-        }
-        for model_name, metrics in results.items()
-    ]
-
-    df = pd.DataFrame(rows)
-    df = df.round(
-        {
-            "Precision": 4,
-            "Recall": 4,
-            "F1": 4,
-            "Time (s)": 2,
-            "Train Time (s)": 2,
-        }
-    )
-
-    df.to_csv(csv_path, index=False)
-
-    # TODO: implement logging
-    print(f"Summary CSV saved to {csv_path}")
-
-
-def save_results(config: RunConfig, results: dict[str, EvaluationMetrics]) -> None:
-    """Saves comprehensive results to multiple formats in disk.
-
-    Args:
-        config: Dataclass with the experiment settings.
-        results: Dictionary containing model names mapped to metric objects.
-
-    Raises:
-        NotADirectoryError: If the output dir specified in `config` does not exist.
-    """
-    if not config.data.output_dir.is_dir():
-        raise NotADirectoryError(
-            f"The directory does not exist: {config.data.output_dir}"
-        )
-
-    config.data.output_dir.mkdir(parents=True, exist_ok=True)
-
-    _save_json_results(config, results)
-    _save_summary_csv(config, results)
-
-
-def create_comparison_plot(config: RunConfig, results: dict[str, Any]) -> None:
-    """Creates a bar chart comparing model performances.
-
-    Args:
-        config: Dataclass with the experiment settings.
-        results: Dictionary containing model names mapped to metric objects.
-
-    Raises:
-        NotADirectoryError: If the output dir specified in `config` does not exist.
-    """
-    if not config.data.output_dir.is_dir():
-        raise NotADirectoryError(
-            f"The directory does not exist: {config.data.output_dir}"
-        )
-
-    models = list(results.keys())
-    if not models:
-        # TODO: logging
-        print("Warning: No results found to plot.")
-        return
-
-    fig, axes = plt.subplots(2, 2, figsize=(14, 10))
-
-    metrics_data = [
-        (axes[0, 0], [results[m].accuracy for m in models], "Accuracy"),
-        (axes[0, 1], [results[m].precision for m in models], "Precision"),
-        (axes[1, 0], [results[m].recall for m in models], "Recall"),
-        (axes[1, 1], [results[m].f1_score for m in models], "F1 Score"),
-    ]
-
-    for ax, data, title in metrics_data:
-        bars = ax.bar(models, data, alpha=0.8)
-
-        ax.set_ylabel(title, fontsize=12)
-        ax.set_title(f"{title} Comparison", fontsize=14, fontweight="bold")
-
-        ax.set_ylim([0, 1.05])
-        ax.grid(axis="y", alpha=0.3)
-
-        for bar in bars:
-            height = bar.get_height()
-            ax.text(
-                bar.get_x() + bar.get_width() / 2.0,
-                height,
-                f"{height:.2f}",
-                ha="center",
-                va="bottom",
-                fontsize=10,
-                fontweight="bold",
-            )
-
-    plt.tight_layout()
-
-    output_file = config.data.output_dir / config.fine_tuning.summary_plot_file
-
-    plt.savefig(output_file, dpi=300, bbox_inches="tight")
-
-    plt.close(fig)
-
-    # TODO: Implement logging
-    print(f"Comparison plot saved to {output_file}")

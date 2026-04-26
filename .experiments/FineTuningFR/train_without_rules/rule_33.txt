@@ -1,0 +1,65 @@
+If name ?f AND successor ?b, then successor ?b.
+
+Formal Rule:
+	Head: ?a successor ?b
+	Body: ?a name ?f AND ?f successor ?b
+
+Real Instances from Knowledge Graph (10 found):
+
+Eleanor of Castile, f has successor Edward II of England
+Eleanor of Castile has name f
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Eleanor of Aquitaine has successor John King of England, f has successor John King of England
+Eleanor of Aquitaine has name f
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: yes
+
+Joan II Countess of Burgundy has successor Joan III Countess of Burgundy, f has successor Joan III Countess of Burgundy
+Joan II Countess of Burgundy has name f
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: yes
+
+Marie Countess of Ponthieu has successor Joan Countess of Ponthieu, f has successor Joan Countess of Ponthieu
+Marie Countess of Ponthieu has name f
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: yes
+
+Joanna of Castile has successor Charles V Holy Roman Emperor, f has successor Charles V Holy Roman Emperor
+Joanna of Castile has name f
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: yes
+
+Margaret Countess of Anjou has successor Philip VI of France, f has successor Philip VI of France
+Margaret Countess of Anjou has name f
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: yes
+
+Maria Teresa Cybo Malaspina Duchess of Massa has successor Maria Beatrice d Este Duchess of Massa, f has successor Maria Beatrice d Este Duchess of Massa
+Maria Teresa Cybo Malaspina Duchess of Massa has name f
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: yes
+
+Alix Duchess of Brittany has successor John I Duke of Brittany, f has successor John I Duke of Brittany
+Alix Duchess of Brittany has name f
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: yes
+
+Petronilla of Aragon has successor Alfonso II of Aragon, f has successor Alfonso II of Aragon
+Petronilla of Aragon has name f
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: yes
+
+Jeanne d Albret has successor Henry IV of France, f has successor Henry IV of France
+Jeanne d Albret has name f
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: yes
+
+
+Rule Metrics:
+	PCA Confidence: 0.7647
+	Standard Confidence: 0.7647
+	Rule Classification: POSITIVE (PCA conf. 0.7647 >= 0.5)
+	Positive Examples: 13.0000
+	Head Coverage: 0.0367

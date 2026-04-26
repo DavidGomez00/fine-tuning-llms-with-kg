@@ -1,0 +1,1647 @@
+If father ?b, then predecessor ?b.
+
+Formal Rule:
+	Head: ?a predecessor ?b
+	Body: ?a father ?b
+
+Real Instances from Knowledge Graph (408 found):
+
+Dangereuse de l Isle Bouchard, Dangereuse de l Isle Bouchard has father A nor de Ch tellerault
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Gertrude of Saxony, Gertrude of Saxony has father Bertha of Holland
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Elizabeth Mure, Elizabeth Mure has father Robert III of Scotland
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Maria of Austria Holy Roman Empress, Maria of Austria Holy Roman Empress has father Elisabeth of Austria Queen of France
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Joan of Geneva, Joan of Geneva has father Humbert II Count of Savoy
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Christine of Saxony, Christine of Saxony has father Christine of Hesse
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Maud of Apulia, Maud of Apulia has father Ramon Berenguer III Count of Barcelona
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Maria Amalia of Saxony, Maria Amalia of Saxony has father Maria Luisa of Spain
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Maria Amalia of Saxony, Maria Amalia of Saxony has father Ferdinand I of the Two Sicilies
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Isabella of France, Isabella of France has father Edward III of England
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Marie Countess of Harcourt, Marie Countess of Harcourt has father Frederick II Count of Vaud mont
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Judith of Bavaria died 843, Judith of Bavaria died 843 has father Charles the Bald
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Richende De Bourges, Richende De Bourges has father Theobald I Count of Blois
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Fran oise Marie de Bourbon, Fran oise Marie de Bourbon has father Louis Duke of Orl ans 1703 1752
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Fran oise Marie de Bourbon, Fran oise Marie de Bourbon has father Charlotte Agla  d Orl ans
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Catherine of Vend me, Catherine of Vend me has father Charlotte of Bourbon Queen of Cyprus
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Elizabeth of Austria 1436 1505, Elizabeth of Austria 1436 1505 has father Barbara Jagiellon
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Joan Fitzalan Countess of Hereford, Joan Fitzalan Countess of Hereford has father Mary de Bohun
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Waldrada of Worms, Waldrada of Worms has father Adelaide of Auxerre born c. 870
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Waldrada of Worms, Waldrada of Worms has father Rudolph I of Burgundy
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Osburh, Osburh has father Alfred the Great
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Bertha daughter of Lothair II, Bertha daughter of Lothair II has father Hugh of Italy
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Alice of Vergy, Alice of Vergy has father Hugh IV Duke of Burgundy
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Adelaide of Maurienne, Adelaide of Maurienne has father Philip of France 1116 1131
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Adelaide of Maurienne, Adelaide of Maurienne has father Robert I Count of Dreux
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Beatrice of Castile 1242 1303, Beatrice of Castile 1242 1303 has father Denis of Portugal
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Eadgifu of Wessex, Eadgifu of Wessex has father Louis IV of France
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Marie Antoinette, Marie Antoinette has father Marie Th r se of France
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Marie Antoinette, Marie Antoinette has father Louis XVII
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Eleanor of Castile, Eleanor of Castile has father Edward II of England
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Auguste of Bade Baden, Auguste of Bade Baden has father Louis Philippe I Duke of Orl ans
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Margaret of Bar, Margaret of Bar has father Henry VI Count of Luxembourg
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Maud Chaworth, Maud Chaworth has father Eleanor of Lancaster
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Matilda of Ringelheim, Matilda of Ringelheim has father Gerberga of Saxony
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Anne Marie d Orl ans, Anne Marie d Orl ans has father Charles Emmanuel III of Sardinia
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Anne Marie d Orl ans, Anne Marie d Orl ans has father Marie Ad la de of Savoy
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Anna Eleonore of Hesse Darmstadt, Anna Eleonore of Hesse Darmstadt has father Ernest Augustus Elector of Hanover
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Beatrice of Savoy, Beatrice of Savoy has father Margaret of Provence
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Beatrice of Savoy, Beatrice of Savoy has father Eleanor of Provence
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Anne of Cyprus, Anne of Cyprus has father Margaret of Savoy Countess of Saint Pol
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Anne of Cyprus, Anne of Cyprus has father Charlotte of Savoy
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Anne of Cyprus, Anne of Cyprus has father Philip II Duke of Savoy
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Charlotte of Bourbon Queen of Cyprus, Charlotte of Bourbon Queen of Cyprus has father Anne of Cyprus
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Maria of Swabia, Maria of Swabia has father Henry III Duke of Brabant
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Maria of Swabia, Maria of Swabia has father Matilda of Brabant Countess of Artois
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+ lisabeth Charlotte d Orl ans,  lisabeth Charlotte d Orl ans has father Francis I Holy Roman Emperor
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Beatrice of Burgundy Lady of Bourbon, Beatrice of Burgundy Lady of Bourbon has father Louis I Duke of Bourbon
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Princess Louise of Hesse Darmstadt 1757 1830, Princess Louise of Hesse Darmstadt 1757 1830 has father Princess Caroline Louise of Saxe Weimar Eisenach
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Estrid of the Obotrites, Estrid of the Obotrites has father Ingegerd Olofsdotter of Sweden
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Princess Augusta of Saxe Gotha, Princess Augusta of Saxe Gotha has father George III
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Eleanor of Aragon Queen of Portugal, Eleanor of Aragon Queen of Portugal has father Afonso V of Portugal
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Eleanor of Aragon Queen of Portugal, Eleanor of Aragon Queen of Portugal has father Ferdinand Duke of Viseu
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Clarice Orsini, Clarice Orsini has father Piero the Unfortunate
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Maria Theresa of Naples and Sicily, Maria Theresa of Naples and Sicily has father Marie Louise Duchess of Parma
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Isabella I of Castile, Isabella I of Castile has father Maria of Aragon Queen of Portugal
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Marie de Medici, Marie de Medici has father Elisabeth of France 1602 1644
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Marie de Medici, Marie de Medici has father Henrietta Maria
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Juana Manuel, Juana Manuel has father John I of Castile
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Urraca of Portugal, Urraca of Portugal has father Alfonso IX of Le n
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Adela of Milan, Adela of Milan has father Albert Azzo II Margrave of Milan
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Mary of Avesnes, Mary of Avesnes has father Peter I Duke of Bourbon
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Mary of Avesnes, Mary of Avesnes has father James I Count of La Marche
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Mar a de Molina, Mar a de Molina has father Ferdinand IV of Castile
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Maria Josepha of Saxony Dauphine of France, Maria Josepha of Saxony Dauphine of France has father Louis XVI
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Maria Josepha of Saxony Dauphine of France, Maria Josepha of Saxony Dauphine of France has father Charles X
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Maria Josepha of Saxony Dauphine of France, Maria Josepha of Saxony Dauphine of France has father Louis XVIII
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Maria Luisa of Spain, Maria Luisa of Spain has father Francis II Holy Roman Emperor
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Claude of France 1547 1575, Claude of France 1547 1575 has father Francis II Duke of Lorraine
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Margaret Boswell, Margaret Boswell has father Matthew Stewart 2nd Earl of Lennox
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Margaret of Valois Duchess of Berry, Margaret of Valois Duchess of Berry has father Charles Emmanuel I Duke of Savoy
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Anne of Brittany has predecessor Claude of France, Anne of Brittany has father Claude of France
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Constance of Castile, Constance of Castile has father Alys of France Countess of Vexin
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Constance of Arles, Constance of Arles has father Hugh Magnus
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Constance of Arles, Constance of Arles has father Robert I Duke of Burgundy
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Magdalene Sibylle of Prussia, Magdalene Sibylle of Prussia has father Sophia Eleonore of Saxony
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Maria Carolina of Austria, Maria Carolina of Austria has father Maria Theresa of Naples and Sicily
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Maria Carolina of Austria, Maria Carolina of Austria has father Maria Amalia of Naples and Sicily
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Anne of Austria, Anne of Austria has father Philippe I Duke of Orl ans
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Sophia of Saxe Weissenfels Princess of Anhalt Zerbst, Sophia of Saxe Weissenfels Princess of Anhalt Zerbst has father Princess Magdalena Augusta of Anhalt Zerbst
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Catherine of Foix Countess of Candale, Catherine of Foix Countess of Candale has father Anne of Foix Candale
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Christine of Hesse, Christine of Hesse has father Anna of Holstei Gottorp
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Wierzchoslawa Ludmilla of Greater Poland, Wierzchoslawa Ludmilla of Greater Poland has father Frederick II Duke of Lorraine
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Maria Antonia Ferdinanda of Spain, Maria Antonia Ferdinanda of Spain has father Maria Theresa of Savoy
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Gisela of Burgundy Marchioness of Montferrat, Gisela of Burgundy Marchioness of Montferrat has father Adelaide of Maurienne
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Beatrice of Portugal Duchess of Savoy, Beatrice of Portugal Duchess of Savoy has father Emmanuel Philibert Duke of Savoy
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Claude Fran oise de Lorraine, Claude Fran oise de Lorraine has father Charles V Duke of Lorraine
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Eleanor of Lancaster, Eleanor of Lancaster has father Alice Holland Countess of Kent
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Joan I of Navarre, Joan I of Navarre has father Charles IV of France
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Joan I of Navarre, Joan I of Navarre has father Isabella of France
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Elisabeth of Nuremberg, Elisabeth of Nuremberg has father Margaret of the Palatinate
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Marie Ad la de of Savoy, Marie Ad la de of Savoy has father Louis XV
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Ren e of Bourbon, Ren e of Bourbon has father Francis I Duke of Lorraine
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Ren e of Bourbon, Ren e of Bourbon has father Nicolas Duke of Merc ur
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Douce I Countess of Provence, Douce I Countess of Provence has father Ramon Berenguer IV Count of Barcelona
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Douce I Countess of Provence, Douce I Countess of Provence has father Berengaria of Barcelona
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Willa of Tuscany, Willa of Tuscany has father Rozala of Italy
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Margaret of Saxony Duchess of Brunswic L neburg, Margaret of Saxony Duchess of Brunswic L neburg has father Ernest I Duke of Brunswic L neburg
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Gerloc, Gerloc has father Adelaide of Aquitaine
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Gerloc, Gerloc has father William IV Duke of Aquitaine
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Anne of Bohemia and Hungary, Anne of Bohemia and Hungary has father Archduchess Anna of Austria
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Anne of Bohemia and Hungary, Anne of Bohemia and Hungary has father Joanna of Austria Grand Duchess of Tuscany
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Anne of Bohemia and Hungary, Anne of Bohemia and Hungary has father Maximilian II Holy Roman Emperor
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Anne of Bohemia and Hungary, Anne of Bohemia and Hungary has father Maria of Austria Duchess of J lich Cleves Berg
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Amicie de Courtenay, Amicie de Courtenay has father Mahaut Countess of Artois
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Maria Theresa of Austria Este Queen of Sardinia, Maria Theresa of Austria Este Queen of Sardinia has father Maria Beatrice of Savoy
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Maria Beatrice d Este Duchess of Massa, Maria Beatrice d Este Duchess of Massa has father Maria Theresa of Austria Este Queen of Sardinia
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Clementia of Hungary, Clementia of Hungary has father John I of France
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Elisabeth Christine of Brunswic Wolfenb ttel, Elisabeth Christine of Brunswic Wolfenb ttel has father Maria Theresa
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Maud FitzJohn Countess of Warwick, Maud FitzJohn Countess of Warwick has father Isabella de Beauchamp
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Isabella of Portugal Queen of Castile, Isabella of Portugal Queen of Castile has father Isabella I of Castile
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Barbara Jagiellon, Barbara Jagiellon has father Christine of Saxony
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Empress Matilda, Empress Matilda has father Henry II of England
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Maria Anna Victoria of Bavaria, Maria Anna Victoria of Bavaria has father Philip V of Spain
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Maria Anna Victoria of Bavaria, Maria Anna Victoria of Bavaria has father Louis Duke of Burgundy
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Infanta Luisa Fernanda Duchess of Montpensier, Infanta Luisa Fernanda Duchess of Montpensier has father Princess Marie Isabelle of Orl ans
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Eleanor of Aquitaine has predecessor John King of England, Eleanor of Aquitaine has father John King of England
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Eleanor of Aquitaine, Eleanor of Aquitaine has father Eleanor of England Queen of Castile
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Joan Beaufort Queen of Scots, Joan Beaufort Queen of Scots has father Margaret Stewart Dauphine of France
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Joan Beaufort Queen of Scots, Joan Beaufort Queen of Scots has father James II of Scotland
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Maria Teresa Felicitas d Este, Maria Teresa Felicitas d Este has father Louise Marie Ad la de de Bourbon Duchess of Orl ans
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Joan II Countess of Burgundy has predecessor Joan III Countess of Burgundy, Joan II Countess of Burgundy has father Joan III Countess of Burgundy
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Berengaria of Barcelona, Berengaria of Barcelona has father Ferdinand II of Le n
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Eleanor of Portugal Holy Roman Empress, Eleanor of Portugal Holy Roman Empress has father Maximilian I Holy Roman Emperor
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Margaret of Joinville, Margaret of Joinville has father Antoine Count of Vaud mont
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Helena of Denmark, Helena of Denmark has father Otto I Duke of Brunswic L neburg
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Valentina Visconti Duchess of Orl ans, Valentina Visconti Duchess of Orl ans has father Charles Duke of Orl ans
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Richilde Countess of Hainaut, Richilde Countess of Hainaut has father Baldwin II Count of Hainaut
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Louise of Savoy, Louise of Savoy has father Margaret of Valois Angoul me
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Joan of Ponthieu Dame of Epernon, Joan of Ponthieu Dame of Epernon has father Catherine of Vend me
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Catherine de Medici, Catherine de Medici has father Margaret of Valois
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Catherine de Medici, Catherine de Medici has father Henry III of France
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Catherine de Medici, Catherine de Medici has father Charles IX of France
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Catherine de Medici, Catherine de Medici has father Francis II of France
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Marie of Anjou, Marie of Anjou has father Louis XI
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Anne Gonzaga, Anne Gonzaga has father Benedicta Henrietta of the Palatinate
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Isabella of Aragon Queen of France, Isabella of Aragon Queen of France has father Charles Count of Valois
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Sibylla of Anjou, Sibylla of Anjou has father Margaret I Countess of Flanders
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Elisabeth Farnese, Elisabeth Farnese has father Maria Antonia Ferdinanda of Spain
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Elisabeth Farnese, Elisabeth Farnese has father Charles III of Spain
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Lady Margaret Beaufort, Lady Margaret Beaufort has father Henry VII of England
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Jeanne de Bourbon Duchess of Bourbon, Jeanne de Bourbon Duchess of Bourbon has father Madeleine de La Tour d Auvergne
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Adela of France, Adela of France has father Baldwin VI Count of Flanders
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Judith of Flanders died 1095, Judith of Flanders died 1095 has father Henry IX Duke of Bavaria
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Marie Countess of Ponthieu has predecessor Joan Countess of Ponthieu, Marie Countess of Ponthieu has father Joan Countess of Ponthieu
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Gerberga of M con, Gerberga of M con has father Otto William Count of Burgundy
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Duchess Helene of Mecklenburg Schwerin, Duchess Helene of Mecklenburg Schwerin has father Prince Philippe Count of Paris
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Anne of Kiev, Anne of Kiev has father Philip I of France
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Isabella of Valois Duchess of Bourbon, Isabella of Valois Duchess of Bourbon has father Joanna of Bourbon
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Beatrice of Silesia, Beatrice of Silesia has father Stephen II Duke of Bavaria
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Agnes of Loon, Agnes of Loon has father Louis I Duke of Bavaria
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Joanna of Castile, Joanna of Castile has father Eleanor of Austria
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Joanna of Castile has predecessor Charles V Holy Roman Emperor, Joanna of Castile has father Charles V Holy Roman Emperor
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Beatrice Regina della Scala, Beatrice Regina della Scala has father Taddea Visconti
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Joanna of Bourbon, Joanna of Bourbon has father Charles VI of France
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Joanna of Bourbon, Joanna of Bourbon has father Louis I Duke of Orl ans
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Louise Marie Ad la de de Bourbon Duchess of Orl ans, Louise Marie Ad la de de Bourbon Duchess of Orl ans has father Louis Philippe I
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Berengaria of Castile, Berengaria of Castile has father Ferdinand III of Castile
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Margaret of Provence, Margaret of Provence has father Philip III of France
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Margaret of Provence, Margaret of Provence has father Robert Count of Clermont
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Maria Amalia of Naples and Sicily, Maria Amalia of Naples and Sicily has father Antoine Duke of Montpensier
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Blanca of Navarre Queen of Castile, Blanca of Navarre Queen of Castile has father Alfonso VIII of Castile
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Yolanda of Courtenay, Yolanda of Courtenay has father Violant of Hungary
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Margaret Countess of Anjou, Margaret Countess of Anjou has father Joan of Valois Countess of Hainaut
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Margaret Countess of Anjou has predecessor Philip VI of France, Margaret Countess of Anjou has father Philip VI of France
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Rozala of Italy, Rozala of Italy has father Baldwin IV Count of Flanders
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Isabella of Portugal, Isabella of Portugal has father Philip II of Spain
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Isabella of Portugal, Isabella of Portugal has father Maria of Austria Holy Roman Empress
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Caroline of Ansbach, Caroline of Ansbach has father Frederick Prince of Wales
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Gerberga of Saxony, Gerberga of Saxony has father Lothair of France
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Gerberga of Saxony, Gerberga of Saxony has father Matilda of France
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Ermengarde of Anjou Duchess of Burgundy, Ermengarde of Anjou Duchess of Burgundy has father Fulk IV Count of Anjou
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Marie of France Countess of Champagne, Marie of France Countess of Champagne has father Theobald III Count of Champagne
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Matilda of England Duchess of Saxony, Matilda of England Duchess of Saxony has father William of Winchester Lord of Lunenburg
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Isabella of Angoul me, Isabella of Angoul me has father Henry III of England
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Margaret of Flanders Duchess of Brabant, Margaret of Flanders Duchess of Brabant has father Margaret of Brabant
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Lucrezia Tornabuoni, Lucrezia Tornabuoni has father Lorenzo de Medici
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Margaret I Countess of Flanders, Margaret I Countess of Flanders has father Isabella of Hainault
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Margaret I Countess of Flanders, Margaret I Countess of Flanders has father Yolanda Latin Empress
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Philippa Countess of Toulouse, Philippa Countess of Toulouse has father William X Duke of Aquitaine
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Adelaide of Auxerre born c. 870, Adelaide of Auxerre born c. 870 has father Rudolph of France
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Matilda of Saxony countess of Flanders, Matilda of Saxony countess of Flanders has father Arnulf II Count of Flanders
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Begga, Begga has father Pepin of Herstal
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Maria Theresa, Maria Theresa has father Leopold II Holy Roman Emperor
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Maria Theresa, Maria Theresa has father Ferdinand Karl Archduke of Austria Este
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Maria Theresa, Maria Theresa has father Marie Antoinette
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Margaret of Bavaria, Margaret of Bavaria has father Mary of Burgundy Duchess of Cleves
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Agnes of Burgundy Duchess of Bourbon, Agnes of Burgundy Duchess of Bourbon has father Isabella of Bourbon
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Agnes of Burgundy Duchess of Bourbon, Agnes of Burgundy Duchess of Bourbon has father Margaret of Bourbon 1438 1483
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Marie de Ch tillon 1323 1363, Marie de Ch tillon 1323 1363 has father John I Duke of Lorraine
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Matilda of Brandenburg Duchess of Brunswic L neburg, Matilda of Brandenburg Duchess of Brunswic L neburg has father Albert I Duke of Brunswic L neburg
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Isabeau of Bavaria, Isabeau of Bavaria has father Catherine of Valois
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Isabeau of Bavaria, Isabeau of Bavaria has father Charles VII of France
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Margaret of the Palatinate, Margaret of the Palatinate has father Isabella Duchess of Lorraine
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Mary de Bohun, Mary de Bohun has father Henry V of England
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Maria Theresa of Spain, Maria Theresa of Spain has father Louis Dauphin of France son of Louis XIV
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Catherine of Valois, Catherine of Valois has father Henry VI of England
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Agnes of France Duchess of Burgundy, Agnes of France Duchess of Burgundy has father Joan the Lame
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Agnes of France Duchess of Burgundy, Agnes of France Duchess of Burgundy has father Odo IV Duke of Burgundy
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Anne of Foix Candale, Anne of Foix Candale has father Anne of Bohemia and Hungary
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Maria Beatrice of Savoy, Maria Beatrice of Savoy has father Archduchess Maria Theresa of Austria Este 1817 1886
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Eleanor of Provence, Eleanor of Provence has father Edward I of England
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Marie Jeanne Baptiste of Savoy Nemours, Marie Jeanne Baptiste of Savoy Nemours has father Victor Amadeus II of Sardinia
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Lutgardis of Luxemburg, Lutgardis of Luxemburg has father Dirk III Count of Holland
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Heilika of Lengenfeld, Heilika of Lengenfeld has father Otto I Duke of Bavaria
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Bonne of Luxembourg, Bonne of Luxembourg has father Marie of France Duchess of Bar
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Bonne of Luxembourg, Bonne of Luxembourg has father Charles V of France
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Bonne of Luxembourg, Bonne of Luxembourg has father Louis I of Anjou
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Marie of Brabant Queen of France, Marie of Brabant Queen of France has father Louis Count of  vreux
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Bertha of Swabia, Bertha of Swabia has father Conrad I of Burgundy
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Sancha of Castile Queen of Aragon, Sancha of Castile Queen of Aragon has father Peter II of Aragon
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Jacquetta of Luxembourg, Jacquetta of Luxembourg has father Elizabeth Woodville
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Gertrude of Hohenberg, Gertrude of Hohenberg has father Albert I of Germany
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Gertrude of Hohenberg, Gertrude of Hohenberg has father Judith of Habsburg
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Gertrude of Hohenberg, Gertrude of Hohenberg has father Clemence of Austria
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Blanche of Brittany, Blanche of Brittany has father Margaret of Artois
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Christina of Denmark, Christina of Denmark has father Charles III Duke of Lorraine
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Marie of Cleves Duchess of Orl ans, Marie of Cleves Duchess of Orl ans has father Louis XII
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Agatha wife of Edward the Exile, Agatha wife of Edward the Exile has father Saint Margaret of Scotland
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Dulce of Aragon, Dulce of Aragon has father Afonso II of Portugal
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Salomea of Berg, Salomea of Berg has father Richeza of Poland Queen of Sweden
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Alice Holland Countess of Kent, Alice Holland Countess of Kent has father Margaret Holland Duchess of Clarence
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Margaret of Brieg, Margaret of Brieg has father Margaret of Bavaria
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Maria Theresa of Savoy, Maria Theresa of Savoy has father Charles Ferdinand Duke of Berry
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Margaret of Baux, Margaret of Baux has father Jacquetta of Luxembourg
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Eleanor of Toledo, Eleanor of Toledo has father Francesco I de Medici Grand Duke of Tuscany
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Mary of Burgundy Duchess of Savoy, Mary of Burgundy Duchess of Savoy has father Louis Duke of Savoy
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Maria Josepha of Austria, Maria Josepha of Austria has father Maria Amalia of Saxony
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Maria Josepha of Austria, Maria Josepha of Austria has father Maria Josepha of Saxony Dauphine of France
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Anna of Nassau Dillenburg, Anna of Nassau Dillenburg has father Henry the Middle Duke of Brunswic L neburg
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Hedwig of Formbach, Hedwig of Formbach has father Simon I Duke of Lorraine
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Dorothea of Denmark Duchess of Brunswic L neburg, Dorothea of Denmark Duchess of Brunswic L neburg has father George Duke of Brunswic Calenberg
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Constance of Portugal, Constance of Portugal has father Alfonso XI of Castile
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Hemma, Hemma has father Charles the Fat
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Beatrice of Castile 1293 1359, Beatrice of Castile 1293 1359 has father Peter I of Portugal
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Urraca of Castile Queen of Portugal, Urraca of Castile Queen of Portugal has father Afonso III of Portugal
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Mary of Guise, Mary of Guise has father Mary Queen of Scots
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Viridis Visconti, Viridis Visconti has father Ernest Duke of Austria
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Alpaida, Alpaida has father Charles Martel
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Ingegerd Olofsdotter of Sweden, Ingegerd Olofsdotter of Sweden has father Anne of Kiev
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Eleonore of Austria Queen of Poland, Eleonore of Austria Queen of Poland has father Leopold Duke of Lorraine
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Mary of Burgundy Duchess of Cleves, Mary of Burgundy Duchess of Cleves has father Marie of Cleves Duchess of Orl ans
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Isabella of Hainault, Isabella of Hainault has father Louis VIII of France
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Gisela of Swabia, Gisela of Swabia has father Liudolf Margrave of Frisia
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Helie of Semur, Helie of Semur has father Henry son of Robert I of Burgundy
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Henrietta Maria, Henrietta Maria has father Henrietta of England
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Bertha of Holland, Bertha of Holland has father Louis VI of France
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Isabella Duchess of Lorraine, Isabella Duchess of Lorraine has father Margaret of Anjou
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Sophia Eleonore of Saxony, Sophia Eleonore of Saxony has father Landgravine Elisabeth Amalie of Hesse Darmstadt
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Blanche of Lancaster, Blanche of Lancaster has father Henry IV of England
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Eleanor of Aragon Queen of Castile, Eleanor of Aragon Queen of Castile has father Ferdinand I of Aragon
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Teresa Louren o, Teresa Louren o has father John I of Portugal
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Princess Caroline Louise of Saxe Weimar Eisenach, Princess Caroline Louise of Saxe Weimar Eisenach has father Duchess Helene of Mecklenburg Schwerin
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Luitgarde of Vermandois, Luitgarde of Vermandois has father Odo I Count of Blois
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Violant of Hungary, Violant of Hungary has father Isabella of Aragon Queen of France
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Maria Christina of the Two Sicilies, Maria Christina of the Two Sicilies has father Infanta Luisa Fernanda Duchess of Montpensier
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Guilla of Provence, Guilla of Provence has father Rudolph II of Burgundy
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Clemence of Austria, Clemence of Austria has father Clementia of Hungary
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Matilda of Savoy Queen of Portugal, Matilda of Savoy Queen of Portugal has father Sancho I of Portugal
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Alfonsina Orsini, Alfonsina Orsini has father Lorenzo de Medici Duke of Urbino
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Anna Maria of Ostfriesland, Anna Maria of Ostfriesland has father Anna Maria of Mecklenburg Schwerin
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Eleanor of Alburquerque, Eleanor of Alburquerque has father Eleanor of Aragon Queen of Portugal
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Eleanor of Alburquerque, Eleanor of Alburquerque has father John II of Aragon
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Philippa of Luxembourg, Philippa of Luxembourg has father William I Count of Hainaut
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Maria Teresa Cybo Malaspina Duchess of Massa has predecessor Maria Beatrice d Este Duchess of Massa, Maria Teresa Cybo Malaspina Duchess of Massa has father Maria Beatrice d Este Duchess of Massa
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Alix Duchess of Brittany has predecessor John I Duke of Brittany, Alix Duchess of Brittany has father John I Duke of Brittany
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Philippa of Guelders, Philippa of Guelders has father Antoine Duke of Lorraine
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Joan II of Navarre, Joan II of Navarre has father Blanche of Navarre Queen of France
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Eleanor de Guzm n, Eleanor de Guzm n has father Henry II of Castile
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Mary of Guelders, Mary of Guelders has father James III of Scotland
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Anabella Drummond, Anabella Drummond has father James I of Scotland
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Margaret of Denmark Queen of Scotland, Margaret of Denmark Queen of Scotland has father James IV of Scotland
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Mahaut of Ch tillon, Mahaut of Ch tillon has father Isabella of Valois Duchess of Bourbon
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Wilhelmine Amalie of Brunswick, Wilhelmine Amalie of Brunswick has father Maria Josepha of Austria
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Ermengarde of Auvergne, Ermengarde of Auvergne has father Theobald III Count of Blois
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Margaret Douglas, Margaret Douglas has father Henry Stuart Lord Darnley
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Kunigunde of Altdorf, Kunigunde of Altdorf has father Welf I Duke of Bavaria
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Ermentrude of Orl ans, Ermentrude of Orl ans has father Louis the Stammerer
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Matilda of Carinthia, Matilda of Carinthia has father Henry I Count of Champagne
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Barbara of Cilli, Barbara of Cilli has father Elizabeth of Luxembourg
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Margaret of Foix, Margaret of Foix has father Anne of Brittany
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Judith of Habsburg, Judith of Habsburg has father Elizabeth of Bohemia 1292 1330
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Blanche of Navarre Countess of Champagne, Blanche of Navarre Countess of Champagne has father Theobald I of Navarre
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+ lffl d wife of Edward the Elder,  lffl d wife of Edward the Elder has father Eadgifu of Wessex
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Agnes de Baudemont Countess of Braine, Agnes de Baudemont Countess of Braine has father Robert II Count of Dreux
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Adelaide Countess of Burgundy has predecessor Otto IV Count of Burgundy, Adelaide Countess of Burgundy has father Otto IV Count of Burgundy
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Alice of Normandy, Alice of Normandy has father William I Count of Burgundy
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Philippa of Lancaster, Philippa of Lancaster has father Edward King of Portugal
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Margaret of Artois, Margaret of Artois has father Joan of  vreux
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Margaret of Artois, Margaret of Artois has father Philip III of Navarre
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Yolanda Latin Empress, Yolanda Latin Empress has father Yolanda of Courtenay
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Adele of Vermandois, Adele of Vermandois has father Baldwin III Count of Flanders
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Petronilla of Aragon has predecessor Alfonso II of Aragon, Petronilla of Aragon has father Alfonso II of Aragon
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Rotrude of Hesbaye, Rotrude of Hesbaye has father Pepin the Short
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Margaret of Austria Queen of Spain, Margaret of Austria Queen of Spain has father Philip IV of Spain
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Elisabeth of Austria Duchess of Lorraine, Elisabeth of Austria Duchess of Lorraine has father Rudolph Duke of Lorraine
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Archduchess Maria Clementina of Austria, Archduchess Maria Clementina of Austria has father Marie Caroline of Bourbo Two Sicilies Duchess of Berry
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Hedwig of Bavaria, Hedwig of Bavaria has father Judith of Bavaria died 843
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Hedwig of Bavaria, Hedwig of Bavaria has father Hemma
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Marie Louise Duchess of Parma, Marie Louise Duchess of Parma has father Napoleon II
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Beatriz Pereira de Alvim, Beatriz Pereira de Alvim has father Isabel of Barcelos
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Gertrude of S pplingenburg, Gertrude of S pplingenburg has father Henry the Lion
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Engeltrude de F zensac, Engeltrude de F zensac has father Ermentrude of Orl ans
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Isabel of Barcelos, Isabel of Barcelos has father Isabella of Portugal Queen of Castile
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Catherine of Mayenne, Catherine of Mayenne has father Anne Gonzaga
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Elizabeth of Luxembourg, Elizabeth of Luxembourg has father Elizabeth of Austria 1436 1505
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Countess Caroline of Nassau Saarbr cken, Countess Caroline of Nassau Saarbr cken has father Countess Palatine Caroline of Zweibr cken
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Ermengarde of Hesbaye, Ermengarde of Hesbaye has father Louis the German
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Margaret of Savoy Countess of Saint Pol, Margaret of Savoy Countess of Saint Pol has father Marie of Luxembourg Countess of Vend me
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Anna Sophia of Prussia, Anna Sophia of Prussia has father John VII Duke of Mecklenburg Schwerin
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Violant of Bar, Violant of Bar has father Yolande of Aragon
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Sibylla of Burgundy Duchess of Burgundy, Sibylla of Burgundy Duchess of Burgundy has father Hugh II Duke of Burgundy
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Marie of Blois Duchess of Anjou, Marie of Blois Duchess of Anjou has father Louis II of Anjou
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Maria Anna of Bavaria born 1551, Maria Anna of Bavaria born 1551 has father Margaret of Austria Queen of Spain
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Ermengarde Countess of Maine, Ermengarde Countess of Maine has father Geoffrey Plantagenet Count of Anjou
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Ermengarde Countess of Maine, Ermengarde Countess of Maine has father Sibylla of Anjou
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+ lfthryth Countess of Flanders,  lfthryth Countess of Flanders has father Arnulf I Count of Flanders
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Elizabeth the Cuman, Elizabeth the Cuman has father Mary of Hungary Queen of Naples
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Beatrice of Vermandois, Beatrice of Vermandois has father Hugh the Great
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Countess Palatine Dorothea Sophie of Neuburg, Countess Palatine Dorothea Sophie of Neuburg has father Elisabeth Farnese
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Emma of Blois, Emma of Blois has father William V Duke of Aquitaine
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Countess Amalia Katharina of Waldeck, Countess Amalia Katharina of Waldeck has father Countess Sophia Albertine of Erbach Erbach
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Margaret Tudor, Margaret Tudor has father James V of Scotland
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Taddea Visconti, Taddea Visconti has father Isabeau of Bavaria
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Matilda of B thune, Matilda of B thune has father Margaret of Flanders Duchess of Brabant
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Adelaide of Burgundy Duchess of Brabant, Adelaide of Burgundy Duchess of Brabant has father Marie of Brabant Queen of France
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Elisabeth of Meissen, Elisabeth of Meissen has father Elisabeth of Nuremberg
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Alys of France Countess of Vexin, Alys of France Countess of Vexin has father Marie Countess of Ponthieu
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Mar a Isabella of Spain, Mar a Isabella of Spain has father Maria Christina of the Two Sicilies
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Margaret III Countess of Flanders, Margaret III Countess of Flanders has father John the Fearless
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Bertha Duchess of Lorraine, Bertha Duchess of Lorraine has father Frederick I Duke of Lorraine
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Matilda of Boulogne Duchess of Brabant, Matilda of Boulogne Duchess of Brabant has father Henry II Duke of Brabant
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Ludmilla of Bohemia, Ludmilla of Bohemia has father Otto II Duke of Bavaria
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Adelaide of Leuven, Adelaide of Leuven has father Matthias I Duke of Lorraine
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Eleanor of Navarre, Eleanor of Navarre has father Catherine of Foix Countess of Candale
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Eleanor of Navarre, Eleanor of Navarre has father Margaret of Foix
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Hedwig of Babenberg, Hedwig of Babenberg has father Henry the Fowler
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Mahaut Countess of Artois, Mahaut Countess of Artois has father Blanche of Burgundy
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Landgravine Elisabeth Amalie of Hesse Darmstadt, Landgravine Elisabeth Amalie of Hesse Darmstadt has father Countess Palatine Dorothea Sophie of Neuburg
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Juana Enr quez, Juana Enr quez has father Ferdinand II of Aragon
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Almodis de la Marche, Almodis de la Marche has father Ramon Berenguer II Count of Barcelona
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Christine of France, Christine of France has father Charles Emmanuel II Duke of Savoy
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Ermentrude de Roucy, Ermentrude de Roucy has father Reginald I Count of Burgundy
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Ansgarde of Burgundy, Ansgarde of Burgundy has father Louis III of France
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Blanche of Artois, Blanche of Artois has father Joan I of Navarre
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Yolande Duchess of Lorraine, Yolande Duchess of Lorraine has father Ren  II Duke of Lorraine
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Catalina Micaela of Spain, Catalina Micaela of Spain has father Victor Amadeus I Duke of Savoy
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Adelaide of Paris, Adelaide of Paris has father Charles the Simple
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Antoinette of Bourbon, Antoinette of Bourbon has father Mary of Guise
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+A nor de Ch tellerault, A nor de Ch tellerault has father Eleanor of Aquitaine
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Mary of Burgundy, Mary of Burgundy has father Philip I of Castile
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Elizabeth of Portugal, Elizabeth of Portugal has father Afonso IV of Portugal
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Margaret of Burgundy Queen of France, Margaret of Burgundy Queen of France has father Joan II of Navarre
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Philippa of Hainault, Philippa of Hainault has father John of Gaunt
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Sophia Dorothea of Celle, Sophia Dorothea of Celle has father George II of Great Britain
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Eilika of Schweinfurt, Eilika of Schweinfurt has father Gertrude of Saxony
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Princess Magdalena Augusta of Anhalt Zerbst, Princess Magdalena Augusta of Anhalt Zerbst has father Princess Augusta of Saxe Gotha
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Sophia of Holstei Gottorp, Sophia of Holstei Gottorp has father Adolphus Frederick I Duke of Mecklenburg Schwerin
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Charlotte Agla  d Orl ans, Charlotte Agla  d Orl ans has father Maria Teresa Felicitas d Este
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Ogive of Luxembourg, Ogive of Luxembourg has father Baldwin V Count of Flanders
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Agnes of Burgundy Duchess of Aquitaine, Agnes of Burgundy Duchess of Aquitaine has father William VIII Duke of Aquitaine
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Louise  lisabeth of France, Louise  lisabeth of France has father Maria Luisa of Parma
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Elisabeth of Swabia, Elisabeth of Swabia has father Alfonso X of Castile
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Madeleine de La Tour d Auvergne, Madeleine de La Tour d Auvergne has father Catherine de Medici
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Margaret of Geneva, Margaret of Geneva has father Beatrice of Savoy
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Judith of Flanders, Judith of Flanders has father Baldwin II Margrave of Flanders
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Maria of Austria Duchess of J lich Cleves Berg, Maria of Austria Duchess of J lich Cleves Berg has father Marie Eleonore of Cleves
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Joan the Lame, Joan the Lame has father John II of France
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Elizabeth of York, Elizabeth of York has father Mary Tudor Queen of France
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Princess Elisabeth Albertine of Saxe Hildburghausen, Princess Elisabeth Albertine of Saxe Hildburghausen has father Charlotte of Mecklenburg Strelitz
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Mar a Manuela Kirkpatrick de Grevign e, Mar a Manuela Kirkpatrick de Grevign e has father Eug nie de Montijo
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Hedwig of Saxony, Hedwig of Saxony has father Hugh Capet
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+In s de Castro, In s de Castro has father Beatrice of Portugal died 1381
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Elisabeth of France 1602 1644, Elisabeth of France 1602 1644 has father Maria Theresa of Spain
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Joan of Navarre Queen of England, Joan of Navarre Queen of England has father Richard Count of  tampes
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Princess Christine Louise of Oettinge Oettingen, Princess Christine Louise of Oettinge Oettingen has father Elisabeth Christine of Brunswic Wolfenb ttel
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Joan of Valois Countess of Hainaut, Joan of Valois Countess of Hainaut has father Philippa of Hainault
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Ida Countess of Hainaut, Ida Countess of Hainaut has father Baldwin III Count of Hainaut
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Marie Eleonore of Cleves, Marie Eleonore of Cleves has father Magdalene Sibylle of Prussia
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Matilda of France, Matilda of France has father Bertha of Burgundy
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Countess Palatine Caroline of Zweibr cken, Countess Palatine Caroline of Zweibr cken has father Princess Louise of Hesse Darmstadt 1757 1830
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Ermesinde of Carcassonne, Ermesinde of Carcassonne has father Berenguer Ramon I Count of Barcelona
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Maria of Aragon Queen of Portugal, Maria of Aragon Queen of Portugal has father Isabella of Portugal
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Marie of Luxembourg Countess of Vend me, Marie of Luxembourg Countess of Vend me has father Charles Duke of Vend me
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Mary of Hungary Queen of Naples, Mary of Hungary Queen of Naples has father Margaret Countess of Anjou
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Adelaide of Tours, Adelaide of Tours has father Odo of France
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Isabella de Beauchamp, Isabella de Beauchamp has father Maud Chaworth
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Yolande of Dreux Duchess of Burgundy, Yolande of Dreux Duchess of Burgundy has father Adelaide of Burgundy Duchess of Brabant
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Jeanne d Albret has predecessor Henry IV of France, Jeanne d Albret has father Henry IV of France
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: yes
+
+Joanna of Pfirt, Joanna of Pfirt has father Leopold III Duke of Austria
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Bianca Maria Visconti, Bianca Maria Visconti has father Galeazzo Maria Sforza
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Margaret II Countess of Flanders, Margaret II Countess of Flanders has father John I Count of Hainaut
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Polyxena of Hesse Rotenburg, Polyxena of Hesse Rotenburg has father Victor Amadeus III of Sardinia
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Isabella of Portugal Duchess of Burgundy, Isabella of Portugal Duchess of Burgundy has father Charles the Bold
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Bertrade of Montfort, Bertrade of Montfort has father Fulk King of Jerusalem
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Margaret Countess of Vertus, Margaret Countess of Vertus has father Francis II Duke of Brittany
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Matilda of Bavaria Margravine of Meissen, Matilda of Bavaria Margravine of Meissen has father Elisabeth of Meissen
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Maria Luisa of Parma, Maria Luisa of Parma has father Mar a Isabella of Spain
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Willa of Burgundy, Willa of Burgundy has father Willa of Tuscany
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Isabelle de Beauvau, Isabelle de Beauvau has father Jeanne de Bourbon Duchess of Bourbon
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Richeza of Poland Queen of Sweden, Richeza of Poland Queen of Sweden has father Sophia of Minsk
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Cymburgis of Masovia, Cymburgis of Masovia has father Frederick III Holy Roman Emperor
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Adelaide of Aquitaine, Adelaide of Aquitaine has father Robert II of France
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Eleanor of England Queen of Castile, Eleanor of England Queen of Castile has father Blanche of Castile
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Adela of Champagne, Adela of Champagne has father Philip II of France
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Garsenda Countess of Forcalquier, Garsenda Countess of Forcalquier has father Ramon Berenguer IV Count of Provence
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Anna Maria of Mecklenburg Schwerin, Anna Maria of Mecklenburg Schwerin has father Sophia of Saxe Weissenfels Princess of Anhalt Zerbst
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Sophia of Brandenburg, Sophia of Brandenburg has father Magnus II Duke of Brunswic L neburg
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+Alice of Namur, Alice of Namur has father Baldwin V Count of Hainaut
+The path is classified as NEGATIVE (PCA conf. 0.4907 < 0.5)
+Answer: no
+
+
+Rule Metrics:
+	PCA Confidence: 0.4907
+	Standard Confidence: 0.1889
+	Rule Classification: NEGATIVE (PCA conf. 0.4907 < 0.5)
+	Positive Examples: 106.0000
+	Head Coverage: 0.2961

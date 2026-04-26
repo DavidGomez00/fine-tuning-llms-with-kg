@@ -1,0 +1,70 @@
+If name ?f AND successor ?b, then successor ?b.
+
+Formal Rule:
+	Head: ?a successor ?b
+	Body: ?a name ?f AND ?f successor ?b
+
+Real Instances from Knowledge Graph (11 found):
+
+Francis II Holy Roman Emperor, Maria Theresa of Naples and Sicily has successor Marie Louise Duchess of Parma
+Francis II Holy Roman Emperor has name Maria Theresa of Naples and Sicily
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Alpaida, Pepin of Herstal has successor Charles Martel
+Alpaida has name Pepin of Herstal
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Adelaide Countess of Burgundy has successor Otto IV Count of Burgundy, Hugh Count of Burgundy has successor Otto IV Count of Burgundy
+Adelaide Countess of Burgundy has name Hugh Count of Burgundy
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: yes
+
+Pepin of Herstal has successor Charles Martel, Alpaida has successor Charles Martel
+Pepin of Herstal has name Alpaida
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: yes
+
+Henry Count of Portugal has successor Afonso I of Portugal, Theresa Countess of Portugal has successor Afonso I of Portugal
+Henry Count of Portugal has name Theresa Countess of Portugal
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: yes
+
+Maria Amalia of Saxony, Elisabeth Farnese has successor Maria Antonia Ferdinanda of Spain
+Maria Amalia of Saxony has name Elisabeth Farnese
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Duke Charles Louis Frederick of Mecklenburg, Princess Elisabeth Albertine of Saxe Hildburghausen has successor Charlotte of Mecklenburg Strelitz
+Duke Charles Louis Frederick of Mecklenburg has name Princess Elisabeth Albertine of Saxe Hildburghausen
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Elisabeth Farnese, Maria Amalia of Saxony has successor Maria Luisa of Spain
+Elisabeth Farnese has name Maria Amalia of Saxony
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Princess Elisabeth Albertine of Saxe Hildburghausen, Duke Charles Louis Frederick of Mecklenburg has successor Charlotte of Mecklenburg Strelitz
+Princess Elisabeth Albertine of Saxe Hildburghausen has name Duke Charles Louis Frederick of Mecklenburg
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Hugh Count of Burgundy, Adelaide Countess of Burgundy has successor Otto IV Count of Burgundy
+Hugh Count of Burgundy has name Adelaide Countess of Burgundy
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: no
+
+Theresa Countess of Portugal has successor Afonso I of Portugal, Henry Count of Portugal has successor Afonso I of Portugal
+Theresa Countess of Portugal has name Henry Count of Portugal
+The path is classified as POSITIVE (PCA conf. 0.7647 >= 0.5)
+Answer: yes
+
+
+Rule Metrics:
+	PCA Confidence: 0.7647
+	Standard Confidence: 0.7647
+	Rule Classification: POSITIVE (PCA conf. 0.7647 >= 0.5)
+	Positive Examples: 13.0000
+	Head Coverage: 0.0367
