@@ -4,6 +4,7 @@
 # TODO: Are there any expected formats or standards for the rules in the .csv files?
 # TODO: Docstrings
 
+import itertools
 import logging
 import re
 from dataclasses import dataclass
@@ -34,6 +35,8 @@ def setup_logging() -> None:
 # Dataclasses
 # ---------------------------------------------------------------------------
 
+CAMEL_CASE_PATTERN = re.compile(r"(?<=[a-z])([A-Z])")
+
 
 @dataclass(frozen=True, slots=True)
 class Atom:
@@ -62,22 +65,31 @@ class Atom:
             return NotImplemented
         return str(self) < str(other)
 
-    def get_predicate_desc(self) -> str:
-        """Return the camelCase predicate to spaced lower-case natural language."""
-        nl_pred = re.sub(r"([A-Z])", r" \1", self.predicate).strip().lower()
-        if nl_pred.startswith("has "):
-            nl_pred = nl_pred[4:]
-        return nl_pred
+    @staticmethod
+    def _clean_term(term: str) -> str:
+        """Cleans a single term by resolving URIs, variables and formatting."""
+        # If it's a variable just return without "?"
+        if term.startswith("?"):
+            return term.removeprefix("?")
 
-    def get_obj_desc(self) -> str:
-        """Return "-" spaced entity to " " spaced natural language."""
-        return self.obj.replace("_", " ")
+        # Extract local name (splits by #, /, or : and takes the last element)
+        term = re.split(r"[#\/:]", term)[-1]
+
+        term = CAMEL_CASE_PATTERN.sub(r" \1", term)
+        term = term.replace("_", " ").strip().lower()
+        return term
+
+    def get_local_names(self) -> tuple[str, str, str]:
+        """Extracts the name of a resource from a URI string."""
+        return (
+            self._clean_term(self.subject),
+            self._clean_term(self.predicate),
+            self._clean_term(self.obj),
+        )
 
     def get_description(self) -> str:
         """Returns a natural language description of the atom."""
-        nl_pred = self.get_predicate_desc()
-        nl_obj = self.get_obj_desc()
-        return f"{nl_pred} {nl_obj}"
+        return " ".join(term for term in self.get_local_names())
 
 
 @dataclass(frozen=True, slots=True)
@@ -304,13 +316,6 @@ def build_sparql_query(
 # ---------------------------------------------------------------------------
 
 
-def _get_local_name(uri: str) -> str:
-    """Extracts the name of a resource from a URI string."""
-    if "#" in uri:
-        return uri.rpartition("#")[-1]
-    return uri.rpartition("/")[-1].replace("_", " ")
-
-
 def _build_grounding_text(
     result: rdflib.query.Result,
     rule: HornRule,
@@ -326,42 +331,41 @@ def _build_grounding_text(
     )
 
     instances: list[str] = []
-    for row_idx, row in enumerate(result):
-        # TODO: Implement something more efficient
-        if max_groundings is not None and row_idx >= max_groundings:
-            break
 
+    bounded_result = (
+        itertools.islice(result, max_groundings) if max_groundings else result
+    )
+
+    for row in bounded_result:
         row_dict = row.asdict()
-
-        # Varaible ?_head_exists only has values bound if a head is found, else is None
         answer = "yes" if row_dict.get("_head_exists") is not None else "no"
 
-        # Head: Show full head if exists, else show just the subject value
-        subject_key = rule.signature.head.subject.removeprefix("?")
-        subject = _get_local_name(row_dict.get(subject_key))
-        head_text = f"{subject}"
+        # Unpack head
+        sub_key, pred_key, obj_key = rule.head.get_local_names()
+        subject = Atom._clean_term(row.get(sub_key, sub_key))
+
         if answer == "yes":
-            obj_key = rule.signature.head.obj.removeprefix("?")
-            obj = _get_local_name(
-                row_dict.get(obj_key, rule.signature.head.get_obj_desc())
-            )
-            predicate = _get_local_name(rule.signature.head.get_predicate_desc())
+            obj = Atom._clean_term(row.get(obj_key, obj_key))
+            predicate = Atom._clean_term(row.get(pred_key, pred_key))
             head_text = f"{subject} has {predicate} {obj}"
+        else:
+            head_text = str(subject)
 
-        # Body: rendered with their correct bound subject
-        body_facts_str: list[str] = []
+        # Unpack body
+        body_facts: list[str] = []
         for atom in rule.signature.body:
-            subject_key = atom.subject.removeprefix("?")
-            subject = _get_local_name(row_dict.get(subject_key, subject_key))
-            obj_key = atom.obj.removeprefix("?")
-            obj = _get_local_name(row_dict.get(obj_key, obj_key))
-            body_facts_str.append(f"{subject} has {atom.predicate} {obj}")
+            sub_key, _, obj_key = atom.get_local_names()
 
-        facts_str = "\n".join(fact_str for fact_str in body_facts_str)
+            subject = Atom._clean_term(row.get(sub_key, sub_key))
+            obj = Atom._clean_term(row.get(obj_key, obj_key))
+
+            body_facts.append(f"{subject} has {atom.predicate} {obj}")
+
+        facts_str = "\n".join(body_facts)
         row_text = f"{head_text}, {facts_str}\n{pca_text}\nAnswer: {answer}\n"
         instances.append(row_text)
 
-    return "\n".join(instance_str for instance_str in instances)
+    return "\n".join(instances)
 
 
 def query_result_to_natural_language(

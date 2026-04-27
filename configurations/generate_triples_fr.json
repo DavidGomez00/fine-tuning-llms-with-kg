@@ -1,18 +1,15 @@
 {
   "data": {
-    "input_dir": ".data/FrenchRoyalty/",
-    "output_dir": ".experiments/CreatingFRCoTs/",
-    "rules_dir": "rules"
+    "input_dir": ".data/David/",
+    "output_dir": ".experiments/GenTriples1pred/"
   },
   "kg": {
-    "kg_name": "French Royalty",
-    "raw_kg": "french_royalty.nt",
-    "kg_file": "french_royalty.nt",
+    "kg_name": "David Familia",
+    "kg_file": "sillyKG.nt",
     "relation_file": "relation2id",
-    "namespace": "http://FrenchRoaylty.org/",
-    "namespace_prefix": "fr",
-    "rules_csv": "french_royalty.csv",
-    "pca_threshold": 0.5,
-    "max_rules": null
+    "namespace": "http://example.org/",
+    "namespace_prefix": "ex",
+    "rules_csv": "sillyKG.csv",
+    "pca_threshold": 0.5
   }
 }

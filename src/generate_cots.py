@@ -1,18 +1,24 @@
 """This file defines methods to generate natural language Chain of Thoughts (CoTs) from
 the instances of a rule present in a Knowledge Graph (KG)."""
 
+# TODO: CoT generation does not take into account use_rules or use_reasoning
 import logging
 import time
 from collections import defaultdict
 from pathlib import Path
-from typing import cast
+from typing import Any, cast
 
 import pandas as pd
 from rdflib import Graph
 
 from config import KGConfig, RunConfig
-from knowledge_graphs import RuleRow, load_knowledge_graph
-from rules import build_sparql_query, parse_horn_rule, query_result_to_natural_language
+from knowledge_graphs import load_knowledge_graph
+from rules import (
+    RuleRow,
+    build_sparql_query,
+    parse_horn_rule,
+    query_result_to_natural_language,
+)
 
 # ---------------------------------------------------------------------------
 # Logging
@@ -76,14 +82,15 @@ def generate_cots_sparql(
     max_rules: int | None = None,
     max_groundings: int | None = None,
     save_summary: bool = False,
+    use_rules: bool = False,
 ) -> None:
     """Generate natural language CoTs from a set of rules.
 
-    A set of queries is generated to retreve the groundings of each rule from the graph.
+    A set of queries is generated to retrieve groundings of each rule from the graph.
     Then, the rules and groundings are used to generate natural language CoTs to answer
     a yes or no question.
-    The answer of the question for each grounded body depends on the existance of the
-    grounded head in the graph. If the head exists, the answer is yes, otherwise is no.
+    The answer for each grounded body depends on the existance of the grounded head in
+    the graph. If the head exists, the answer is yes, otherwise is no.
 
     Args:
         kg_config: Configuration object with information about the KG files used.
@@ -116,7 +123,7 @@ def generate_cots_sparql(
     logger.info(text)
 
     # For each rule, generate a query
-    query_mapping: defaultdict[str, str] = defaultdict()
+    query_mapping: defaultdict[str, dict[str, Any]] = defaultdict()
     logger.info("Generating queries for %d rules.", len(rules_df))
 
     start_time = time.time()
@@ -132,16 +139,18 @@ def generate_cots_sparql(
             ns_prefix=kg_config.namespace_prefix,
             namespace=kg_config.namespace,
         )
-        query_mapping[rule_id] = query
+        query_mapping[rule_id] = {"query": query, "rule": rule}
 
     logger.info(
         "Executing %d queries and generating a text description of the results.",
         len(query_mapping),
     )
 
-    for rule_id, query in query_mapping.items():
+    for rule_id, mapping in query_mapping.items():
+        # Load the correct rule
+        rule = mapping["rule"]
         # Query the graph
-        result = graph.query(query)
+        result = graph.query(mapping["query"])
 
         # Generate rule + groundings natural language description
         grounding_description = query_result_to_natural_language(

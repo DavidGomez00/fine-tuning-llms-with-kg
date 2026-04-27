@@ -1,6 +1,7 @@
 """This file is dedicated to triple generation. Triple generation must generate a set of
 triples following a set of rules, using cardinality values."""
 
+import itertools
 import logging
 import random
 from collections.abc import Iterator
@@ -89,6 +90,63 @@ def gen_triples(
         yield (s, p, o)
 
 
+def generate_intentional_database(
+    graph_metrics: GraphMetrics,
+    output_file: Path,
+    rules_df: pd.DataFrame,
+    namespace: str = "http://example.org/",
+    ns_prefix: str = "ex",
+) -> None:
+    """Generates the intentional database from the real graph metrics.
+
+    Args:
+        graph_metrics: GraphMetrics object with the characteristics of the real KG.
+
+    Returns:
+        A dict mapping each predicate to a set of generated triples (s, p, o).
+    """
+
+    # Select only those predicates that are not present in any rule head
+    all_head_predicates: set[str] = set()
+
+    # For the moment consider all predicates in the graph that are not in the rule
+    # heads. TODO: Should we include predicates not present in the rules?
+
+    for row in rules_df.itertuples(index=False):
+        all_head_predicates.add(parse_head(str(row.Head)).predicate)
+
+    intentional_predicates = graph_metrics.predicates.keys() - all_head_predicates
+
+    logger.debug(
+        "Loaded %d unique predicates, from which %d are intentional.",
+        len(graph_metrics.predicates.keys() | all_head_predicates),
+        len(intentional_predicates),
+    )
+
+    # Generate intentional graph with the intentional predicates
+    intentional_graph: list[str] = []
+    for predicate in intentional_predicates:
+        key = f"{predicate}"
+        p_domain = graph_metrics.predicates[key].domain
+        p_range = graph_metrics.predicates[key].range
+
+        # Possible pairs in p
+        possible_pairs = list(itertools.product(p_domain, p_range))
+        pairs = random.sample(
+            possible_pairs,
+            graph_metrics.predicates[key].frecuency,
+        )
+
+        # Generate triples
+        triples = "\n".join(
+            f"<{namespace}{subject}> <{ns_prefix}:{predicate}> <{namespace}{object}> ."
+            for subject, object in pairs
+        )
+        intentional_graph.append(triples)
+    intentional_graph_text = "\n".join(intentional_graph)
+    output_file.write_text(intentional_graph_text, encoding="utf-8")
+
+
 if __name__ == "__main__":
     # Set up logger
     setup_logging()
@@ -100,9 +158,10 @@ if __name__ == "__main__":
     # Load files
     kg_file_path = config.data.input_dir / config.kg.kg_file
     graph = load_knowledge_graph(kg_file_path)
-
-    # Load KG metrics
     kg_metrics = get_kg_metrics(graph)
+    rules_csv_path = config.data.input_dir / config.kg.rules_csv
+    rules_df = pd.read_csv(rules_csv_path)
 
     # Test gen_triples
-    gen_triples(config.kg, config.data, kg_metrics)
+    intentional_graph = config.data.output_dir / "intentional_graph.nt"
+    generate_intentional_database(kg_metrics, intentional_graph, rules_df)

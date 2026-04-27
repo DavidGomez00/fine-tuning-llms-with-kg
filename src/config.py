@@ -29,8 +29,8 @@ class FineTuningConfig:
     # Dataset generation for fine-tuning
     generate_datasets: bool = False
     train_with_rules_samples: int = 10
-    train_without_rules_samples: int = 5
-    test_samples: int = 3
+    train_without_rules_samples: int = 10
+    test_samples: int = 5
 
     # Base model configuration
     model_name: str = "meta-llama/Llama-3.2-1B-Instruct"

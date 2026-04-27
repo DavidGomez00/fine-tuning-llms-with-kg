@@ -4,6 +4,7 @@
 # TODO: load KG from CSV files?
 # TODO: Do I need to throw errors if relation2id does not exists in this script?
 import logging
+import re
 from collections import Counter, defaultdict
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -22,20 +23,17 @@ logger = logging.getLogger(__name__)
 class PredicateProfile:
     """Tracks subject and object frequency distributions for a specific predicate."""
 
-    subjects: Counter[str] = field(default_factory=Counter)
-    objects: Counter[str] = field(default_factory=Counter)
+    domain: set[str] = field(default_factory=set)
+    range: set[str] = field(default_factory=set)
+    frecuency: int = 0
 
 
 @dataclass
 class GraphMetrics:
     """A structured container for RDF graph metrics and properties."""
 
-    profiles: dict[str, PredicateProfile]
+    predicates: dict[str, PredicateProfile]
     total_triples: int
-    unique_subjects: int
-    unique_predicates: int
-    unique_objects: int
-    predicate_frequencies: dict[str, int]
     class_frecuencies: dict[str, int]
 
 
@@ -49,26 +47,26 @@ def get_kg_metrics(graph: Graph) -> GraphMetrics:
         A GraphMetrics dataclass containing cardinalities and frequency distributions.
     """
 
-    # Sets for distinct cardinality counting
-    subjects: set[str] = set()
-    objects: set[str] = set()
+    def _get_local_name(term: str) -> str:
+        """Helper function to resolve URIs."""
+        return re.split(r"[#\/:]", term)[-1]
 
     # Counters and mappings
-    pred_counter: Counter[str] = Counter()
     class_counter: Counter[str] = Counter()
-    profiles: defaultdict[str, PredicateProfile] = defaultdict(PredicateProfile)
-
+    predicates: defaultdict[str, PredicateProfile] = defaultdict(PredicateProfile)
     total_triples = 0
 
     # Single pass through the graph
     for s, p, o in graph:
-        s_str, p_str, o_str = str(s), str(p), str(o)
+        s_str = _get_local_name(str(s))
+        p_str = _get_local_name(str(p))
+        o_str = _get_local_name(str(o))
 
         total_triples += 1
-        pred_counter[p_str] += 1
+        predicates[p_str].frecuency += 1
 
-        subjects.add(s_str)
-        objects.add(o_str)
+        predicates[p_str].domain.add(s_str)
+        predicates[p_str].range.add(o_str)
 
         # Track instances of rdf:type for class distribution
         # NOTE: We check the original 'p' against the RDF.type URIRef for speed,
@@ -76,16 +74,9 @@ def get_kg_metrics(graph: Graph) -> GraphMetrics:
         if p == RDF.type:
             class_counter[o_str] += 1
 
-        profiles[p_str].subjects[s_str] += 1
-        profiles[p_str].objects[o_str] += 1
-
     return GraphMetrics(
-        profiles=dict(profiles),
+        predicates=dict(predicates),
         total_triples=total_triples,
-        unique_subjects=len(subjects),
-        unique_predicates=len(pred_counter),
-        unique_objects=len(objects),
-        predicate_frequencies=dict(pred_counter),
         class_frecuencies=dict(class_counter),
     )
 

@@ -1,0 +1,3 @@
+Body,Head,Head_Coverage,Std_Confidence,PCA_Confidence,Positive_Examples,Body_size,PCA_Body_size,Functional_variable
+?a sibling ?b,?b sibling ?a,nan,nan,nan,nan,nan,nan,?a
+?a child ?b  ?a child ?c, ?b sibling ?c,nan,nan,nan,nan,nan,nan,?a
