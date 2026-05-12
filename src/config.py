@@ -216,8 +216,7 @@ class RunConfig:
 
     def __post_init__(self) -> None:
         """Validate paths for input and output files."""
-
-        logger.debug("Confifuration correctly initialized.")
+        logger.info("Confifuration correctly initialized.")
 
 
 if __name__ == "__main__":
