@@ -1,0 +1,15 @@
+{
+  "data": {
+    "input_dir": ".data/FrenchRoyalty/",
+    "output_dir": ".experiments/GenTriplesFR/"
+  },
+  "kg": {
+    "kg_name": "French Royalty",
+    "kg_file": "french_royalty.nt",
+    "relation_file": "relation2id",
+    "namespace": "http://FrenchRoaylty.org/",
+    "namespace_prefix": "fr",
+    "rules_csv": "french_royalty.csv",
+    "pca_threshold": 0.5
+  }
+}
