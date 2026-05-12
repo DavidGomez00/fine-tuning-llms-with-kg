@@ -1,8 +1,8 @@
-"""Rules - Rule file that defines rule representations and logic."""
-# TODO: Can rules have empty heads or empty bodies?
-# TODO: Are subject, predicate, or object components of a rule/body always a variable?
-# TODO: Are there any expected formats or standards for the rules in the .csv files?
-# TODO: Docstrings
+"""Defines data structures and logic for Horn Rule-based systems.
+
+Provides the HornRule dataclass, Pandas CSV parsing, and core logic operations
+(like forward chaining) to verify and evaluate inferrable predicates within a rule set.
+"""
 
 import itertools
 import logging
@@ -22,12 +22,21 @@ from config import KGConfig
 logger = logging.getLogger(__name__)
 
 
-def setup_logging() -> None:
-    """Configures the root logger to output to the console."""
+def setup_logging(level: int | str = logging.INFO) -> None:
+    """Configures the root logger to output to the console.
+
+    Args:
+        level: The logging level to set. Accepts standard logging integers
+               (e.g., logging.DEBUG) or strings (e.g., "INFO", "DEBUG").
+    """
+    if isinstance(level, str):
+        level = level.upper()
+
     logging.basicConfig(
-        level=logging.DEBUG,
+        level=level,
         format="%(asctime)s | %(name)-12s | %(levelname)-8s | %(message)s",
         datefmt="%Y-%m-%d %H:%M:%S",
+        force=True,
     )
 
 
@@ -65,9 +74,14 @@ class Atom:
             return NotImplemented
         return str(self) < str(other)
 
+    def __contains__(self, item: str) -> bool:
+        """Returns True if the term is in the atom, False otherwise."""
+        return item in (self.subject, self.predicate, self.obj)
+
     @staticmethod
     def _clean_term(term: str) -> str:
         """Cleans a single term by resolving URIs, variables and formatting."""
+        # TODO: Maybe change name ot "to_natural_language" ??
         # If it's a variable just return without "?"
         if term.startswith("?"):
             return term.removeprefix("?")
@@ -78,6 +92,16 @@ class Atom:
         term = CAMEL_CASE_PATTERN.sub(r" \1", term)
         term = term.replace("_", " ").strip().lower()
         return term
+
+    @staticmethod
+    def _to_sparql(term: str, namespace: str) -> str:
+        """Returns a term in sparql compatible format."""
+        if term.startswith("?") or term.startswith("<"):
+            return term
+        else:
+            # Remove URI
+            term = re.split(r"[#\/:]", term)[-1]
+            return f"<{namespace}{term}>"
 
     def get_local_names(self) -> tuple[str, str, str]:
         """Extracts the name of a resource from a URI string."""
@@ -90,6 +114,14 @@ class Atom:
     def get_description(self) -> str:
         """Returns a natural language description of the atom."""
         return " ".join(term for term in self.get_local_names())
+
+    def to_sparql(self, namespace: str) -> str:
+        """Returns the atom in sparql format."""
+        return (
+            f"{self._to_sparql(self.subject, namespace)} "
+            f"{self._to_sparql(self.predicate, namespace)} "
+            f"{self._to_sparql(self.obj, namespace)} ."
+        )
 
 
 @dataclass(frozen=True, slots=True)
@@ -118,22 +150,56 @@ class RuleSignature:
             f"Formal Rule:\n\tHead: {self.head}\n\tBody: {body_formal}"
         )
 
-    def get_variables(self) -> str:
-        """Return all the variables present in the rule as 'var ... var'."""
-        all_atoms = {self.head} | self.body
-        variables = {
+    def get_variables(self, sort: bool = True) -> list[str]:
+        """Return unique variables starting with '?' in this rule.
+
+        Args:
+            sort: Whether to return variables in alphabetical order to ensure stable
+            SPARQL SELECT clauses.
+        """
+        vars_set = {
             term
-            for atom in sorted(all_atoms)
+            for atom in (self.head, *self.body)
             for term in (atom.subject, atom.obj)
             if term.startswith("?")
         }
+        return sorted(vars_set) if sort else list(vars_set)
 
-        return " ".join(var for var in variables)
+    def get_head_variables(self, sort: bool = True) -> list[str]:
+        """Return unique variables starting with '?' in this rule's head.
+
+        Args:
+            sort: Whether to return variables in alphabetical order to ensure stable
+            SPARQL SELECT clauses.
+        """
+        vars_set = {
+            term for term in (self.head.subject, self.head.obj) if term.startswith("?")
+        }
+        return sorted(vars_set) if sort else list(vars_set)
 
     def get_predicates(self) -> set[str]:
         """Return the set of unique predicates in the rule."""
-        all_atoms = {self.head} | self.body
-        return {atom.predicate for atom in sorted(all_atoms)}
+        return {atom.predicate for atom in (self.body | {self.head})}
+
+    def get_body_predicates(self) -> set[str]:
+        """Return the set of unique predicates in the body atoms."""
+        return {atom.predicate for atom in self.body}
+
+    def head_with_ns(self, namespace: str) -> str:
+        return self.head.to_sparql(namespace)
+
+    def body_with_ns(self, namespace: str) -> set[str]:
+        return set(atom.to_sparql(namespace) for atom in self.body)
+
+    def rule_query_body(self, var_mappings: dict[str, str], namespace: str) -> set[str]:
+        return {
+            (
+                f"{var_mappings.get(atom.subject, atom.subject)} "
+                f"<{namespace}{atom.predicate}> "
+                f"{var_mappings.get(atom.obj, atom.obj)}"
+            )
+            for atom in self.body
+        }
 
 
 @dataclass(slots=True)
@@ -169,10 +235,10 @@ class HornRule:
     def __str__(self) -> str:
         """Returns a formatted string representation of the rule and its stats."""
         return (
-            f"{self.rule_id}: {self.signature} | "
-            f"PCA conf.: {self.pca_confidence}, "
-            f"supp.: {self.support}, "
-            f"hc: {self.head_coverage}"
+            f"| Id: {self.rule_id} | Signature: {self.signature} | "
+            f"PCA conf.: {self.pca_confidence} | "
+            f"supp.: {self.support} | "
+            f"hc: {self.head_coverage} |"
         )
 
 
@@ -187,11 +253,13 @@ ATOM_PATTERN = re.compile(r"(\?\w+)\s+(\S+)\s+(\S+)")
 class RuleRow(Protocol):
     """Definines the expected structure of a rule DataFrame row."""
 
-    Head: Any
-    Body: Any
-    Std_Confidence: Any
-    Positive_Examples: Any
-    Head_Coverage: Any
+    Head: str
+    Body: str
+    Std_Confidence: float
+    Positive_Examples: float
+    Head_Coverage: float
+    PCA_Confidence: float
+    Classification: str
 
 
 def parse_body(body_str: str) -> frozenset[Atom]:
@@ -217,49 +285,118 @@ def parse_head(head_str: str) -> Atom:
     return Atom(*parts[:3])
 
 
+def _parse_metric(value: float | None) -> float | None:
+    """Returns float or Python None for Pandas/Numpy NaNs securely."""
+    if pd.isna(value) or value is None:
+        return None
+    else:
+        return float(value)
+
+
 def parse_horn_rule(
     row: RuleRow,
     rule_id: str,
-    pca_threshold: float | None = None,
 ) -> HornRule:
     """Extracts a HornRule object from a pandas DataFrame row.
 
     Args:
         row: A named tuple representing a row form the rules DataFrame.
         rule_id: Assigned string identifier for the rule.
-        pca_threshold: Threshold for classificating a rule as POSITIVE.
 
     Returns:
         A populated HornRule instance.
     """
 
-    def _fetch_attr(row: RuleRow, key: str) -> Any:
-        """Returns an attribute from a RuleRow or None if it's nan."""
-        value_raw = getattr(row, key, None)
-        return None if pd.isna(value_raw) else float(value_raw)
-
-    support = _fetch_attr(row, "Positive_Examples")
-    head_coverage = _fetch_attr(row, "Head_Coverage")
-    std_conf = _fetch_attr(row, "Std_Confidence")
-    pca_conf = _fetch_attr(row, "PCA_Confidence")
-
-    if pca_conf is None or pca_threshold is None:
-        classification = "UNKNOWN"
-    else:
-        classification = "POSITIVE" if pca_conf >= pca_threshold else "NEGATIVE"
-
-    return HornRule(
+    rule = HornRule(
         rule_id=rule_id,
         signature=RuleSignature(
             head=parse_head(str(row.Head)),
             body=parse_body(str(row.Body)),
         ),
-        support=support,
-        head_coverage=head_coverage,
-        std_confidence=std_conf,
-        pca_confidence=pca_conf,
-        classification=classification,
+        support=_parse_metric(row.Positive_Examples),
+        head_coverage=_parse_metric(row.Head_Coverage),
+        std_confidence=_parse_metric(row.Std_Confidence),
+        pca_confidence=_parse_metric(row.PCA_Confidence),
+        classification=row.Classification,
     )
+
+    logger.debug("Parsed rule: %s", rule)
+    return rule
+
+
+# --
+# Rule set handling
+# --
+def parse_rule_set(
+    rules_df: pd.DataFrame, pca_threshold: float | None
+) -> tuple[dict[str, HornRule], set[str]]:
+    """Parse a DataFrame into a dict of HornRules identified by rule_id.
+
+    Args:
+        rules_df: DataFrame containing information for each rule in each row.
+
+    Returns:
+        A tuple containing
+            - A dict of HornRules identified by rule_id.
+            - A set of strings representing the predicates in the rules' head.
+    """
+    # Doing this here is more optimal than comparing for each row
+    if pca_threshold is not None:
+        rules_df["Classification"] = "NEGATIVE"
+        rules_df.loc[rules_df["PCA_Confidence"] >= pca_threshold, "Classification"] = (
+            "POSITIVE"
+        )
+        rules_df.loc[rules_df["PCA_Confidence"].isna(), "Classification"] = "UNKNOWN"
+    else:
+        rules_df["Classification"] = "UNKNOWN"
+
+    rules: dict[str, HornRule] = {}
+    intensional_predicates: set[str] = set()
+
+    for row_id, row in enumerate(rules_df.itertuples(index=False), start=1):
+        rule_id = f"rule_{row_id}"
+        rule = parse_horn_rule(row, rule_id)
+
+        rules[rule.rule_id] = rule
+        intensional_predicates.add(rule.head.predicate)
+
+    return rules, intensional_predicates
+
+
+def get_uninferrable_predicates(
+    rule_mapping: dict[str, list[set[str]]],
+    intensional_predicates: set[str],
+) -> set[str]:
+    """Identifies intensional predicates that cannot be inferred from the ruleset.
+
+    Uses bottom-up forward chaining to avoid deep recursion and safely handle cyclic
+    dependencies.
+
+    Args:
+        rule_mapping: Dictionary mapping head predicates to lists of their rule bodies.
+        intensional_predicates: Set of all intensional predicates to be inferred.
+
+    Returns:
+        A set of strings containing the predicates that cannot be deduced.
+        An empty set indicates all intensional predicates are inferrable.
+    """
+    deducible: set[str] = set()
+
+    # Iteratively expand the set of deducible predicates
+    while True:
+        added_new = False
+        for head, bodies in rule_mapping.items():
+            if head in deducible:
+                continue
+            if any(body.issubset(deducible) for body in bodies):
+                deducible.add(head)
+                added_new = True
+
+        if not added_new:
+            break
+
+    uninferrable = intensional_predicates - deducible
+    return uninferrable
 
 
 # ---------------------------------------------------------------------------
@@ -267,7 +404,7 @@ def parse_horn_rule(
 # ---------------------------------------------------------------------------
 
 
-def build_sparql_query(
+def build_rule_query(
     rule_signature: RuleSignature, ns_prefix: str, namespace: str
 ) -> str:
     """Builds a SPARQL SELECT query from a rule signature.
@@ -296,7 +433,7 @@ def build_sparql_query(
         obj = format_term(atom.obj)
         return f"{subject} {ns_prefix}:{atom.predicate} {obj} ."
 
-    select_vars = rule_signature.get_variables()
+    select_vars = " ".join(rule_signature.get_variables())
     body_lines = "\n\t".join(format_atom(atom) for atom in rule_signature.body)
     head_line = f"{format_atom(rule_signature.head)}"
 
@@ -309,6 +446,36 @@ def build_sparql_query(
         f"\t\tBIND(true AS ?_head_exists)\n"
         f"\t}}\n}}"
     )
+
+
+def build_ruleset_query(rule_set: dict[str, HornRule], namespace: str) -> str:
+    """Builds a single query to retrieve variables that satisfy each rule in the set."""
+    subqueries: list[str] = []
+    global_vars: set[str] = {"?rule_id"}
+
+    for rule_id, rule in rule_set.items():
+        var_list = rule.signature.get_head_variables(sort=True)
+        global_vars.update(var_list)
+
+        proj = " ".join(var_list)
+
+        body_sparql = " . \n      ".join(
+            [atom.to_sparql(namespace) for atom in rule.body]
+        )
+        subqueries.append(
+            f"  {{\n"
+            f'    SELECT ("{rule_id}" AS ?rule_id) {proj}\n'
+            f"    WHERE {{\n"
+            f"      {body_sparql}\n"
+            f"    }}\n"
+            f"  }}"
+        )
+
+    outer_proj = " ".join(sorted(global_vars))
+    query = f"SELECT {outer_proj}\nWHERE {{\n" + "\n  UNION\n".join(subqueries) + "\n}"
+
+    logger.debug("Created ruleset query for %d rules:\n%s", len(rule_set), query)
+    return query
 
 
 # ---------------------------------------------------------------------------
@@ -337,16 +504,17 @@ def _build_grounding_text(
     )
 
     for row in bounded_result:
-        row_dict = row.asdict()
-        answer = "yes" if row_dict.get("_head_exists") is not None else "no"
+        row_data: dict[str, Any] = {str(var): row[var] for var in row.labels}
+        answer = "yes" if row_data.get("_head_exists") is not None else "no"
 
         # Unpack head
         sub_key, pred_key, obj_key = rule.head.get_local_names()
-        subject = Atom._clean_term(row.get(sub_key, sub_key))
+
+        subject = Atom._clean_term(str(row_data.get(sub_key, sub_key)))
 
         if answer == "yes":
-            obj = Atom._clean_term(row.get(obj_key, obj_key))
-            predicate = Atom._clean_term(row.get(pred_key, pred_key))
+            obj = Atom._clean_term(str(row_data.get(obj_key, obj_key)))
+            predicate = Atom._clean_term(str(row_data.get(pred_key, pred_key)))
             head_text = f"{subject} has {predicate} {obj}"
         else:
             head_text = str(subject)
@@ -356,8 +524,8 @@ def _build_grounding_text(
         for atom in rule.signature.body:
             sub_key, _, obj_key = atom.get_local_names()
 
-            subject = Atom._clean_term(row.get(sub_key, sub_key))
-            obj = Atom._clean_term(row.get(obj_key, obj_key))
+            subject = Atom._clean_term(str(row_data.get(sub_key, sub_key)))
+            obj = Atom._clean_term(str(row_data.get(obj_key, obj_key)))
 
             body_facts.append(f"{subject} has {atom.predicate} {obj}")
 
@@ -397,7 +565,7 @@ def query_result_to_natural_language(
             max_groundings=max_groundings,
         )
 
-    # Desciption footer
+    # Description footer
     _footer_title = "Rule Metrics:"
     _rule_classification_text = (
         f"Rule Classification: {rule.classification} "
@@ -438,7 +606,7 @@ if __name__ == "__main__":
         head_coverage=0.7,
         classification="POSITIVE",
     )
-    query = build_sparql_query(
+    query = build_rule_query(
         rule_signature=rule.signature,
         ns_prefix="ex",
         namespace="http://www.example.org/",
