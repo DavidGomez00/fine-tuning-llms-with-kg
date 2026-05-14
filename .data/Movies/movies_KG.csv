@@ -1,0 +1,7 @@
+Body,Head,Head_Coverage,Std_Confidence,PCA_Confidence,Positive_Examples,Body_size,PCA_Body_size,Functional_variable
+?actorA acted_in ?movie ?actorB acted_in ?movie,?actorA worked_with ?actorB,
+?director directed ?movie ?actor acted_in ?movie,?director directed_actor ?actor
+?actor acted_in ?movie ?movie has_genre ?genre,?actor acts_in_genre ?genre
+?director directed ?movie ?movie has_genre ?genre,?director directs_genre ?genre
+?personA knows ?personB ?personB knows ?personC,?personA has_mutual_connection ?personC
+?director directed_actor ?co_star ?co_star worked_with ?actor,?director warm_lead_for ?actor
