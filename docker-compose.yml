@@ -1,0 +1,19 @@
+services:
+  graph_database:
+    container_name: graph_database
+    image: kemele/virtuoso:7-stable
+    restart: unless-stopped
+    ports:
+      - "8890:8890"
+    volumes:
+      - graph_data:/.data
+
+  sparql_ui:
+    container_name: sparql_ui
+    image: erikap/yasgui:latest
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+
+volumes:
+  graph_data:
