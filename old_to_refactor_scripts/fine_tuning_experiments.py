@@ -6,13 +6,13 @@ from pathlib import Path
 from typing import Any
 
 import pandas as pd
+from gen_cots import generate_cots_sparql
 from matplotlib import pyplot as plt
 from rdflib import Graph
 
 from config import DirConfig, FineTuningConfig, KGConfig, RunConfig
-from generate_cots import generate_cots_sparql
-from knowledge_graphs import load_knowledge_graph
-from model import (
+from graphs import load_knowledge_graph
+from old_to_refactor_scripts.model import (
     EvaluationMetrics,
     evaluate_model,
     fine_tune,
@@ -84,31 +84,6 @@ def _load_datasets(input_dir: Path) -> dict[str, pd.DataFrame]:
 # ---------------------------------------------------------------------------
 # Plot results and comparisons
 # ---------------------------------------------------------------------------
-
-
-# def _save_json_results(
-#     ft_config: FineTuningConfig,
-#     results: dict[str, EvaluationMetrics],
-#     output_file: Path
-# ) -> None:
-#     """Generates and saves the JSON payload."""
-
-#     results_dict: dict[str, Any] = {
-#         "experiment_info": {
-#             "timestamp": datetime.now(timezone.utc).isoformat(),
-#             "model": ft_config.model_name,
-#             "model_alias": ft_config.model_alias,
-#             "train_samples": ft_config.train_samples,
-#             "training_steps": ft_config.max_steps,
-#             "epochs": ft_config.num_train_epochs,
-#         },
-#         "results": results,
-#     }
-
-#     with open(output_file, "w", encoding="utf-8") as f:
-#         json.dump(results_dict, f, indent=2)
-
-#     logger.debug("JSON results saved to %s", output_file)
 
 
 def _save_summary_csv(results: dict[str, EvaluationMetrics], output_file: Path) -> None:

@@ -1,7 +1,6 @@
 """This file defines methods to generate natural language Chain of Thoughts (CoTs) from
 the instances of a rule present in a Knowledge Graph (KG)."""
 
-# TODO: CoT generation does not take into account use_rules or use_reasoning
 import logging
 import time
 from collections import defaultdict
@@ -12,7 +11,7 @@ import pandas as pd
 from rdflib import Graph
 
 from config import KGConfig, RunConfig
-from knowledge_graphs import load_knowledge_graph
+from graphs import load_knowledge_graph
 from rules import (
     RuleRow,
     build_sparql_query,
@@ -205,7 +204,7 @@ if __name__ == "__main__":
         max_groundings = config.cot_generation.max_groundings
 
     # Load the graph
-    from knowledge_graphs import load_knowledge_graph  # type: ignore
+    from graphs import load_knowledge_graph  # type: ignore
 
     graph = load_knowledge_graph(kg_file=config.data.input_dir / config.kg.kg_file)
 

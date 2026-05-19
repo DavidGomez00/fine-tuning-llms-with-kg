@@ -1,8 +1,5 @@
 """File for managing KG related functions."""
 
-# TODO: Finish PredicateProfile and GraphMetrics
-# TODO: load KG from CSV files?
-# TODO: Do I need to throw errors if relation2id does not exists in this script?
 import logging
 import re
 from collections import Counter, defaultdict
@@ -26,6 +23,7 @@ class PredicateProfile:
     domain: Counter[str] = field(default_factory=Counter)
     range: Counter[str] = field(default_factory=Counter)
     frequency: int = 0
+    reflexive: int = 0
 
 
 @dataclass
@@ -67,9 +65,17 @@ def get_kg_metrics(graph: Graph) -> GraphMetrics:
 
         total_triples += 1
         predicates[p_str].frequency += 1
-
         predicates[p_str].domain[s_str] += 1
         predicates[p_str].range[o_str] += 1
+
+        if s_str == o_str:
+            logger.debug(
+                "Getting the Graph metrics I found that %s is refelxive:\n%s\n%s",
+                p_str,
+                s_str,
+                o_str,
+            )
+            predicates[p_str].reflexive += 1
 
         # Track instances of rdf:type for class distribution
         # NOTE: We check the original 'p' against the RDF.type URIRef for speed,
@@ -77,11 +83,23 @@ def get_kg_metrics(graph: Graph) -> GraphMetrics:
         if p == RDF.type:
             class_counter[o_str] += 1
 
-    return GraphMetrics(
+    metrics = GraphMetrics(
         predicates=dict(predicates),
         total_triples=total_triples,
         class_frequencies=dict(class_counter),
     )
+
+    reflexive_preds = 0
+    for _, profile in predicates.items():
+        if profile.reflexive > 0:
+            reflexive_preds += 1
+
+    logger.debug(
+        "Loaded graph metrics for %d predicates, from which %d are reflexive.",
+        len(predicates),
+        reflexive_preds,
+    )
+    return metrics
 
 
 # ---------------------------------------------------------------------------

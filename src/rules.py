@@ -98,10 +98,10 @@ class Atom:
         """Returns a term in sparql compatible format."""
         if term.startswith("?") or term.startswith("<"):
             return term
-        else:
-            # Remove URI
-            term = re.split(r"[#\/:]", term)[-1]
-            return f"<{namespace}{term}>"
+
+        # Remove URI
+        local_name = re.split(r"[#\/:]", term)[-1]
+        return f"<{namespace}{local_name}>"
 
     def get_local_names(self) -> tuple[str, str, str]:
         """Extracts the name of a resource from a URI string."""
@@ -118,9 +118,9 @@ class Atom:
     def to_sparql(self, namespace: str) -> str:
         """Returns the atom in sparql format."""
         return (
-            f"{self._to_sparql(self.subject, namespace)} "
-            f"{self._to_sparql(self.predicate, namespace)} "
-            f"{self._to_sparql(self.obj, namespace)} ."
+            f"{Atom._to_sparql(self.subject, namespace)} "
+            f"{Atom._to_sparql(self.predicate, namespace)} "
+            f"{Atom._to_sparql(self.obj, namespace)}"
         )
 
 
