@@ -3,3 +3,6 @@
 *.pyc
 *.pyo
 *.pyd
+
+# Environment variable file
+.env
