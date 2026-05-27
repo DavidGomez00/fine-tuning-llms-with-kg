@@ -11,7 +11,7 @@ import pandas as pd
 from rdflib import Graph
 
 from config import KGConfig, RunConfig
-from graphs import load_knowledge_graph
+from graph_metrics import load_knowledge_graph
 from rules import (
     RuleRow,
     build_sparql_query,
@@ -204,7 +204,7 @@ if __name__ == "__main__":
         max_groundings = config.cot_generation.max_groundings
 
     # Load the graph
-    from graphs import load_knowledge_graph  # type: ignore
+    from graph_metrics import load_knowledge_graph  # type: ignore
 
     graph = load_knowledge_graph(kg_file=config.data.input_dir / config.kg.kg_file)
 

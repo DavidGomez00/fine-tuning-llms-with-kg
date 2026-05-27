@@ -1,0 +1,16 @@
+{
+  "data": {
+    "input_dir": ".data/Movies/",
+    "output_dir": ".experiments/GenTriples/FrenchRoyalty/"
+  },
+  "graph": {
+    "name": "Simple KG",
+    "nt_file": "french_royalty.nt",
+    "ontology_file": "french_royalty.ttl",
+    "uri": "http://FrenchRoyalty.org/"
+  },
+  "rules":{
+    "rules_csv": "filtered_fr.csv",
+    "pca_threshold": 0.9
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "data": {
+    "input_dir": ".data/FrenchRoyalty/",
+    "output_dir": ".experiments/GenTriples/FrenchRoyalty/",
+    "database_url": "http://localhost:8890/",
+    "sparql_endpoint": "sparql-auth",
+    "crud_endpoint": "sparql-graph-crud-auth"
+  },
+  "graph": {
+    "name": "Frech Royalty KG",
+    "nt_file": "french_royalty.nt",
+    "ontology_file": "french_royalty.ttl",
+    "uri": "http://FrenchRoyalty.org/"
+  },
+  "rules":{
+    "rules_file": "french_royalty_filtered.csv",
+    "pca_threshold": 0.9
+  }
+}

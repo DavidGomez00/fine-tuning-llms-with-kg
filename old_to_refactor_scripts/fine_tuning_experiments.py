@@ -11,7 +11,7 @@ from matplotlib import pyplot as plt
 from rdflib import Graph
 
 from config import DirConfig, FineTuningConfig, KGConfig, RunConfig
-from graphs import load_knowledge_graph
+from graph_metrics import load_knowledge_graph
 from old_to_refactor_scripts.model import (
     EvaluationMetrics,
     evaluate_model,

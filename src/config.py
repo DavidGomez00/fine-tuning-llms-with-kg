@@ -8,6 +8,7 @@ from typing import Any, Literal
 
 import torch
 from typing_extensions import Self
+from yarl import URL
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +22,7 @@ class FineTuningConfig:
     skip_baseline: bool = False
 
     # Generated outputs
-    resuts_json_file: str = "results.json"
+    results_json_file: str = "results.json"
     summary_csv_file: str = "summary.csv"
     summary_plot_file: str = "experiment_plot.png"
     summary_table_file: str = "experiment_table.png"
@@ -67,34 +68,38 @@ class CoTGenerationConfig:
 
 
 @dataclass
-class DirConfig:
-    """Configuration for base input and output directories."""
+class DataConfig:
+    """Configuration for input and output directories."""
 
     input_dir: Path = Path(".data/")
     output_dir: Path = Path(".experiments/new_experiment")
+    database_url: URL = URL("http://localhost:8890/")
+    sparql_endpoint: str = "sparql-auth"
+    crud_endpoint: str = "sparql-graph-crud-auth"
 
     def __post_init__(self) -> None:
         """Validate input and create output directories."""
         self.input_dir = Path(self.input_dir)
         self.output_dir = Path(self.output_dir)
+        self.database_url = URL(self.database_url)
 
         self._validate_path(self.input_dir, "input_dir")
         self.output_dir.mkdir(parents=True, exist_ok=True)
 
     @staticmethod
     def _validate_path(path: Path, field_name: str) -> None:
-        """Check wether a path is valid."""
+        """Check whether a path is valid."""
         if not path.exists():
             raise FileNotFoundError(
                 f"Configuration Error: The {field_name} does not exist at {path}"
             )
         if not path.is_dir():
             raise NotADirectoryError(
-                f"Configuration Error: The {field_name} at {path} is not a directory."
+                f"Configuration Error: {field_name} at {path} is not a directory."
             )
 
 
-@dataclass
+@dataclass(frozen=True)
 class HardwareConfig:
     """Hardware settings.
 
@@ -114,42 +119,44 @@ class HardwareConfig:
 
 
 @dataclass
-class KGConfig:
+class GraphConfig:
     """Knowledge Graph settings.
 
-    Attributes:
-        kg_name: Not formated name of the knowledge graph.
-        namespace: Namespace for the knowledge graph entities.
-        namespace_prefix: Prefix for the knowledge graph entities' namespace.
-        kg_file: Name of the knowledge graph formated file.
-        relation_file: Name of the relation mapping file.
-        rules_csv: Name of the CSV containing rules.
+    TODO: Docstrings
     """
 
-    kg_name: str
-    namespace: str
-    namespace_prefix: str
+    name: str
+    ontology_file: str
+    nt_file: str
+    uri: str
+
+
+@dataclass
+class RulesConfig:
+    """
+    TODO: Docstrings
+    """
+
+    rules_file: str
     pca_threshold: float
-    kg_file: str
-    relation_file: str
-    rules_csv: str
 
 
 @dataclass
 class RunConfig:
     """Master configuration object for the experiment run."""
 
-    kg: KGConfig
+    graph: GraphConfig
+    rules: RulesConfig
     fine_tuning: FineTuningConfig | None
     cot_generation: CoTGenerationConfig | None
-    data: DirConfig = field(default_factory=DirConfig)
+    data: DataConfig = field(default_factory=DataConfig)
     hardware: HardwareConfig = field(default_factory=HardwareConfig)
 
     @classmethod
     def from_json(cls, json_path: Path | str) -> Self:
         """Loads a RunConfig from a JSON file."""
 
-        def _get_config_section(key: str, required: bool = False) -> dict[str, Any]:
+        def get_section(key: str, required: bool = False) -> dict[str, Any]:
             """Fetches a section from JSON.
 
             Args:
@@ -163,7 +170,7 @@ class RunConfig:
             if key not in data:
                 if required:
                     raise KeyError(
-                        f"Configuratoin Error: Missing mandatory section {key}"
+                        f"Configuration Error: Missing mandatory section {key}"
                     )
                 logger.debug(
                     "Configuration section '%s' not found; using defaults.", key
@@ -189,9 +196,10 @@ class RunConfig:
             logger.error(f"Invalid JSON format in {json_path.name}: {e}")
             raise
 
-        kg_config = KGConfig(**_get_config_section("kg", required=True))
-        dir_config = DirConfig(**_get_config_section("data"))
-        hardware_config = HardwareConfig(**_get_config_section("hardware"))
+        graph_config = GraphConfig(**get_section("graph", required=True))
+        rules_config = RulesConfig(**get_section("rules", required=True))
+        data_config = DataConfig(**get_section("data", required=True))
+        hardware_config = HardwareConfig(**get_section("hardware"))
 
         # --- Optional attributes ---
         if "cot_generation" in data:
@@ -207,23 +215,14 @@ class RunConfig:
             fine_tuning = None
 
         return cls(
+            data=data_config,
+            graph=graph_config,
+            rules=rules_config,
+            hardware=hardware_config,
             fine_tuning=fine_tuning,
             cot_generation=cot_config,
-            data=dir_config,
-            hardware=hardware_config,
-            kg=kg_config,
         )
 
     def __post_init__(self) -> None:
         """Validate paths for input and output files."""
         logger.info("Confifuration correctly initialized.")
-
-
-if __name__ == "__main__":
-    # Tets many possible errors in the configuration
-    complete_config = Path("configurations/tests/complete.json")
-    missing_cot = Path("configurations/tests/missing_cot.json")
-    missing_data = Path("configurations/tests/missing_data.json")
-    missing_ft = Path("configurations/tests/missing_ft.json")
-    missing_hw = Path("configurations/tests/missing_hw.json")
-    missing_kg = Path("configurations/tests/missing_kg.json")
