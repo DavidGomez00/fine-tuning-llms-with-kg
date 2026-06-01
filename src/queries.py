@@ -7,6 +7,7 @@ from typing import cast
 import requests
 from requests.auth import HTTPDigestAuth
 from SPARQLWrapper import GET, JSON, SPARQLWrapper
+from yarl import URL
 
 from rules import HornRule, RuleSignature
 from utils import setup_logging
@@ -17,97 +18,57 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 # SPARQL Query generation.
 # ---------------------------------------------------------------------------
-def build_rule_query(
-    rule: RuleSignature, graph_uri: str, include_head: bool = True
-) -> str:
+def build_rule_query(rule: RuleSignature, ebd_uri: str, searchspace_uri: str) -> str:
     """Builds a SPARQL query for a rule."""
-    var_set = set(rule.get_head_variables())
-    proj = " ".join(var_set)
-
-    if include_head:
-        patterns = [f"{atom} ." for atom in rule.body] + [f"{rule.head} ."]
-    else:
-        patterns = [f"{atom} ." for atom in rule.body]
-
-    where_patterns = "\n        ".join(patterns)
-    query = f"""
-    SELECT DISTINCT ?rule_id {proj}
-    WHERE {{
-      BIND ("{rule.rule_id}" AS ?rule_id)
-      GRAPH <{graph_uri}> {{
-        {where_patterns}
-      }} 
-    }}
-    """
-
-    logger.debug("Built query for rule %s (%s):\n%s", rule.rule_id, rule.head, query)
-    return query
-
-
-def build_federated_query(
-    rule: RuleSignature,
-    ebd_uri: str,
-    searchspace_uri: str,
-) -> str:
-    """Builds a SPARQL query that routes patterns to specific named graphs.
-
-    Iterates through a rule's body and routes triple patterns containing the
-    target predicate to the search space graph, while directing all other
-    patterns to the main graph.
-
-    Args:
-        rule: The HornRule object containing the body patterns.
-        ebd_uri: The URI of the primary named graph.
-        searchspace_uri: The URI of the search space named graph.
-
-    Returns:
-        A formatted SPARQL SELECT query string.
-    """
-    t_predicate = rule.head.predicate
     t_vars = set(rule.get_head_variables())
+    t_predicate = rule.head.predicate
 
     if t_predicate in rule.get_body_predicates():
-        for atom in rule.body:
-            if atom.predicate == t_predicate:
-                s_var, o_var = atom.get_variables()
-                if s_var is not None:
-                    t_vars.add(s_var)
-                if o_var is not None:
-                    t_vars.add(o_var)
+        for atom in (a for a in rule.body if a.predicate == t_predicate):
+            s_var, o_var = atom.get_variables()
+            if s_var is not None:
+                t_vars.add(s_var)
+            if o_var is not None:
+                t_vars.add(o_var)
 
     proj = " ".join(t_vars)
 
     intensional_patterns: list[str] = []
     extensional_patterns: list[str] = []
 
-    for atom in rule:
+    for atom in rule.body:
         if atom.predicate != t_predicate:
             extensional_patterns.append(f"{atom} .")
         else:
             intensional_patterns.append(f"{atom} .")
 
-    extensional_join = "\n          ".join(extensional_patterns)
-    extensional_block = f"""
-      GRAPH <{ebd_uri}> {{
-          {extensional_join}
-      }}"""
+    blocks = []
+    if extensional_patterns:
+        extensional_join = "\n            ".join(extensional_patterns)
+        extensional_block = f"""
+          GRAPH <{ebd_uri}> {{
+            {extensional_join}
+          }}"""
+        blocks.append(extensional_block)
+    if intensional_patterns:
+        intensional_patterns.append(f"{rule.head} .")
+        intensional_join = "\n            ".join(intensional_patterns)
+        intensional_block = f"""
+          GRAPH <{searchspace_uri}> {{
+            {intensional_join}
+          }}"""
+        blocks.append(intensional_block)
 
-    intensional_join = "\n          ".join(intensional_patterns)
-    intensional_block = f"""
-      GRAPH <{searchspace_uri}> {{
-          {intensional_join}
-      }}"""
-
-    where_clause = " .\n    ".join((extensional_block, intensional_block))
-
-    # Construct the final query string
+    where_clause = ".\n    ".join(blocks)
     query = f"""
-    SELECT DISTINCT {proj}
+    SELECT DISTINCT ?rule_id {proj}
     WHERE {{
-      {where_clause}
-    }}"""
+      BIND ("{rule.rule_id}" AS ?rule_id)      
+        {where_clause}
+    }}
+    """
 
-    logger.debug("Generated federated query for rule %s:\n%s", rule.rule_id, query)
+    logger.debug("Built query for rule %s (%s):", rule.rule_id, rule.head)
     return query
 
 
@@ -271,7 +232,7 @@ def download_graph_raw(
     limit: int = 10000,
 ) -> None:
     """Directly stores graph contents to a disk file."""
-    endpoint = "http://localhost:8890/sparql"
+    endpoint = URL(client.endpoint).with_name("sparql")
 
     offset = 0
     total_triples = 0
@@ -465,8 +426,6 @@ def get_support(client: SPARQLWrapper, rule: HornRule, graph_uri: str) -> int:
       }}  
       }}
     }}"""
-
-    logger.debug("Getting support for %s using \n%s", rule.rule_id, query)
 
     if results := get_select_results(client, query):
         return int(results[0]["supp"]["value"])

@@ -15,7 +15,6 @@ from SPARQLWrapper import SPARQLWrapper
 from graph_metrics import PredicateProfile
 from queries import (
     SparqlBindings,
-    build_federated_query,
     build_rule_query,
     get_select_results,
     insert_triples_gsp,
@@ -83,42 +82,27 @@ def apply_rule(
     client: SPARQLWrapper,
     rule: HornRule,
     graph_uri: str,
-) -> Iterator[RawTriple]:
-    """Applies a rule to a graph and retuns a raw triple Iterator that generates the
-    resulted triples from the graph."""
-    query = build_rule_query(rule.signature, graph_uri, include_head=False)
-    raw_bindings = get_select_results(client, query)
-    logger.debug("Retrieved %d results from rule %s.", len(raw_bindings), rule.rule_id)
-    return iter_raw_triples({rule.rule_id: rule}, raw_bindings)
-
-
-def apply_recursive_rule(
-    client: SPARQLWrapper,
-    graph_uri: str,
-    rule: HornRule,
-    profile: PredicateProfile,
     term_mapping: dict[str, str],
+    profile: PredicateProfile,
     crud_endpoint: str,
 ) -> SparqlBindings:
-    """Applias a recursive rule to a graph to extend it."""
+    """Applies a rule to a graph and retuns a raw triple Iterator that generates the
+    resulted triples from the graph."""
 
     searchspace_uri = "http://SearchSpace.org/"
 
-    query = build_federated_query(rule.signature, graph_uri, searchspace_uri)
+    if rule.head.predicate in rule.get_body_predicates():
+        create_predicate_searchspace(
+            predicate=rule.head.predicate,
+            profile=profile,
+            searchspace_uri=searchspace_uri,
+            term_mapping=term_mapping,
+            client=client,
+            crud_endpoint=crud_endpoint,
+        )
 
-    create_predicate_searchspace(
-        predicate=rule.head.predicate,
-        profile=profile,
-        searchspace_uri=searchspace_uri,
-        term_mapping=term_mapping,
-        crud_endpoint=crud_endpoint,
-        client=client,
-    )
-
-    raw_bindings = get_select_results(client, query)
-
-    logger.debug("Retrieved %d bindings from %s.", len(raw_bindings), rule.rule_id)
-    return raw_bindings
+    query = build_rule_query(rule.signature, graph_uri, searchspace_uri)
+    return get_select_results(client, query)
 
 
 # ---------------------------------------------------------------------------

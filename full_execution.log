@@ -1,0 +1,440 @@
+2026-06-01 18:07:06 | __main__     | INFO     | Confifuration correctly initialized.
+2026-06-01 18:07:06 | graph_metrics | DEBUG    | Retrieving metrics from http://FrenchRoyalty.org/ with 10641 triples.
+2026-06-01 18:07:06 | graph_metrics | DEBUG    | Loaded DB metrics for 12 predicates.
+2026-06-01 18:07:06 | rules        | DEBUG    | Created term to prefix mapping.
+2026-06-01 18:07:06 | __main__     | INFO     | 6 out of 12 predicates are extensional.
+2026-06-01 18:07:06 | __main__     | DEBUG    | 
+Intensional preds.:
+	<http://FrenchRoyalty.org/successor>
+	<http://FrenchRoyalty.org/father>
+	<http://FrenchRoyalty.org/predecessor>
+	<http://FrenchRoyalty.org/parent>
+	<http://FrenchRoyalty.org/mother>
+	<http://FrenchRoyalty.org/child>
+Extensional preds.:
+	<http://FrenchRoyalty.org/hasSpouse>
+	<http://FrenchRoyalty.org/spouse>
+	<http://FrenchRoyalty.org/marriedTo>
+	<http://xmlns.com/foaf/0.1/name>
+	<http://FrenchRoyalty.org/gender>
+	<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>
+Profiles: <http://FrenchRoyalty.org/hasSpouse>
+	<http://FrenchRoyalty.org/parent>
+	<http://FrenchRoyalty.org/spouse>
+	<http://FrenchRoyalty.org/gender>
+	<http://FrenchRoyalty.org/mother>
+	<http://FrenchRoyalty.org/father>
+	<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>
+	<http://FrenchRoyalty.org/predecessor>
+	<http://FrenchRoyalty.org/marriedTo>
+	<http://FrenchRoyalty.org/child>
+	<http://FrenchRoyalty.org/successor>
+	<http://xmlns.com/foaf/0.1/name>
+2026-06-01 18:07:07 | queries      | DEBUG    | Successfully cleared graph <http://SyntheticFrechRoyalty.org/>.
+2026-06-01 18:07:27 | gen_triples  | INFO     | Graph generated at <http://SyntheticFrechRoyalty.org/> with 6506 triples for 6 predicates.
+2026-06-01 18:07:27 | rules        | INFO     | Created dependency graph for 69 rules.
+2026-06-01 18:07:27 | __main__     | INFO     | Iter 1: Applying 1 rules.
+2026-06-01 18:07:27 | gen_triples  | INFO     | Creating searchspace for <http://FrenchRoyalty.org/child> with 511119 triples
+2026-06-01 18:07:27 | queries      | DEBUG    | Inserting triples to http://SearchSpace.org/ via GSP.
+2026-06-01 18:07:32 | queries      | DEBUG    | Successfully uploaded 511119 triples to <http://SearchSpace.org/> via GSP.
+2026-06-01 18:07:32 | queries      | DEBUG    | Built query for rule rule_66 (?a <http://FrenchRoyalty.org/child> ?b):
+
+    SELECT DISTINCT ?rule_id ?a ?f ?b
+    WHERE {
+      BIND ("rule_66" AS ?rule_id)      
+        
+          GRAPH <http://SyntheticFrechRoyalty.org/> {
+            ?a <http://FrenchRoyalty.org/marriedTo> ?f .
+          }.
+    
+          GRAPH <http://SearchSpace.org/> {
+            ?f <http://FrenchRoyalty.org/child> ?b .
+            ?a <http://FrenchRoyalty.org/child> ?b .
+          }
+    }
+    
+2026-06-01 18:07:33 | __main__     | DEBUG    | Retrieved 8379 bindings for rule_66.
+2026-06-01 18:07:40 | __main__     | DEBUG    | Counted filtered triples: 16758
+2026-06-01 18:07:40 | __main__     | INFO     | Rule rule_66 yielded 16758 triples for <http://FrenchRoyalty.org/child>.
+2026-06-01 18:07:40 | __main__     | DEBUG    | <http://FrenchRoyalty.org/hasSpouse> [1928/1928]
+2026-06-01 18:07:40 | __main__     | DEBUG    | <http://FrenchRoyalty.org/parent> [0/946]
+2026-06-01 18:07:40 | __main__     | DEBUG    | <http://FrenchRoyalty.org/spouse> [865/865]
+2026-06-01 18:07:40 | __main__     | DEBUG    | <http://FrenchRoyalty.org/gender> [892/892]
+2026-06-01 18:07:40 | __main__     | DEBUG    | <http://FrenchRoyalty.org/mother> [0/408]
+2026-06-01 18:07:40 | __main__     | DEBUG    | <http://FrenchRoyalty.org/father> [0/561]
+2026-06-01 18:07:40 | __main__     | DEBUG    | <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> [2221/2221]
+2026-06-01 18:07:40 | __main__     | DEBUG    | <http://FrenchRoyalty.org/predecessor> [0/358]
+2026-06-01 18:07:40 | __main__     | DEBUG    | <http://FrenchRoyalty.org/marriedTo> [15/15]
+2026-06-01 18:07:40 | __main__     | DEBUG    | <http://FrenchRoyalty.org/child> [11970/1508]
+2026-06-01 18:07:40 | __main__     | DEBUG    | <http://FrenchRoyalty.org/successor> [0/354]
+2026-06-01 18:07:40 | __main__     | DEBUG    | <http://xmlns.com/foaf/0.1/name> [585/585]
+2026-06-01 18:07:40 | __main__     | INFO     | Closed predicates {'<http://FrenchRoyalty.org/child>'}
+2026-06-01 18:07:40 | __main__     | DEBUG    | Rules to check: dict_keys(['rule_24', 'rule_66', 'rule_60', 'rule_23', 'rule_34', 'rule_46', 'rule_11', 'rule_64', 'rule_25', 'rule_69', 'rule_6', 'rule_51', 'rule_18', 'rule_55', 'rule_63', 'rule_65', 'rule_59', 'rule_42', 'rule_68', 'rule_5', 'rule_52', 'rule_26', 'rule_22', 'rule_67', 'rule_56', 'rule_61', 'rule_16', 'rule_45', 'rule_36', 'rule_62'])
+2026-06-01 18:07:40 | __main__     | DEBUG    | rule_24 [0/199]
+2026-06-01 18:07:40 | __main__     | DEBUG    | rule_66 [8379/26]
+2026-06-01 18:07:40 | __main__     | DEBUG    | rule_60 [0/67]
+2026-06-01 18:07:40 | __main__     | DEBUG    | rule_23 [0/159]
+2026-06-01 18:07:40 | __main__     | DEBUG    | rule_34 [0/100]
+2026-06-01 18:07:40 | __main__     | DEBUG    | rule_46 [0/60]
+2026-06-01 18:07:40 | __main__     | DEBUG    | rule_11 [0/199]
+2026-06-01 18:07:40 | __main__     | DEBUG    | rule_64 [0/23]
+2026-06-01 18:07:40 | __main__     | DEBUG    | rule_25 [0/127]
+2026-06-01 18:07:40 | __main__     | DEBUG    | rule_69 [0/23]
+2026-06-01 18:07:40 | __main__     | DEBUG    | rule_6 [0/127]
+2026-06-01 18:07:40 | __main__     | DEBUG    | rule_51 [0/5]
+2026-06-01 18:07:40 | __main__     | DEBUG    | rule_18 [0/339]
+2026-06-01 18:07:40 | __main__     | DEBUG    | rule_55 [0/66]
+2026-06-01 18:07:40 | __main__     | DEBUG    | rule_63 [0/153]
+2026-06-01 18:07:40 | __main__     | DEBUG    | rule_65 [0/22]
+2026-06-01 18:07:40 | __main__     | DEBUG    | rule_59 [0/100]
+2026-06-01 18:07:40 | __main__     | DEBUG    | rule_42 [0/19]
+2026-06-01 18:07:41 | __main__     | DEBUG    | rule_68 [0/22]
+2026-06-01 18:07:41 | __main__     | DEBUG    | rule_5 [0/127]
+2026-06-01 18:07:41 | __main__     | DEBUG    | rule_52 [0/153]
+2026-06-01 18:07:41 | __main__     | DEBUG    | rule_26 [0/339]
+2026-06-01 18:07:41 | __main__     | DEBUG    | rule_22 [0/127]
+2026-06-01 18:07:41 | __main__     | DEBUG    | rule_67 [0/73]
+2026-06-01 18:07:41 | __main__     | DEBUG    | rule_56 [0/73]
+2026-06-01 18:07:41 | __main__     | DEBUG    | rule_61 [0/60]
+2026-06-01 18:07:41 | __main__     | DEBUG    | rule_16 [0/159]
+2026-06-01 18:07:41 | __main__     | DEBUG    | rule_45 [0/67]
+2026-06-01 18:07:41 | __main__     | DEBUG    | rule_36 [0/100]
+2026-06-01 18:07:41 | __main__     | DEBUG    | rule_62 [0/66]
+2026-06-01 18:07:41 | __main__     | INFO     | Closed rules in this strata: {'rule_66'}
+2026-06-01 18:07:41 | __main__     | INFO     | Closed: Rules [1/69] | Predicates [7/12].
+2026-06-01 18:07:41 | __main__     | INFO     | Iter 2: Applying 1 rules.
+2026-06-01 18:07:41 | queries      | DEBUG    | Built query for rule rule_51 (?a <http://FrenchRoyalty.org/mother> ?b):
+
+    SELECT DISTINCT ?rule_id ?a ?b
+    WHERE {
+      BIND ("rule_51" AS ?rule_id)      
+        
+          GRAPH <http://SyntheticFrechRoyalty.org/> {
+            ?f <http://FrenchRoyalty.org/child> ?a .
+            ?b <http://FrenchRoyalty.org/marriedTo> ?f .
+          }
+    }
+    
+2026-06-01 18:07:41 | __main__     | DEBUG    | Retrieved 10000 bindings for rule_51.
+2026-06-01 18:07:45 | __main__     | DEBUG    | Counted filtered triples: 10000
+2026-06-01 18:07:45 | __main__     | INFO     | Rule rule_51 yielded 10000 triples for <http://FrenchRoyalty.org/mother>.
+2026-06-01 18:07:45 | __main__     | DEBUG    | <http://FrenchRoyalty.org/hasSpouse> [1928/1928]
+2026-06-01 18:07:45 | __main__     | DEBUG    | <http://FrenchRoyalty.org/parent> [0/946]
+2026-06-01 18:07:45 | __main__     | DEBUG    | <http://FrenchRoyalty.org/spouse> [865/865]
+2026-06-01 18:07:45 | __main__     | DEBUG    | <http://FrenchRoyalty.org/gender> [892/892]
+2026-06-01 18:07:45 | __main__     | DEBUG    | <http://FrenchRoyalty.org/mother> [10000/408]
+2026-06-01 18:07:45 | __main__     | DEBUG    | <http://FrenchRoyalty.org/father> [0/561]
+2026-06-01 18:07:45 | __main__     | DEBUG    | <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> [2221/2221]
+2026-06-01 18:07:45 | __main__     | DEBUG    | <http://FrenchRoyalty.org/predecessor> [0/358]
+2026-06-01 18:07:45 | __main__     | DEBUG    | <http://FrenchRoyalty.org/marriedTo> [15/15]
+2026-06-01 18:07:45 | __main__     | DEBUG    | <http://FrenchRoyalty.org/child> [11970/1508]
+2026-06-01 18:07:45 | __main__     | DEBUG    | <http://FrenchRoyalty.org/successor> [0/354]
+2026-06-01 18:07:45 | __main__     | DEBUG    | <http://xmlns.com/foaf/0.1/name> [585/585]
+2026-06-01 18:07:45 | __main__     | INFO     | Closed predicates {'<http://FrenchRoyalty.org/mother>'}
+2026-06-01 18:07:45 | __main__     | DEBUG    | Rules to check: dict_keys(['rule_33', 'rule_29', 'rule_41', 'rule_50', 'rule_23', 'rule_43', 'rule_20', 'rule_51', 'rule_15', 'rule_35', 'rule_7', 'rule_16', 'rule_3'])
+2026-06-01 18:07:45 | __main__     | DEBUG    | rule_33 [0/4]
+2026-06-01 18:07:45 | __main__     | DEBUG    | rule_29 [0/9]
+2026-06-01 18:07:45 | __main__     | DEBUG    | rule_41 [0/9]
+2026-06-01 18:07:45 | __main__     | DEBUG    | rule_50 [0/6]
+2026-06-01 18:07:45 | __main__     | DEBUG    | rule_23 [7606/159]
+2026-06-01 18:07:45 | __main__     | DEBUG    | rule_43 [0/4]
+2026-06-01 18:07:45 | __main__     | DEBUG    | rule_20 [0/312]
+2026-06-01 18:07:45 | __main__     | DEBUG    | rule_51 [10000/5]
+2026-06-01 18:07:45 | __main__     | DEBUG    | rule_15 [0/312]
+2026-06-01 18:07:45 | __main__     | DEBUG    | rule_35 [0/4]
+2026-06-01 18:07:45 | __main__     | DEBUG    | rule_7 [0/10]
+2026-06-01 18:07:45 | __main__     | DEBUG    | rule_16 [7606/159]
+2026-06-01 18:07:45 | __main__     | DEBUG    | rule_3 [0/11]
+2026-06-01 18:07:45 | __main__     | INFO     | Closed rules in this strata: {'rule_23', 'rule_51', 'rule_16'}
+2026-06-01 18:07:45 | __main__     | INFO     | Closed: Rules [4/69] | Predicates [8/12].
+2026-06-01 18:07:45 | __main__     | INFO     | Iter 3: Applying 1 rules.
+2026-06-01 18:07:45 | queries      | DEBUG    | Built query for rule rule_20 (?a <http://FrenchRoyalty.org/parent> ?b):
+
+    SELECT DISTINCT ?rule_id ?a ?b
+    WHERE {
+      BIND ("rule_20" AS ?rule_id)      
+        
+          GRAPH <http://SyntheticFrechRoyalty.org/> {
+            ?a <http://FrenchRoyalty.org/mother> ?b .
+          }
+    }
+    
+2026-06-01 18:07:46 | __main__     | DEBUG    | Retrieved 10000 bindings for rule_20.
+2026-06-01 18:07:50 | __main__     | DEBUG    | Counted filtered triples: 10000
+2026-06-01 18:07:50 | __main__     | INFO     | Rule rule_20 yielded 10000 triples for <http://FrenchRoyalty.org/parent>.
+2026-06-01 18:07:50 | __main__     | DEBUG    | <http://FrenchRoyalty.org/hasSpouse> [1928/1928]
+2026-06-01 18:07:50 | __main__     | DEBUG    | <http://FrenchRoyalty.org/parent> [10000/946]
+2026-06-01 18:07:50 | __main__     | DEBUG    | <http://FrenchRoyalty.org/spouse> [865/865]
+2026-06-01 18:07:50 | __main__     | DEBUG    | <http://FrenchRoyalty.org/gender> [892/892]
+2026-06-01 18:07:50 | __main__     | DEBUG    | <http://FrenchRoyalty.org/mother> [10000/408]
+2026-06-01 18:07:50 | __main__     | DEBUG    | <http://FrenchRoyalty.org/father> [0/561]
+2026-06-01 18:07:50 | __main__     | DEBUG    | <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> [2221/2221]
+2026-06-01 18:07:50 | __main__     | DEBUG    | <http://FrenchRoyalty.org/predecessor> [0/358]
+2026-06-01 18:07:50 | __main__     | DEBUG    | <http://FrenchRoyalty.org/marriedTo> [15/15]
+2026-06-01 18:07:50 | __main__     | DEBUG    | <http://FrenchRoyalty.org/child> [11970/1508]
+2026-06-01 18:07:50 | __main__     | DEBUG    | <http://FrenchRoyalty.org/successor> [0/354]
+2026-06-01 18:07:50 | __main__     | DEBUG    | <http://xmlns.com/foaf/0.1/name> [585/585]
+2026-06-01 18:07:50 | __main__     | INFO     | Closed predicates {'<http://FrenchRoyalty.org/parent>'}
+2026-06-01 18:07:50 | __main__     | DEBUG    | Rules to check: dict_keys(['rule_53', 'rule_1', 'rule_47', 'rule_63', 'rule_48', 'rule_21', 'rule_54', 'rule_55', 'rule_17', 'rule_12', 'rule_30', 'rule_38', 'rule_52', 'rule_26', 'rule_57', 'rule_32', 'rule_19', 'rule_67', 'rule_56', 'rule_20', 'rule_49', 'rule_37', 'rule_15', 'rule_27', 'rule_58', 'rule_28', 'rule_18', 'rule_62', 'rule_8'])
+2026-06-01 18:07:50 | __main__     | DEBUG    | rule_53 [0/90]
+2026-06-01 18:07:50 | __main__     | DEBUG    | rule_1 [0/113]
+2026-06-01 18:07:50 | __main__     | DEBUG    | rule_47 [0/81]
+2026-06-01 18:07:50 | __main__     | DEBUG    | rule_63 [0/153]
+2026-06-01 18:07:50 | __main__     | DEBUG    | rule_48 [0/18]
+2026-06-01 18:07:50 | __main__     | DEBUG    | rule_21 [0/431]
+2026-06-01 18:07:50 | __main__     | DEBUG    | rule_54 [0/81]
+2026-06-01 18:07:50 | __main__     | DEBUG    | rule_55 [0/66]
+2026-06-01 18:07:50 | __main__     | DEBUG    | rule_17 [0/113]
+2026-06-01 18:07:50 | __main__     | DEBUG    | rule_12 [0/431]
+2026-06-01 18:07:50 | __main__     | DEBUG    | rule_30 [0/4]
+2026-06-01 18:07:50 | __main__     | DEBUG    | rule_38 [0/83]
+2026-06-01 18:07:50 | __main__     | DEBUG    | rule_52 [0/153]
+2026-06-01 18:07:50 | __main__     | DEBUG    | rule_26 [7606/339]
+2026-06-01 18:07:50 | __main__     | DEBUG    | rule_57 [0/83]
+2026-06-01 18:07:50 | __main__     | DEBUG    | rule_32 [0/17]
+2026-06-01 18:07:50 | __main__     | DEBUG    | rule_19 [0/115]
+2026-06-01 18:07:50 | __main__     | DEBUG    | rule_67 [0/73]
+2026-06-01 18:07:50 | __main__     | DEBUG    | rule_56 [0/73]
+2026-06-01 18:07:50 | __main__     | DEBUG    | rule_20 [10000/312]
+2026-06-01 18:07:50 | __main__     | DEBUG    | rule_49 [0/83]
+2026-06-01 18:07:50 | __main__     | DEBUG    | rule_37 [0/90]
+2026-06-01 18:07:50 | __main__     | DEBUG    | rule_15 [10000/312]
+2026-06-01 18:07:50 | __main__     | DEBUG    | rule_27 [0/90]
+2026-06-01 18:07:50 | __main__     | DEBUG    | rule_58 [0/17]
+2026-06-01 18:07:50 | __main__     | DEBUG    | rule_28 [0/81]
+2026-06-01 18:07:50 | __main__     | DEBUG    | rule_18 [7606/339]
+2026-06-01 18:07:50 | __main__     | DEBUG    | rule_62 [0/66]
+2026-06-01 18:07:50 | __main__     | DEBUG    | rule_8 [0/115]
+2026-06-01 18:07:50 | __main__     | INFO     | Closed rules in this strata: {'rule_18', 'rule_15', 'rule_26', 'rule_20'}
+2026-06-01 18:07:50 | __main__     | INFO     | Closed: Rules [8/69] | Predicates [9/12].
+2026-06-01 18:07:50 | __main__     | INFO     | Iter 4: Applying 2 rules.
+2026-06-01 18:07:50 | queries      | DEBUG    | Built query for rule rule_30 (?a <http://FrenchRoyalty.org/successor> ?b):
+
+    SELECT DISTINCT ?rule_id ?a ?b
+    WHERE {
+      BIND ("rule_30" AS ?rule_id)      
+        
+          GRAPH <http://SyntheticFrechRoyalty.org/> {
+            ?b <http://FrenchRoyalty.org/parent> ?f .
+            ?f <http://FrenchRoyalty.org/marriedTo> ?a .
+          }
+    }
+    
+2026-06-01 18:07:51 | __main__     | DEBUG    | Retrieved 10000 bindings for rule_30.
+2026-06-01 18:07:56 | __main__     | DEBUG    | Counted filtered triples: 10000
+2026-06-01 18:07:56 | __main__     | INFO     | Rule rule_30 yielded 10000 triples for <http://FrenchRoyalty.org/successor>.
+2026-06-01 18:07:56 | queries      | DEBUG    | Built query for rule rule_52 (?a <http://FrenchRoyalty.org/father> ?b):
+
+    SELECT DISTINCT ?rule_id ?a ?b
+    WHERE {
+      BIND ("rule_52" AS ?rule_id)      
+        
+          GRAPH <http://SyntheticFrechRoyalty.org/> {
+            ?b <http://FrenchRoyalty.org/child> ?a .
+            ?a <http://FrenchRoyalty.org/parent> ?b .
+          }
+    }
+    
+2026-06-01 18:07:56 | __main__     | DEBUG    | Retrieved 7606 bindings for rule_52.
+2026-06-01 18:07:59 | __main__     | DEBUG    | Counted filtered triples: 7606
+2026-06-01 18:07:59 | __main__     | INFO     | Rule rule_52 yielded 7606 triples for <http://FrenchRoyalty.org/father>.
+2026-06-01 18:07:59 | __main__     | DEBUG    | <http://FrenchRoyalty.org/hasSpouse> [1928/1928]
+2026-06-01 18:07:59 | __main__     | DEBUG    | <http://FrenchRoyalty.org/parent> [10000/946]
+2026-06-01 18:07:59 | __main__     | DEBUG    | <http://FrenchRoyalty.org/spouse> [865/865]
+2026-06-01 18:07:59 | __main__     | DEBUG    | <http://FrenchRoyalty.org/gender> [892/892]
+2026-06-01 18:07:59 | __main__     | DEBUG    | <http://FrenchRoyalty.org/mother> [10000/408]
+2026-06-01 18:07:59 | __main__     | DEBUG    | <http://FrenchRoyalty.org/father> [7606/561]
+2026-06-01 18:07:59 | __main__     | DEBUG    | <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> [2221/2221]
+2026-06-01 18:07:59 | __main__     | DEBUG    | <http://FrenchRoyalty.org/predecessor> [0/358]
+2026-06-01 18:07:59 | __main__     | DEBUG    | <http://FrenchRoyalty.org/marriedTo> [15/15]
+2026-06-01 18:07:59 | __main__     | DEBUG    | <http://FrenchRoyalty.org/child> [11970/1508]
+2026-06-01 18:07:59 | __main__     | DEBUG    | <http://FrenchRoyalty.org/successor> [10000/354]
+2026-06-01 18:07:59 | __main__     | DEBUG    | <http://xmlns.com/foaf/0.1/name> [585/585]
+2026-06-01 18:07:59 | __main__     | INFO     | Closed predicates {'<http://FrenchRoyalty.org/father>', '<http://FrenchRoyalty.org/successor>'}
+2026-06-01 18:07:59 | __main__     | DEBUG    | Rules to check: dict_keys(['rule_10', 'rule_53', 'rule_24', 'rule_1', 'rule_47', 'rule_34', 'rule_46', 'rule_13', 'rule_35', 'rule_48', 'rule_54', 'rule_55', 'rule_59', 'rule_17', 'rule_21', 'rule_5', 'rule_12', 'rule_14', 'rule_52', 'rule_33', 'rule_29', 'rule_39', 'rule_57', 'rule_9', 'rule_2', 'rule_37', 'rule_27', 'rule_58', 'rule_45', 'rule_62', 'rule_3', 'rule_60', 'rule_50', 'rule_11', 'rule_25', 'rule_4', 'rule_65', 'rule_31', 'rule_63', 'rule_30', 'rule_42', 'rule_68', 'rule_38', 'rule_32', 'rule_40', 'rule_41', 'rule_43', 'rule_61', 'rule_49', 'rule_28', 'rule_44', 'rule_36'])
+2026-06-01 18:07:59 | __main__     | DEBUG    | rule_10 [0/268]
+2026-06-01 18:07:59 | __main__     | DEBUG    | rule_53 [0/90]
+2026-06-01 18:07:59 | __main__     | DEBUG    | rule_24 [7606/199]
+2026-06-01 18:07:59 | __main__     | DEBUG    | rule_1 [6409/113]
+2026-06-01 18:07:59 | __main__     | DEBUG    | rule_47 [6409/81]
+2026-06-01 18:07:59 | __main__     | DEBUG    | rule_34 [0/100]
+2026-06-01 18:07:59 | __main__     | DEBUG    | rule_46 [6409/60]
+2026-06-01 18:07:59 | __main__     | DEBUG    | rule_13 [0/106]
+2026-06-01 18:07:59 | __main__     | DEBUG    | rule_35 [15362/4]
+2026-06-01 18:07:59 | __main__     | DEBUG    | rule_48 [0/18]
+2026-06-01 18:07:59 | __main__     | DEBUG    | rule_54 [6409/81]
+2026-06-01 18:07:59 | __main__     | DEBUG    | rule_55 [6409/66]
+2026-06-01 18:07:59 | __main__     | DEBUG    | rule_59 [0/100]
+2026-06-01 18:07:59 | __main__     | DEBUG    | rule_17 [6409/113]
+2026-06-01 18:07:59 | __main__     | DEBUG    | rule_21 [7606/431]
+2026-06-01 18:07:59 | __main__     | DEBUG    | rule_5 [10000/127]
+2026-06-01 18:07:59 | __main__     | DEBUG    | rule_12 [7606/431]
+2026-06-01 18:07:59 | __main__     | DEBUG    | rule_14 [6409/102]
+2026-06-01 18:07:59 | __main__     | DEBUG    | rule_52 [7606/153]
+2026-06-01 18:07:59 | __main__     | DEBUG    | rule_33 [0/4]
+2026-06-01 18:07:59 | __main__     | DEBUG    | rule_29 [0/9]
+2026-06-01 18:07:59 | __main__     | DEBUG    | rule_39 [0/78]
+2026-06-01 18:07:59 | __main__     | DEBUG    | rule_57 [0/83]
+2026-06-01 18:07:59 | __main__     | DEBUG    | rule_9 [0/106]
+2026-06-01 18:07:59 | __main__     | DEBUG    | rule_2 [6409/102]
+2026-06-01 18:07:59 | __main__     | DEBUG    | rule_37 [0/90]
+2026-06-01 18:07:59 | __main__     | DEBUG    | rule_27 [0/90]
+2026-06-01 18:07:59 | __main__     | DEBUG    | rule_58 [0/17]
+2026-06-01 18:07:59 | __main__     | DEBUG    | rule_45 [0/67]
+2026-06-01 18:08:00 | __main__     | DEBUG    | rule_62 [6409/66]
+2026-06-01 18:08:00 | __main__     | DEBUG    | rule_3 [6409/11]
+2026-06-01 18:08:00 | __main__     | DEBUG    | rule_60 [0/67]
+2026-06-01 18:08:00 | __main__     | DEBUG    | rule_50 [15362/6]
+2026-06-01 18:08:00 | __main__     | DEBUG    | rule_11 [7606/199]
+2026-06-01 18:08:00 | __main__     | DEBUG    | rule_25 [10000/127]
+2026-06-01 18:08:00 | __main__     | DEBUG    | rule_4 [0/268]
+2026-06-01 18:08:00 | __main__     | DEBUG    | rule_65 [64090/22]
+2026-06-01 18:08:00 | __main__     | DEBUG    | rule_31 [0/78]
+2026-06-01 18:08:00 | __main__     | DEBUG    | rule_63 [7606/153]
+2026-06-01 18:08:00 | __main__     | DEBUG    | rule_30 [10000/4]
+2026-06-01 18:08:00 | __main__     | DEBUG    | rule_42 [0/19]
+2026-06-01 18:08:00 | __main__     | DEBUG    | rule_68 [64090/22]
+2026-06-01 18:08:00 | __main__     | DEBUG    | rule_38 [0/83]
+2026-06-01 18:08:00 | __main__     | DEBUG    | rule_32 [0/17]
+2026-06-01 18:08:00 | __main__     | DEBUG    | rule_40 [0/4]
+2026-06-01 18:08:00 | __main__     | DEBUG    | rule_41 [0/9]
+2026-06-01 18:08:00 | __main__     | DEBUG    | rule_43 [0/4]
+2026-06-01 18:08:00 | __main__     | DEBUG    | rule_61 [6409/60]
+2026-06-01 18:08:00 | __main__     | DEBUG    | rule_49 [0/83]
+2026-06-01 18:08:00 | __main__     | DEBUG    | rule_28 [6409/81]
+2026-06-01 18:08:00 | __main__     | DEBUG    | rule_44 [0/14]
+2026-06-01 18:08:00 | __main__     | DEBUG    | rule_36 [0/100]
+2026-06-01 18:08:00 | __main__     | INFO     | Closed rules in this strata: {'rule_24', 'rule_1', 'rule_47', 'rule_46', 'rule_35', 'rule_55', 'rule_54', 'rule_21', 'rule_17', 'rule_12', 'rule_5', 'rule_14', 'rule_52', 'rule_2', 'rule_62', 'rule_3', 'rule_50', 'rule_11', 'rule_25', 'rule_65', 'rule_63', 'rule_30', 'rule_68', 'rule_61', 'rule_28'}
+2026-06-01 18:08:00 | __main__     | INFO     | Closed: Rules [33/69] | Predicates [11/12].
+2026-06-01 18:08:00 | __main__     | INFO     | Iter 5: Applying 5 rules.
+2026-06-01 18:08:00 | queries      | DEBUG    | Built query for rule rule_38 (?a <http://FrenchRoyalty.org/predecessor> ?b):
+
+    SELECT DISTINCT ?rule_id ?a ?b
+    WHERE {
+      BIND ("rule_38" AS ?rule_id)      
+        
+          GRAPH <http://SyntheticFrechRoyalty.org/> {
+            ?a <http://FrenchRoyalty.org/parent> ?b .
+            ?a <http://FrenchRoyalty.org/father> ?b .
+          }
+    }
+    
+2026-06-01 18:08:01 | __main__     | DEBUG    | Retrieved 7606 bindings for rule_38.
+2026-06-01 18:08:04 | __main__     | DEBUG    | Counted filtered triples: 7606
+2026-06-01 18:08:04 | __main__     | INFO     | Rule rule_38 yielded 7606 triples for <http://FrenchRoyalty.org/predecessor>.
+2026-06-01 18:08:04 | queries      | DEBUG    | Built query for rule rule_42 (?a <http://FrenchRoyalty.org/predecessor> ?b):
+
+    SELECT DISTINCT ?rule_id ?a ?b
+    WHERE {
+      BIND ("rule_42" AS ?rule_id)      
+        
+          GRAPH <http://SyntheticFrechRoyalty.org/> {
+            ?b <http://FrenchRoyalty.org/child> ?f .
+            ?a <http://FrenchRoyalty.org/successor> ?f .
+          }
+    }
+    
+2026-06-01 18:08:04 | __main__     | DEBUG    | Retrieved 90 bindings for rule_42.
+2026-06-01 18:08:04 | __main__     | DEBUG    | Counted filtered triples: 90
+2026-06-01 18:08:04 | __main__     | INFO     | Rule rule_42 yielded 90 triples for <http://FrenchRoyalty.org/predecessor>.
+2026-06-01 18:08:04 | queries      | DEBUG    | Built query for rule rule_43 (?a <http://FrenchRoyalty.org/predecessor> ?b):
+
+    SELECT DISTINCT ?rule_id ?a ?b
+    WHERE {
+      BIND ("rule_43" AS ?rule_id)      
+        
+          GRAPH <http://SyntheticFrechRoyalty.org/> {
+            ?a <http://FrenchRoyalty.org/successor> ?f .
+            ?f <http://FrenchRoyalty.org/mother> ?b .
+          }
+    }
+    
+2026-06-01 18:08:04 | __main__     | DEBUG    | Retrieved 81 bindings for rule_43.
+2026-06-01 18:08:04 | __main__     | DEBUG    | Counted filtered triples: 81
+2026-06-01 18:08:04 | __main__     | INFO     | Rule rule_43 yielded 81 triples for <http://FrenchRoyalty.org/predecessor>.
+2026-06-01 18:08:04 | queries      | DEBUG    | Built query for rule rule_44 (?a <http://FrenchRoyalty.org/predecessor> ?b):
+
+    SELECT DISTINCT ?rule_id ?a ?b
+    WHERE {
+      BIND ("rule_44" AS ?rule_id)      
+        
+          GRAPH <http://SyntheticFrechRoyalty.org/> {
+            ?f <http://FrenchRoyalty.org/father> ?b .
+            ?a <http://FrenchRoyalty.org/successor> ?f .
+          }
+    }
+    
+2026-06-01 18:08:04 | __main__     | DEBUG    | Retrieved 63 bindings for rule_44.
+2026-06-01 18:08:04 | __main__     | DEBUG    | Counted filtered triples: 63
+2026-06-01 18:08:04 | __main__     | INFO     | Rule rule_44 yielded 63 triples for <http://FrenchRoyalty.org/predecessor>.
+2026-06-01 18:08:04 | queries      | DEBUG    | Built query for rule rule_48 (?a <http://FrenchRoyalty.org/predecessor> ?b):
+
+    SELECT DISTINCT ?rule_id ?a ?b
+    WHERE {
+      BIND ("rule_48" AS ?rule_id)      
+        
+          GRAPH <http://SyntheticFrechRoyalty.org/> {
+            ?f <http://FrenchRoyalty.org/parent> ?b .
+            ?a <http://FrenchRoyalty.org/successor> ?f .
+          }
+    }
+    
+2026-06-01 18:08:04 | __main__     | DEBUG    | Retrieved 81 bindings for rule_48.
+2026-06-01 18:08:04 | __main__     | DEBUG    | Counted filtered triples: 81
+2026-06-01 18:08:04 | __main__     | INFO     | Rule rule_48 yielded 81 triples for <http://FrenchRoyalty.org/predecessor>.
+2026-06-01 18:08:04 | __main__     | DEBUG    | <http://FrenchRoyalty.org/hasSpouse> [1928/1928]
+2026-06-01 18:08:04 | __main__     | DEBUG    | <http://FrenchRoyalty.org/parent> [10000/946]
+2026-06-01 18:08:04 | __main__     | DEBUG    | <http://FrenchRoyalty.org/spouse> [865/865]
+2026-06-01 18:08:04 | __main__     | DEBUG    | <http://FrenchRoyalty.org/gender> [892/892]
+2026-06-01 18:08:04 | __main__     | DEBUG    | <http://FrenchRoyalty.org/mother> [10000/408]
+2026-06-01 18:08:04 | __main__     | DEBUG    | <http://FrenchRoyalty.org/father> [7606/561]
+2026-06-01 18:08:04 | __main__     | DEBUG    | <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> [2221/2221]
+2026-06-01 18:08:04 | __main__     | DEBUG    | <http://FrenchRoyalty.org/predecessor> [7672/358]
+2026-06-01 18:08:04 | __main__     | DEBUG    | <http://FrenchRoyalty.org/marriedTo> [15/15]
+2026-06-01 18:08:04 | __main__     | DEBUG    | <http://FrenchRoyalty.org/child> [11970/1508]
+2026-06-01 18:08:04 | __main__     | DEBUG    | <http://FrenchRoyalty.org/successor> [10000/354]
+2026-06-01 18:08:04 | __main__     | DEBUG    | <http://xmlns.com/foaf/0.1/name> [585/585]
+2026-06-01 18:08:04 | __main__     | INFO     | Closed predicates {'<http://FrenchRoyalty.org/predecessor>'}
+2026-06-01 18:08:04 | __main__     | DEBUG    | Rules to check: dict_keys(['rule_10', 'rule_53', 'rule_34', 'rule_13', 'rule_69', 'rule_6', 'rule_48', 'rule_59', 'rule_33', 'rule_29', 'rule_39', 'rule_57', 'rule_22', 'rule_67', 'rule_9', 'rule_37', 'rule_27', 'rule_58', 'rule_45', 'rule_60', 'rule_64', 'rule_4', 'rule_7', 'rule_31', 'rule_42', 'rule_38', 'rule_32', 'rule_40', 'rule_41', 'rule_19', 'rule_43', 'rule_56', 'rule_49', 'rule_44', 'rule_36', 'rule_8'])
+2026-06-01 18:08:04 | __main__     | DEBUG    | rule_10 [6427/268]
+2026-06-01 18:08:04 | __main__     | DEBUG    | rule_53 [6409/90]
+2026-06-01 18:08:04 | __main__     | DEBUG    | rule_34 [6427/100]
+2026-06-01 18:08:04 | __main__     | DEBUG    | rule_13 [7606/106]
+2026-06-01 18:08:04 | __main__     | DEBUG    | rule_69 [28360/23]
+2026-06-01 18:08:04 | __main__     | DEBUG    | rule_6 [7624/127]
+2026-06-01 18:08:04 | __main__     | DEBUG    | rule_48 [83816/18]
+2026-06-01 18:08:04 | __main__     | DEBUG    | rule_59 [6427/100]
+2026-06-01 18:08:04 | __main__     | DEBUG    | rule_33 [83816/4]
+2026-06-01 18:08:04 | __main__     | DEBUG    | rule_29 [6409/9]
+2026-06-01 18:08:05 | __main__     | DEBUG    | rule_39 [6409/78]
+2026-06-01 18:08:05 | __main__     | DEBUG    | rule_57 [7606/83]
+2026-06-01 18:08:05 | __main__     | DEBUG    | rule_22 [7624/127]
+2026-06-01 18:08:05 | __main__     | DEBUG    | rule_67 [7606/73]
+2026-06-01 18:08:05 | __main__     | DEBUG    | rule_9 [7606/106]
+2026-06-01 18:08:05 | __main__     | DEBUG    | rule_37 [6409/90]
+2026-06-01 18:08:05 | __main__     | DEBUG    | rule_27 [6409/90]
+2026-06-01 18:08:05 | __main__     | DEBUG    | rule_58 [83816/17]
+2026-06-01 18:08:05 | __main__     | DEBUG    | rule_45 [7606/67]
+2026-06-01 18:08:05 | __main__     | DEBUG    | rule_60 [7606/67]
+2026-06-01 18:08:05 | __main__     | DEBUG    | rule_64 [28360/23]
+2026-06-01 18:08:05 | __main__     | DEBUG    | rule_4 [6427/268]
+2026-06-01 18:08:05 | __main__     | DEBUG    | rule_7 [7618/10]
+2026-06-01 18:08:05 | __main__     | DEBUG    | rule_31 [6409/78]
+2026-06-01 18:08:05 | __main__     | DEBUG    | rule_42 [100000/19]
+2026-06-01 18:08:05 | __main__     | DEBUG    | rule_38 [7606/83]
+2026-06-01 18:08:05 | __main__     | DEBUG    | rule_32 [83816/17]
+2026-06-01 18:08:05 | __main__     | DEBUG    | rule_40 [36/4]
+2026-06-01 18:08:05 | __main__     | DEBUG    | rule_41 [6409/9]
+2026-06-01 18:08:05 | __main__     | DEBUG    | rule_19 [7618/115]
+2026-06-01 18:08:05 | __main__     | DEBUG    | rule_43 [83816/4]
+2026-06-01 18:08:05 | __main__     | DEBUG    | rule_56 [7606/73]
+2026-06-01 18:08:05 | __main__     | DEBUG    | rule_49 [7606/83]
+2026-06-01 18:08:05 | __main__     | DEBUG    | rule_44 [63816/14]
+2026-06-01 18:08:05 | __main__     | DEBUG    | rule_36 [6427/100]
+2026-06-01 18:08:05 | __main__     | DEBUG    | rule_8 [7618/115]
+2026-06-01 18:08:05 | __main__     | INFO     | Closed rules in this strata: {'rule_10', 'rule_53', 'rule_34', 'rule_13', 'rule_69', 'rule_6', 'rule_48', 'rule_59', 'rule_33', 'rule_29', 'rule_39', 'rule_57', 'rule_22', 'rule_67', 'rule_9', 'rule_37', 'rule_27', 'rule_58', 'rule_45', 'rule_60', 'rule_64', 'rule_4', 'rule_7', 'rule_31', 'rule_42', 'rule_38', 'rule_32', 'rule_40', 'rule_41', 'rule_19', 'rule_43', 'rule_56', 'rule_49', 'rule_44', 'rule_36', 'rule_8'}
+2026-06-01 18:08:05 | __main__     | INFO     | Closed: Rules [69/69] | Predicates [12/12].
+2026-06-01 18:08:05 | __main__     | INFO     | All predicates closed.
+2026-06-01 18:08:05 | __main__     | INFO     | Execution finished after 58.97 s.
+2026-06-01 18:08:05 | __main__     | INFO     | Original graph has 10641 triples.
+2026-06-01 18:08:05 | __main__     | INFO     | Synthetic graph at <http://SyntheticFrechRoyalty.org/> has 63754 triples.
