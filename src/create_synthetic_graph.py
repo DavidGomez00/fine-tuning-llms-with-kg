@@ -1,23 +1,24 @@
+import itertools
 import logging
 import random
 import time
 from collections.abc import Iterator
 from pathlib import Path
-from typing import Any
 
 import pandas as pd
 from SPARQLWrapper import DIGEST, SPARQLWrapper
+from yarl import URL
 
 from config import RunConfig
 from gen_triples import (
     RawTriple,
-    apply_recursive_rule,
     apply_rule,
     from_binding_row,
     gen_graph,
 )
 from graph_metrics import GraphMetrics, PredicateProfile
 from queries import (
+    SparqlBindings,
     clear_graph_sparql,
     get_frequency,
     get_support,
@@ -83,80 +84,55 @@ def get_closed_predicates(
     closed_predicates: set[str] = set()
 
     for predicate, profile in profiles.items():
-        if frequency := get_frequency(client, predicate, graph_uri):
-            logger.debug("%s [%d/%d]", predicate, frequency, profile.frequency)
-            if frequency >= profile.frequency:
-                closed_predicates.add(predicate)
+        frequency = get_frequency(client, predicate, graph_uri)
+        logger.debug("%s [%d/%d]", predicate, frequency, profile.frequency)
+        if frequency >= profile.frequency:
+            closed_predicates.add(predicate)
 
     return closed_predicates
 
 
 # ---------------------------------------------------------------------------
-# Filter triples from results TODO: join these two metods
+# Filter triples from results.
 # ---------------------------------------------------------------------------
 def filter_and_format_triples(
-    raw_triple_iterator: Iterator[RawTriple],
+    raw_bindings: SparqlBindings,
     profile: PredicateProfile,
-    predicate: str,
+    rule: HornRule,
     term_mapping: dict[str, str],
 ) -> Iterator[str]:
     # TODO: Change so it is aware of global profile of the triple
     """Filters raw triples against profile constraints and yields RDF strings."""
 
-    # Pre-allocate state using dictionary comprehensions for speed
-    for triple in raw_triple_iterator:
-        # TODO: Any filtering of these triples must be done here with the profile
-        yield format_triple(
-            subject=triple.subject_val,
-            predicate=triple.predicate,
-            obj=triple.object_val,
-            term_mapping=term_mapping,
-        )
+    # Shuffle to avoid deterministic bias if multiple valid options exist
+    shuffled_bindings = list(raw_bindings)
+    random.shuffle(shuffled_bindings)
 
+    created = 0
+    for bindings_row in shuffled_bindings:
+        if created >= profile.frequency:
+            logger.debug("Closed %s, finishing generation.", rule.head.predicate)
+            break
 
-def filter_and_format_triples_recursive(
-    profile: PredicateProfile,
-    predicate: str,
-    bindings: list[dict[str, Any]],
-    rule: HornRule,
-    term_mapping: dict[str, str],
-) -> Iterator[str]:
-    """Filters raw triples against profile constraints and yields RDF strings."""
-
-    if bindings:
-        # Shuffle to avoid deterministic bias if multiple valid options exist
-        shuffled_bindings = list(bindings)
-        random.shuffle(shuffled_bindings)
-
-        created = 0
-        for bindings_row in shuffled_bindings:
-            if created >= profile.frequency:
-                logger.debug("Closed %s, finishing generation.", predicate)
-                break
-
-            # Create that many triples
-            triples: set[RawTriple] = set()
-            for atom in rule.body:
-                if atom.predicate == predicate:
-                    subject_val, _ = from_binding_row(atom.subject, bindings_row)
-                    object_value, object_type = from_binding_row(atom.obj, bindings_row)
-
-                    triples.add(
-                        RawTriple(
-                            atom.predicate, subject_val, object_value, object_type
-                        )
-                    )
-
+        triples: set[RawTriple] = set()
+        for atom in (a for a in rule.body if a.predicate == rule.head.predicate):
+            subject_val, _ = from_binding_row(atom.subject, bindings_row)
+            object_value, object_type = from_binding_row(atom.obj, bindings_row)
             # TODO: If we were to filter the triples, this must be done here
-            for t in triples:
-                # TODO: This does not take into account possible literals
-                yield format_triple(
-                    subject=t.subject_val,
-                    predicate=t.predicate,
-                    obj=t.object_val,
-                    term_mapping=term_mapping,
-                )
-                # TODO: Update profile
+            triples.add(
+                RawTriple(atom.predicate, subject_val, object_value, object_type)
+            )
+
+        for t in triples:
+            # TODO: This does not take into account possible literals
+            yield format_triple(
+                subject=t.subject_val,
+                predicate=t.predicate,
+                obj=t.object_val,
+                term_mapping=term_mapping,
+            )
+            # created += 1
+            # TODO: Update profile
 
 
 # ---------------------------------------------------------------------------
@@ -209,83 +185,58 @@ def _execute_stratification(
         iter += 1
 
         available_rules = {r_id: r for r_id, r in rules.items() if is_ready(r_id)}
-        logger.info("Iter %d: Applying %d rules.", iter, len(available_rules))
-
-        direct_rules: dict[str, HornRule] = {}
-        recursive_rules: dict[str, HornRule] = {}
-
-        for rule_id, rule in available_rules.items():
-            if rule.head.predicate in rule.get_body_predicates():
-                recursive_rules[rule_id] = rule
-            else:
-                direct_rules[rule_id] = rule
-
-        if not (direct_rules or recursive_rules):
+        if not available_rules:
             logger.info("No rules to apply.")
             break
 
-        # Apply direct rules first
-        if direct_rules:
-            for r_id, rule in direct_rules.items():
-                raw_triple_iterator = apply_rule(
-                    graph_uri=graph_uri, client=client, rule=rule
+        logger.info("Iter %d: Applying %d rules.", iter, len(available_rules))
+
+        direct_rules: list[str] = []
+        recursive_rules: list[str] = []
+
+        for r_id, r in available_rules.items():
+            if r.head.predicate in r.get_body_predicates():
+                recursive_rules.append(r_id)
+            else:
+                direct_rules.append(r_id)
+
+        # Apply direct rules first, then recursive rules
+        for r_id in itertools.chain(direct_rules, recursive_rules):
+            rule = rules[r_id]
+            predicate = rule.head.predicate
+            raw_bindings = apply_rule(
+                client=client,
+                graph_uri=graph_uri,
+                rule=rule,
+                profile=profiles[predicate],
+                term_mapping=term_mapping,
+                crud_endpoint=crud_endpoint,
+            )
+
+            if not raw_bindings:
+                logger.warning("No results found for %s", r_id)
+                continue
+            logger.debug("Retrieved %d bindings for %s.", len(raw_bindings), r_id)
+
+            filtered_triple_iterator = filter_and_format_triples(
+                raw_bindings=raw_bindings,
+                profile=profiles[predicate],
+                rule=rule,
+                term_mapping=term_mapping,
+            )
+
+            if count := insert_triples_sparql(
+                graph_uri=graph_uri,
+                client=client,
+                triple_stream=filtered_triple_iterator,
+                chunk_size=chunk_size,
+            ):
+                grounded_predicates.add(predicate)
+                logger.info(
+                    "Rule %s yielded %d triples for %s.", r_id, count, predicate
                 )
-                predicate = rule.head.predicate
-
-                filtered_triple_iterator = filter_and_format_triples(
-                    raw_triple_iterator=raw_triple_iterator,
-                    predicate=predicate,
-                    profile=profiles[predicate],
-                    term_mapping=term_mapping,
-                )
-
-                if count := insert_triples_sparql(
-                    graph_uri=graph_uri,
-                    client=client,
-                    triple_stream=filtered_triple_iterator,
-                    chunk_size=chunk_size,
-                ):
-                    grounded_predicates.add(predicate)
-                    logger.info(
-                        "Rule %s yielded %d triples for %s.", r_id, count, predicate
-                    )
-
-        # Apply recursive rules
-        if recursive_rules:
-            for r_id, rule in recursive_rules.items():
-                predicate = rule.head.predicate
-                profile = profiles[predicate]
-
-                raw_bindings = apply_recursive_rule(
-                    client=client,
-                    graph_uri=graph_uri,
-                    rule=rule,
-                    profile=profile,
-                    term_mapping=term_mapping,
-                    crud_endpoint=crud_endpoint,
-                )
-
-                filtered_triple_iterator = filter_and_format_triples_recursive(
-                    profile=profile,
-                    predicate=predicate,
-                    bindings=raw_bindings,
-                    rule=rule,
-                    term_mapping=term_mapping,
-                )
-
-                if count := insert_triples_sparql(
-                    graph_uri=graph_uri,
-                    client=client,
-                    triple_stream=filtered_triple_iterator,
-                    chunk_size=chunk_size,
-                ):
-                    grounded_predicates.add(predicate)
-                    logger.info(
-                        "Rule %s yielded %d triples for %s.", r_id, count, predicate
-                    )
 
         updated_closure = False
-
         # Update predicates
         new_preds = get_closed_predicates(client, graph_uri, profiles) - closed_preds
         if new_preds:
@@ -335,8 +286,8 @@ def create_synthetic_graph(
     rules: dict[str, HornRule],
     term_mapping: dict[str, str],
     graph_metrics: GraphMetrics,
-    crud_endpoint: str,
     graph_uri: str,
+    crud_endpoint: str,
 ) -> None:
     """Generates a new graph from a set of rules and metrics from the orginal graph.
 
@@ -451,7 +402,7 @@ if __name__ == "__main__":
             rules=rules,
             term_mapping=term_mapping,
             graph_metrics=graph_metrics,
-            crud_endpoint=str(config.data.database_url / config.data.crud_endpoint),
+            crud_endpoint=URL(client.endpoint).with_name("sparql-graph-crud-auth"),
             graph_uri=f"http://Synthetic{config.graph.name}.org/",
         )
     except SyntheticGraphError as e:

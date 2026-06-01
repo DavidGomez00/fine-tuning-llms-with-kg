@@ -10,8 +10,6 @@ import torch
 from typing_extensions import Self
 from yarl import URL
 
-logger = logging.getLogger(__name__)
-
 
 @dataclass
 class FineTuningConfig:
@@ -187,9 +185,7 @@ class RunConfig:
                     raise KeyError(
                         f"Configuration Error: Missing mandatory section {key}"
                     )
-                logger.debug(
-                    "Configuration section '%s' not found; using defaults.", key
-                )
+
                 return {}
 
             section = data[key]
@@ -201,15 +197,9 @@ class RunConfig:
 
         # Read JSON contents
         json_path = Path(json_path)
-        try:
-            with open(json_path, encoding="utf-8") as f:
-                data: dict[str, Any] = json.load(f)
-        except FileNotFoundError:
-            logger.error(f"Configuration file not found: {json_path.absolute()}")
-            raise
-        except json.JSONDecodeError as e:
-            logger.error(f"Invalid JSON format in {json_path.name}: {e}")
-            raise
+
+        with open(json_path, encoding="utf-8") as f:
+            data: dict[str, Any] = json.load(f)
 
         virtuoso_config = VirtuosoConfig(**get_section("virtuoso", required=True))
         graph_config = GraphConfig(**get_section("graph", required=True))
@@ -222,13 +212,13 @@ class RunConfig:
         if "cot_generation" in data:
             cot_config = CoTGenerationConfig(**data["cot_generation"])
         else:
-            logger.debug("Optional section 'cot_generation' not defined. Skipping.")
+            print("Optional section 'cot_generation' not defined. Skipping.")
             cot_config = None
 
         if "fine_tuning" in data:
             fine_tuning = FineTuningConfig(**data["fine_tuning"])
         else:
-            logger.debug("Optional section 'fine_tuning' not defined. Skipping.")
+            print("Optional section 'fine_tuning' not defined. Skipping.")
             fine_tuning = None
 
         return cls(
