@@ -9,6 +9,7 @@ from requests.auth import HTTPDigestAuth
 from SPARQLWrapper import GET, JSON, SPARQLWrapper
 
 from rules import HornRule, RuleSignature
+from utils import setup_logging
 
 logger = logging.getLogger(__name__)
 
@@ -39,7 +40,7 @@ def build_rule_query(
     }}
     """
 
-    logger.debug("Built query for rule %s:\n%s", rule.rule_id, query)
+    logger.debug("Built query for rule %s (%s):\n%s", rule.rule_id, rule.head, query)
     return query
 
 
@@ -160,9 +161,9 @@ def insert_triples_sparql(
 def insert_triples_gsp(
     graph_uri: str,
     triples: Iterator[str],
+    client: SPARQLWrapper,
     crud_endpoint: str,
     chunk_size: int = 50000,
-    auth: tuple[str, str] = ("dba", "dba"),
 ) -> None:
     """Inserts triples into Virtuoso using the Graph Store HTTP Protocol.
 
@@ -179,8 +180,6 @@ def insert_triples_gsp(
     Raises:
         requests.HTTPError: If the Virtuoso server rejects the payload.
     """
-    # TODO: Fix parameters
-
     params = {"graph-uri": graph_uri}
     headers = {"Content-Type": "application/n-triples"}
 
@@ -188,7 +187,7 @@ def insert_triples_gsp(
     logger.debug("Inserting triples to %s via GSP.", graph_uri)
 
     with requests.Session() as session:
-        session.auth = HTTPDigestAuth(*auth)
+        session.auth = HTTPDigestAuth(*(client.user, client.passwd))
 
         while True:
             batch = list(itertools.islice(triples, chunk_size))
@@ -212,7 +211,6 @@ def insert_triples_gsp(
     )
 
 
-# ------------------------------- Fix ---------------------------------------
 def insert_graph_sparql(
     client: SPARQLWrapper,
     graph_uri: str,
@@ -221,7 +219,7 @@ def insert_graph_sparql(
 ) -> None:
     """Overwrites a graph from an .nt file to the database management system."""
 
-    clear_named_graph(client, graph_uri)
+    clear_graph_sparql(client, graph_uri)
 
     def _parse_line(text: str) -> str:
         """Parses a line from a .nt file to a valid triple."""
@@ -241,7 +239,7 @@ def insert_graph_sparql(
     insert_triples_sparql(client, graph_uri, iterator, chunk_size)
 
 
-def clear_named_graph(client: SPARQLWrapper, graph_uri: str) -> None:
+def clear_graph_sparql(client: SPARQLWrapper, graph_uri: str) -> None:
     """Removes all triples from a specified named graph.
 
     Args:
@@ -265,7 +263,64 @@ def clear_named_graph(client: SPARQLWrapper, graph_uri: str) -> None:
         raise
 
 
-# ---------------------------------------------------------------------------
+def download_graph_raw(
+    client: SPARQLWrapper,
+    graph_uri: str,
+    output_path: Path,
+    file_name: str,
+    limit: int = 10000,
+) -> None:
+    """Directly stores graph contents to a disk file."""
+    endpoint = "http://localhost:8890/sparql"
+
+    offset = 0
+    total_triples = 0
+
+    logger.info("Starting extraction from <%s>...", graph_uri)
+
+    output_path.mkdir(exist_ok=True, parents=True)
+    output_file = output_path / file_name
+
+    with output_file.open("a", encoding="utf-8") as f:
+        while True:
+            query = f"""
+            CONSTRUCT {{ ?s ?p ?o }}
+            WHERE {{ GRAPH <{graph_uri}> {{ ?s ?p ?o }} }}
+            LIMIT {limit} OFFSET {offset}
+            """
+
+            response = requests.get(
+                endpoint,
+                params={"query": query},
+                headers={"Accept": "application/n-triples"},
+            )
+
+            if response.status_code == 200:
+                triples = response.text.strip()
+
+                if not triples:
+                    break
+
+                f.write(triples + "\n")
+
+                chunk_size = len([line for line in triples.split("\n") if line.strip()])
+                total_triples += chunk_size
+
+                logger.debug("Downloaded %d triples so far...", total_triples)
+
+                if chunk_size < limit:
+                    break
+
+                offset += limit
+            else:
+                error_msg = (
+                    f"Failed to query endpoint (code {response.status_code})\n"
+                    f"{response.text}"
+                )
+                logger.error(error_msg)
+                raise Exception(error_msg)
+
+    logger.info(f"Successfully saved {total_triples} triples to {output_file}.")
 
 
 # ---------------------------------------------------------------------------
@@ -284,7 +339,6 @@ def get_select_results(client: SPARQLWrapper, query: str) -> SparqlBindings:
         response = client.queryAndConvert()
 
         if isinstance(response, dict) and "results" in response:
-            logger.debug("SELECT response: %s", response)
             raw_bindings = response["results"].get("bindings", [])
             return cast(SparqlBindings, raw_bindings)
 
@@ -396,15 +450,23 @@ def get_reflexivity(client: SPARQLWrapper, graph_uri: str, predicate: str) -> in
 def get_support(client: SPARQLWrapper, rule: HornRule, graph_uri: str) -> int:
     """Returns the support for the rule in the graph."""
 
-    patterns = "\n".join([f"{atom} ." for atom in rule.body] + [f"{rule.head}"])
+    patterns = "\n        ".join(
+        [f"{atom} ." for atom in rule.body] + [f"{rule.head} ."]
+    )
+    proj = " ".join(rule.get_variables())
 
     query = f"""
-    SELECT (COUNT(DISTINCT ?target) AS ?supp)
+    SELECT (COUNT(*) AS ?supp)
     WHERE {{
-      GRAPH <{graph_uri}> {{
+      SELECT DISTINCT {proj}
+      WHERE {{
+        GRAPH <{graph_uri}> {{
         {patterns}
+      }}  
       }}
     }}"""
+
+    logger.debug("Getting support for %s using \n%s", rule.rule_id, query)
 
     if results := get_select_results(client, query):
         return int(results[0]["supp"]["value"])
@@ -455,17 +517,32 @@ def get_total_triples(client: SPARQLWrapper, graph_uri: str) -> int:
 if __name__ == "__main__":
     from SPARQLWrapper import DIGEST
 
-    # Clean the french royalty graph
-    client = SPARQLWrapper(endpoint="http://localhost:8890/sparql-auth")
+    from config import RunConfig
+
+    config_file = Path("configurations/gen_triples/simpsons.json")
+    config = RunConfig.from_json(config_file)
+
+    setup_logging(level=config.logging.level)
+
+    client = SPARQLWrapper(str(config.data.database_url / config.data.sparql_endpoint))
     client.setHTTPAuth(DIGEST)
-    client.setCredentials("dba", "dba")
-    clear_named_graph(client, "http://FrenchRoyalty.org/")
+    client.setCredentials(config.virtuoso.user, config.virtuoso.password)
+
+    # --- Execution ---
+
+    # output_path = Path(
+    #     "/home/master/GitHub/fine-tuning-llms-with-kg/.data/Synthetic/FrenchRoyalty/synthetic_graph.nt"
+    # )
+    # download_graph_raw(
+    #     client=client,
+    #     graph_uri="http://SyntheticKG.org/",
+    #     output_path=output_path,
+    #     file_name="synthetic_graph.nt",
+    # )
 
     insert_graph_sparql(
         client=client,
-        graph_uri="http://FrenchRoyalty.org/",
-        nt_file=Path(
-            "/home/master/GitHub/fine-tuning-llms-with-kg/.data/FrenchRoyalty/french_royalty.nt"
-        ),
-        chunk_size=500,
+        graph_uri="http://SimpsonFamily.org/",
+        nt_file=config.data.input_dir / config.graph.nt_file,
+        chunk_size=5000,
     )

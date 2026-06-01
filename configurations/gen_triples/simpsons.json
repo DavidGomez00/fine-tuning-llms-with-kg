@@ -1,0 +1,26 @@
+{
+  "data": {
+    "input_dir": ".data/Simpsons/",
+    "output_dir": ".experiments/GenTriples/Simpsons/",
+    "database_url": "http://localhost:8890/",
+    "sparql_endpoint": "sparql-auth",
+    "crud_endpoint": "sparql-graph-crud-auth"
+  },
+  "virtuoso": {
+    "user": "dba",
+    "password": "dba"
+  },
+  "graph": {
+    "name": "SimpsonFamily",
+    "nt_file": "simpsons.nt",
+    "ontology_file": "simpsons.ttl",
+    "uri": "http://SimpsonFamily.org/"
+  },
+  "rules":{
+    "rules_file": "simpsons.csv",
+    "pca_threshold": 0.9
+  },
+  "logging":{
+    "level":"DEBUG"
+  }
+}

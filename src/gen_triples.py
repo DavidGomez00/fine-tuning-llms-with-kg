@@ -112,6 +112,7 @@ def apply_recursive_rule(
         searchspace_uri=searchspace_uri,
         term_mapping=term_mapping,
         crud_endpoint=crud_endpoint,
+        client=client,
     )
 
     raw_bindings = get_select_results(client, query)
@@ -259,12 +260,18 @@ def gen_graph(
         for predicate, profile in predicate_profiles.items()
     )
 
-    insert_triples_sparql(client, graph_uri, triple_stream, chunk_size)
+    count = insert_triples_sparql(client, graph_uri, triple_stream, chunk_size)
 
-    logger.info("Graph generated at <%s>.", graph_uri)
+    logger.info(
+        "Graph generated at <%s> with %d triples for %d predicates.",
+        graph_uri,
+        count,
+        len(predicate_profiles),
+    )
 
 
 def create_predicate_searchspace(
+    client: SPARQLWrapper,
     predicate: str,
     profile: PredicateProfile,
     term_mapping: dict[str, str],
@@ -299,5 +306,8 @@ def create_predicate_searchspace(
     )
 
     insert_triples_gsp(
-        graph_uri=searchspace_uri, triples=triple_generator, crud_endpoint=crud_endpoint
+        graph_uri=searchspace_uri,
+        triples=triple_generator,
+        client=client,
+        crud_endpoint=crud_endpoint,
     )

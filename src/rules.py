@@ -222,6 +222,10 @@ class HornRule:  # type: ignore
         """Returns a set containing all predicates present in the rule"""
         return self.signature.get_predicates()
 
+    def get_variables(self) -> set[str]:
+        """Returns a set with all the variables present in the rule."""
+        return self.signature.get_variables()
+
 
 # ---------------------------------------------------------------------------
 # Rule custom errors.

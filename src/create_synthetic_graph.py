@@ -1,4 +1,3 @@
-import itertools
 import logging
 import random
 import time
@@ -19,7 +18,7 @@ from gen_triples import (
 )
 from graph_metrics import GraphMetrics, PredicateProfile
 from queries import (
-    clear_named_graph,
+    clear_graph_sparql,
     get_frequency,
     get_support,
     get_total_triples,
@@ -63,7 +62,9 @@ def get_closed_rules(
 
     # Check support
     for r_id, rule in rules.items():
-        if support := get_support(client, rule, graph_uri):
+        support = get_support(client, rule, graph_uri)
+        logger.debug("%s [%d/%d]", r_id, support, rule.support)
+        if support:
             if support >= rule.support:
                 closed_rules.add(r_id)
 
@@ -83,6 +84,7 @@ def get_closed_predicates(
 
     for predicate, profile in profiles.items():
         if frequency := get_frequency(client, predicate, graph_uri):
+            logger.debug("%s [%d/%d]", predicate, frequency, profile.frequency)
             if frequency >= profile.frequency:
                 closed_predicates.add(predicate)
 
@@ -292,11 +294,14 @@ def _execute_stratification(
             updated_closure = True
 
         # Update rules
-        affected_rule_ids = itertools.chain.from_iterable(
-            predicate_to_rules[rules[r_id].head.predicate] for r_id in available_rules
-        )
+        affected_rule_ids: set[str] = set()
+        for rule in available_rules.values():
+            head_predicate = rule.head.predicate
+            affected_rule_ids.update(predicate_to_rules[head_predicate])
+
         if pending_rule_ids := set(affected_rule_ids) - closed_rule_ids:
             rules_to_check = {r_id: rules[r_id] for r_id in pending_rule_ids}
+            logger.debug("Rules to check: %s", rules_to_check.keys())
 
             if closed_r := (get_closed_rules(client, graph_uri, rules_to_check)):
                 logger.info("Closed rules in this strata: %s", closed_r)
@@ -356,19 +361,19 @@ def create_synthetic_graph(
         raise SyntheticGraphError(error_msg)
 
     logger.info(
-        "%d from %d predicates are extensional:\n\t%s",
+        "%d out of %d predicates are extensional.",
         len(extensional_preds),
         len(graph_metrics.profiles),
-        extensional_preds,
     )
     logger.debug(
-        "\n\tInt. predicates: %s\n\tProfiles: %s",
-        intensional_preds,
-        graph_metrics.profiles.keys(),
+        "\nIntensional preds.:\n\t%s\nExtensional preds.:\n\t%s\nProfiles: %s",
+        "\n\t".join(intensional_preds),
+        "\n\t".join(extensional_preds),
+        "\n\t".join(graph_metrics.profiles.keys()),
     )
 
     # Clean the space where the new Synthetic graph is going to be stored
-    clear_named_graph(graph_uri=graph_uri, client=client)
+    clear_graph_sparql(graph_uri=graph_uri, client=client)
 
     # Generate the graph initially as the extensional database (EDB)
     edb_profiles = {k: graph_metrics.profiles[k] for k in extensional_predicates}
@@ -400,13 +405,15 @@ def create_synthetic_graph(
 if __name__ == "__main__":
     ## -------------------------------- Setup ------------------------------------------
     config_file = Path("configurations/gen_triples/french_royalty.json")
-    config = RunConfig.from_json(config_file)
+    # config_file = Path("configurations/gen_triples/simpsons.json")
 
+    config = RunConfig.from_json(config_file)
     setup_logging(level=config.logging.level)
+    logger.info("Confifuration correctly initialized.")
 
     client = SPARQLWrapper(str(config.data.database_url / config.data.sparql_endpoint))
     client.setHTTPAuth(DIGEST)
-    client.setCredentials("dba", "dba")
+    client.setCredentials(config.virtuoso.user, config.virtuoso.password)
 
     graph_metrics = GraphMetrics.from_uri(client, config.graph.uri)
 
@@ -445,7 +452,7 @@ if __name__ == "__main__":
             term_mapping=term_mapping,
             graph_metrics=graph_metrics,
             crud_endpoint=str(config.data.database_url / config.data.crud_endpoint),
-            graph_uri="http://SyntheticKG.org/",
+            graph_uri=f"http://Synthetic{config.graph.name}.org/",
         )
     except SyntheticGraphError as e:
         logger.info("Generation error: %s", e)

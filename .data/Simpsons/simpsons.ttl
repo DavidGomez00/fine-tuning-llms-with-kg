@@ -1,0 +1,43 @@
+@prefix ex: <http://example.org/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+
+# ----------------------------------------
+# Ontology Declaration
+# ----------------------------------------
+ex:FamilyOntology a owl:Ontology ;
+    rdfs:label "A toy family ontology for AMIE 3 testing" .
+
+# ----------------------------------------
+# Classes
+# ----------------------------------------
+ex:Person a owl:Class ;
+    rdfs:label "Person" ;
+    rdfs:comment "Represents a human being." .
+
+ex:Place a owl:Class ;
+    rdfs:label "Place" ;
+    rdfs:comment "Represents a geographical location or city." .
+
+# ----------------------------------------
+# Properties
+# ----------------------------------------
+ex:hasChild a owl:ObjectProperty ;
+    rdfs:label "has child" ;
+    rdfs:domain ex:Person ;
+    rdfs:range ex:Person ;
+    rdfs:comment "Links a parent to their child." .
+
+ex:isMarriedTo a owl:ObjectProperty ;
+    a owl:SymmetricProperty ;      # If A is married to B, B is married to A
+    rdfs:label "is married to" ;
+    rdfs:domain ex:Person ;
+    rdfs:range ex:Person ;
+    rdfs:comment "Links two people who are married." .
+
+ex:livesIn a owl:ObjectProperty ;
+    rdfs:label "lives in" ;
+    rdfs:domain ex:Person ;
+    rdfs:range ex:Place ;
+    rdfs:comment "Links a person to the place they reside." .

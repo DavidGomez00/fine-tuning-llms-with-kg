@@ -6,8 +6,12 @@
     "sparql_endpoint": "sparql-auth",
     "crud_endpoint": "sparql-graph-crud-auth"
   },
+  "virtuoso": {
+    "user": "dba",
+    "password": "dba"
+  },
   "graph": {
-    "name": "Frech Royalty KG",
+    "name": "FrechRoyalty",
     "nt_file": "french_royalty.nt",
     "ontology_file": "french_royalty.ttl",
     "uri": "http://FrenchRoyalty.org/"

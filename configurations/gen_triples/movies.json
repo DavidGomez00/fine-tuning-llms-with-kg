@@ -1,16 +1,26 @@
 {
   "data": {
     "input_dir": ".data/Movies/",
-    "output_dir": ".experiments/GenTriples/FrenchRoyalty/"
+    "output_dir": ".experiments/GenTriples/Movies/",
+    "database_url": "http://localhost:8890/",
+    "sparql_endpoint": "sparql-auth",
+    "crud_endpoint": "sparql-graph-crud-auth"
+  },
+  "virtuoso": {
+    "user": "dba",
+    "password": "dba"
   },
   "graph": {
-    "name": "Simple KG",
-    "nt_file": "french_royalty.nt",
-    "ontology_file": "french_royalty.ttl",
-    "uri": "http://FrenchRoyalty.org/"
+    "name": "Movies KG",
+    "nt_file": "movies.nt",
+    "ontology_file": ".ttl",
+    "uri": "http://example.org/"
   },
   "rules":{
-    "rules_csv": "filtered_fr.csv",
+    "rules_file": "movies.csv",
     "pca_threshold": 0.9
+  },
+  "logging":{
+    "level":"INFO"
   }
 }

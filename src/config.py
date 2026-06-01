@@ -118,7 +118,7 @@ class HardwareConfig:
     max_memory_mb: int = 40960
 
 
-@dataclass
+@dataclass(frozen=True)
 class GraphConfig:
     """Knowledge Graph settings.
 
@@ -129,6 +129,12 @@ class GraphConfig:
     ontology_file: str
     nt_file: str
     uri: str
+
+
+@dataclass(frozen=True)
+class VirtuosoConfig:
+    user: str = "dba"
+    password: str = "dba"
 
 
 @dataclass(frozen=True)
@@ -156,6 +162,7 @@ class RunConfig:
     rules: RulesConfig
     fine_tuning: FineTuningConfig | None
     cot_generation: CoTGenerationConfig | None
+    virtuoso: VirtuosoConfig = field(default_factory=VirtuosoConfig)
     data: DataConfig = field(default_factory=DataConfig)
     hardware: HardwareConfig = field(default_factory=HardwareConfig)
     logging: LoggingConfig = field(default_factory=LoggingConfig)
@@ -204,6 +211,7 @@ class RunConfig:
             logger.error(f"Invalid JSON format in {json_path.name}: {e}")
             raise
 
+        virtuoso_config = VirtuosoConfig(**get_section("virtuoso", required=True))
         graph_config = GraphConfig(**get_section("graph", required=True))
         rules_config = RulesConfig(**get_section("rules", required=True))
         data_config = DataConfig(**get_section("data", required=True))
@@ -231,8 +239,9 @@ class RunConfig:
             fine_tuning=fine_tuning,
             cot_generation=cot_config,
             logging=logging_config,
+            virtuoso=virtuoso_config,
         )
 
     def __post_init__(self) -> None:
-        """Validate paths for input and output files."""
-        logger.info("Confifuration correctly initialized.")
+        """Validate config."""
+        pass
