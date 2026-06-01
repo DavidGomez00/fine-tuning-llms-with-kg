@@ -115,13 +115,15 @@ def filter_and_format_triples(
             break
 
         triples: set[RawTriple] = set()
-        for atom in (a for a in rule.body if a.predicate == rule.head.predicate):
-            subject_val, _ = from_binding_row(atom.subject, bindings_row)
-            object_value, object_type = from_binding_row(atom.obj, bindings_row)
-            # TODO: If we were to filter the triples, this must be done here
-            triples.add(
-                RawTriple(atom.predicate, subject_val, object_value, object_type)
-            )
+
+        for atom in rule.signature:
+            if atom.predicate == rule.head.predicate:
+                subject_val, _ = from_binding_row(atom.subject, bindings_row)
+                object_value, object_type = from_binding_row(atom.obj, bindings_row)
+                # TODO: If we were to filter the triples, this must be done here
+                triples.add(
+                    RawTriple(atom.predicate, subject_val, object_value, object_type)
+                )
 
         for t in triples:
             # TODO: This does not take into account possible literals
@@ -204,6 +206,7 @@ def _execute_stratification(
         for r_id in itertools.chain(direct_rules, recursive_rules):
             rule = rules[r_id]
             predicate = rule.head.predicate
+
             raw_bindings = apply_rule(
                 client=client,
                 graph_uri=graph_uri,
@@ -216,6 +219,7 @@ def _execute_stratification(
             if not raw_bindings:
                 logger.warning("No results found for %s", r_id)
                 continue
+
             logger.debug("Retrieved %d bindings for %s.", len(raw_bindings), r_id)
 
             filtered_triple_iterator = filter_and_format_triples(
@@ -225,12 +229,14 @@ def _execute_stratification(
                 term_mapping=term_mapping,
             )
 
-            if count := insert_triples_sparql(
+            count = insert_triples_sparql(
                 graph_uri=graph_uri,
                 client=client,
                 triple_stream=filtered_triple_iterator,
                 chunk_size=chunk_size,
-            ):
+            )
+            logger.debug("Counted filtered triples: %d", count)
+            if count:
                 grounded_predicates.add(predicate)
                 logger.info(
                     "Rule %s yielded %d triples for %s.", r_id, count, predicate

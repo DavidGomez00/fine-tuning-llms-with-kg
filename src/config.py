@@ -212,13 +212,13 @@ class RunConfig:
         if "cot_generation" in data:
             cot_config = CoTGenerationConfig(**data["cot_generation"])
         else:
-            print("Optional section 'cot_generation' not defined. Skipping.")
+            # TODO: print
             cot_config = None
 
         if "fine_tuning" in data:
             fine_tuning = FineTuningConfig(**data["fine_tuning"])
         else:
-            print("Optional section 'fine_tuning' not defined. Skipping.")
+            # TODO: print
             fine_tuning = None
 
         return cls(

@@ -68,7 +68,7 @@ def build_rule_query(rule: RuleSignature, ebd_uri: str, searchspace_uri: str) ->
     }}
     """
 
-    logger.debug("Built query for rule %s (%s):\n%s", rule.rule_id, rule.head, query)
+    logger.debug("Built query for rule %s (%s):", rule.rule_id, rule.head)
     return query
 
 
