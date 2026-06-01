@@ -37,7 +37,7 @@ CAMEL_CASE_PATTERN = re.compile(r"(?<=[a-z])([A-Z])")
 
 
 @dataclass(frozen=True, slots=True)
-class Atom:  # type: ignore
+class Atom:
     """Represents a triple composed of subject predicate object.
 
     The values of the each of these attributes are strings that represent a variable
@@ -73,31 +73,24 @@ class Atom:  # type: ignore
         o_var = self.obj if self.obj.startswith("?") else None
         return (s_var, o_var)
 
-    @staticmethod
-    def _clean(term: str) -> str:
-        """Cleans a single term by resolving URIs, variables and formatting."""
-        # If it's a variable just return without "?"
-        if term.startswith("?"):
-            return term.removeprefix("?")
-
-        # Extract local name (splits by #, /, or : and takes the last element)
-        term = re.split(r"[#\/:]", term)[-1]
-
-        term = CAMEL_CASE_PATTERN.sub(r" \1", term)
-        term = term.replace("_", " ").strip().lower()
-        return term
-
     def to_natural_language(self) -> tuple[str, str, str]:
         """Extracts the name of a resource from a URI string."""
-        return (
-            self._clean(self.subject),
-            self._clean(self.predicate),
-            self._clean(self.obj),
-        )
+
+        def clean(term: str) -> str:
+            """Resolve URIs, variables and formatting."""
+            if term.startswith("?"):
+                return term.removeprefix("?")
+
+            term = re.split(r"[#\/:]", term)[-1]
+            term = CAMEL_CASE_PATTERN.sub(r" \1", term)
+            term = term.replace("_", " ").strip().lower()
+            return term
+
+        return (clean(self.subject), clean(self.predicate), clean(self.obj))
 
 
 @dataclass(frozen=True, slots=True)
-class RuleSignature:  # type: ignore
+class RuleSignature:
     """Signature of a Horn Rule."""
 
     rule_id: str
@@ -157,19 +150,9 @@ class RuleSignature:  # type: ignore
         """Return the set of unique predicates in the body atoms."""
         return {atom.predicate for atom in self.body}
 
-    def rule_query_body(self, var_mappings: dict[str, str], namespace: str) -> set[str]:
-        return {
-            (
-                f"{var_mappings.get(atom.subject, atom.subject)} "
-                f"<{namespace}{atom.predicate}> "
-                f"{var_mappings.get(atom.obj, atom.obj)}"
-            )
-            for atom in self.body
-        }
-
 
 @dataclass(slots=True)
-class HornRule:  # type: ignore
+class HornRule:
     """Represents a Horn Rule.
 
     Attributes:
@@ -225,15 +208,6 @@ class HornRule:  # type: ignore
     def get_variables(self) -> set[str]:
         """Returns a set with all the variables present in the rule."""
         return self.signature.get_variables()
-
-
-# ---------------------------------------------------------------------------
-# Rule custom errors.
-# ---------------------------------------------------------------------------
-class RulesError(Exception):
-    """Base exception for errors during rule handling."""
-
-    pass
 
 
 # ---------------------------------------------------------------------------

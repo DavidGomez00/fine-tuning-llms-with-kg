@@ -399,7 +399,7 @@ if __name__ == "__main__":
             f"The following predicates cannot be deduced: {uninferrable_preds}."
         )
         logger.error(error_msg)
-        raise SyntheticGraphError(error_msg)
+        raise RuntimeError(error_msg)
 
     ## ----------------------- Synthetic Graph Generation  -----------------------------
     try:
