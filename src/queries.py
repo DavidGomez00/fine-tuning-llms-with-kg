@@ -529,20 +529,3 @@ if __name__ == "__main__":
     client.setCredentials(config.virtuoso.user, config.virtuoso.password)
 
     # --- Execution ---
-
-    # output_path = Path(
-    #     "/home/master/GitHub/fine-tuning-llms-with-kg/.data/Synthetic/FrenchRoyalty/synthetic_graph.nt"
-    # )
-    # download_graph_raw(
-    #     client=client,
-    #     graph_uri="http://SyntheticKG.org/",
-    #     output_path=output_path,
-    #     file_name="synthetic_graph.nt",
-    # )
-
-    insert_graph_sparql(
-        client=client,
-        graph_uri="http://SimpsonFamily.org/",
-        nt_file=config.data.input_dir / config.graph.nt_file,
-        chunk_size=5000,
-    )
