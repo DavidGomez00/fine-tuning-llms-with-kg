@@ -6,3 +6,6 @@
 
 # Environment variable file
 .env
+
+# Logs
+*.log
