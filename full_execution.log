@@ -1,0 +1,2 @@
+2026-06-01 09:15:47 | __main__     | INFO     | 6 from 12 predicates are extensional:
+	{'<http://FrenchRoyalty.org/gender>', '<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>', '<http://FrenchRoyalty.org/hasSpouse>', '<http://xmlns.com/foaf/0.1/name>', '<http://FrenchRoyalty.org/marriedTo>', '<http://FrenchRoyalty.org/spouse>'}

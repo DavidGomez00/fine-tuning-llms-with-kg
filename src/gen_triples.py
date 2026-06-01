@@ -18,15 +18,13 @@ from queries import (
     build_federated_query,
     build_rule_query,
     get_select_results,
+    insert_triples_gsp,
     insert_triples_sparql,
 )
 from rules import HornRule
 from utils import format_triple
 
-# ---------------------------------------------------------------------------
-# Logging
 logger = logging.getLogger(__name__)
-# ---------------------------------------------------------------------------
 
 
 # ---------------------------------------------------------------------------
@@ -45,7 +43,7 @@ def from_binding_row(term: str, bindings_row: dict[str, Any]) -> tuple[str, str]
     """Safely extracts a term from a single binding row."""
     if term.startswith("?"):
         var_name = term.lstrip("?")
-        val = bindings_row.get(var_name, {}).get("value", term)
+        val = bindings_row.get(var_name, {}).get("value", var_name)
         v_type = bindings_row.get(var_name, {}).get("type", "uri")
         return val, v_type
     return term, "uri"
@@ -82,34 +80,50 @@ def iter_raw_triples(
 
 
 def apply_rule(
-    sparql_client: SPARQLWrapper,
+    client: SPARQLWrapper,
     rule: HornRule,
     graph_uri: str,
 ) -> Iterator[RawTriple]:
     """Applies a rule to a graph and retuns a raw triple Iterator that generates the
     resulted triples from the graph."""
-    query = build_rule_query(rule.signature, graph_uri)
-    raw_bindings = get_select_results(sparql_client, query)
+    query = build_rule_query(rule.signature, graph_uri, include_head=False)
+    raw_bindings = get_select_results(client, query)
     logger.debug("Retrieved %d results from rule %s.", len(raw_bindings), rule.rule_id)
     return iter_raw_triples({rule.rule_id: rule}, raw_bindings)
 
 
 def apply_recursive_rule(
-    sparql_client: SPARQLWrapper,
-    rule: HornRule,
+    client: SPARQLWrapper,
     graph_uri: str,
+    rule: HornRule,
+    profile: PredicateProfile,
+    term_mapping: dict[str, str],
+    crud_endpoint: str,
 ) -> SparqlBindings:
     """Applias a recursive rule to a graph to extend it."""
-    query = build_federated_query(rule.signature, graph_uri, "http://SearchSpace.org/")
-    raw_bindings = get_select_results(sparql_client, query)
-    logger.debug("Retrieved %d results from rule %s.", len(raw_bindings), rule.rule_id)
+
+    searchspace_uri = "http://SearchSpace.org/"
+
+    query = build_federated_query(rule.signature, graph_uri, searchspace_uri)
+
+    create_predicate_searchspace(
+        predicate=rule.head.predicate,
+        profile=profile,
+        searchspace_uri=searchspace_uri,
+        term_mapping=term_mapping,
+        crud_endpoint=crud_endpoint,
+    )
+
+    raw_bindings = get_select_results(client, query)
+
+    logger.debug("Retrieved %d bindings from %s.", len(raw_bindings), rule.rule_id)
     return raw_bindings
 
 
 # ---------------------------------------------------------------------------
 # Extensional Database (EDB) creation
 # ---------------------------------------------------------------------------
-def get_extensional_triples(
+def triple_iterator(
     predicate: str,
     profile: PredicateProfile,
     term_mapping: dict[str, str],
@@ -122,14 +136,14 @@ def get_extensional_triples(
     resolved directly by assigning it to each unique object in distinct triples.
     The same is true for objects.
 
-    If none of the above conditions is met, we select a random subject and create as
-    many unique triples as its frequency, then check again the remaining entities.
+    If none of the above conditions is met, a random subject is selected and generated
+    until it's frequency is closed and the loop starts again untill no more triples can
+    be generated.
 
     Args:
-        predicate: The predicate.
-        profile: Profile containing the distribution of domain and range entities as
-            Counter objects, as well as the reflexive triple count and predicate name.
-        namespace: URI namespace applied to all subjects, predicates, and objects.
+        predicate: The predicate value.
+        profile: Profile containing the properties of the predicate.
+        term_mapping: Mapping from a term to its namespace.
 
     Yields:
         Formatted triple strings in N-Triples format, e.g.:
@@ -221,26 +235,69 @@ def get_extensional_triples(
             del p_domain[subject]
 
 
-def gen_extensional_graph(
-    sparql_client: SPARQLWrapper,
+def gen_graph(
+    client: SPARQLWrapper,
     predicate_profiles: dict[str, PredicateProfile],
     graph_uri: str,
     term_mapping: dict[str, str],
     chunk_size: int = 1000,
 ) -> None:
-    """Generates an extensional graph and inserts it directly into a SPARQL endpoint.
+    """Generates a graph following the predicate distributions and inserts it into a DB
+    through SPARQL.
 
     Args:
-        predicate_profiles: Mapping of predicates to their profile objects.
-        namespace: The URI namespace.
-        chunk_size: The maximum number of triples to insert in a single HTTP request.
+        client: SPARQL client.
+        predicate_profiles: Mapping from the predicate to its distributions.
+        graph_uri: Graph URI.
+        term_mapping: Mapping from terms to their prefix.
+        chunk_size: Maximum number of triples to insert per SPARQL query.
     """
 
+    # Use a chain of iterators since we are passing an iterator for each predicate
     triple_stream = itertools.chain.from_iterable(
-        get_extensional_triples(predicate, profile, term_mapping)
+        triple_iterator(predicate, profile, term_mapping)
         for predicate, profile in predicate_profiles.items()
     )
 
-    insert_triples_sparql(sparql_client, graph_uri, triple_stream, chunk_size)
+    insert_triples_sparql(client, graph_uri, triple_stream, chunk_size)
 
-    logger.info("EDB generated at <%s>.", graph_uri)
+    logger.info("Graph generated at <%s>.", graph_uri)
+
+
+def create_predicate_searchspace(
+    predicate: str,
+    profile: PredicateProfile,
+    term_mapping: dict[str, str],
+    searchspace_uri: str,
+    crud_endpoint: str,
+) -> None:
+    """Generates and inserts a predicate search space into the database.
+
+    Creates all possible triples for the given predicate using the cartesian
+    product of the domain and range entities, and inserts them into a specific
+    named graph using batching to ensure scalability.
+
+    Args:
+        database_endpoint: The URL of the SPARQL database endpoint.
+        predicate: The URI of the predicate to link subjects and objects.
+        profile: A profile object containing `domain` and `range` Counters.
+
+    Returns:
+        The URI of the generated search space named graph.
+
+    Raises:
+        Exception: If a SPARQL insertion batch fails.
+    """
+
+    count = len(profile.domain) * len(profile.range)
+
+    logger.info("Creating searchspace for %s with %d triples", predicate, count)
+
+    triple_generator: Iterator[str] = (
+        format_triple(subj, predicate, obj, term_mapping)
+        for subj, obj in itertools.product(profile.domain.keys(), profile.range.keys())
+    )
+
+    insert_triples_gsp(
+        graph_uri=searchspace_uri, triples=triple_generator, crud_endpoint=crud_endpoint
+    )

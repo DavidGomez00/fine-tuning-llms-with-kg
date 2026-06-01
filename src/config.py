@@ -131,7 +131,7 @@ class GraphConfig:
     uri: str
 
 
-@dataclass
+@dataclass(frozen=True)
 class RulesConfig:
     """
     TODO: Docstrings
@@ -139,6 +139,13 @@ class RulesConfig:
 
     rules_file: str
     pca_threshold: float
+
+
+@dataclass(frozen=True)
+class LoggingConfig:
+    """TODO: Docs"""
+
+    level: int | str = logging.INFO
 
 
 @dataclass
@@ -151,6 +158,7 @@ class RunConfig:
     cot_generation: CoTGenerationConfig | None
     data: DataConfig = field(default_factory=DataConfig)
     hardware: HardwareConfig = field(default_factory=HardwareConfig)
+    logging: LoggingConfig = field(default_factory=LoggingConfig)
 
     @classmethod
     def from_json(cls, json_path: Path | str) -> Self:
@@ -200,6 +208,7 @@ class RunConfig:
         rules_config = RulesConfig(**get_section("rules", required=True))
         data_config = DataConfig(**get_section("data", required=True))
         hardware_config = HardwareConfig(**get_section("hardware"))
+        logging_config = LoggingConfig(**get_section("logging"))
 
         # --- Optional attributes ---
         if "cot_generation" in data:
@@ -221,6 +230,7 @@ class RunConfig:
             hardware=hardware_config,
             fine_tuning=fine_tuning,
             cot_generation=cot_config,
+            logging=logging_config,
         )
 
     def __post_init__(self) -> None:

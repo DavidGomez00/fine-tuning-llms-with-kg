@@ -75,7 +75,6 @@ def format_triple(
     default_ns: str = "http://ExplicitFormat.org",
 ) -> str:
     """Returns triple is in SPARQL format with the correct namespace and a final '.'."""
-
     subject_str = format_term(subject, term_mapping, default_ns)
     predicate_str = format_term(predicate, term_mapping, default_ns)
     object_str = format_term(obj, term_mapping, default_ns)

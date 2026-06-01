@@ -15,5 +15,8 @@
   "rules":{
     "rules_file": "french_royalty_filtered.csv",
     "pca_threshold": 0.9
+  },
+  "logging":{
+    "level":"INFO"
   }
 }

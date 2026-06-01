@@ -7,6 +7,7 @@ Provides the HornRule dataclass, Pandas CSV parsing, and core logic operations
 import logging
 import re
 from collections import defaultdict
+from collections.abc import Iterator
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Protocol
@@ -66,6 +67,12 @@ class Atom:  # type: ignore
         """Returns True if the term is in the atom, False otherwise."""
         return item in (self.subject, self.predicate, self.obj)
 
+    def get_variables(self) -> tuple[str | None, str | None]:
+        """Returns the variables in this atom, ordered as [subject_var, object_var]"""
+        s_var = self.subject if self.subject.startswith("?") else None
+        o_var = self.obj if self.obj.startswith("?") else None
+        return (s_var, o_var)
+
     @staticmethod
     def _clean(term: str) -> str:
         """Cleans a single term by resolving URIs, variables and formatting."""
@@ -101,6 +108,15 @@ class RuleSignature:  # type: ignore
         """Returns the formal representation of the rule as 'atom AND ... -> head'."""
         body_desc = " AND ".join(f"{atom}" for atom in sorted(self.body))
         return f"{body_desc} -> {self.head}"
+
+    def __iter__(self) -> Iterator[Atom]:
+        """Iterates over all atoms in the rule (body and head).
+
+        Yields:
+            Atom: Each atom composing the rule's body, followed by the head atom.
+        """
+        yield from self.body
+        yield self.head
 
     def to_natural_language(self) -> str:
         """Returns a natural language description of the rule."""
@@ -208,6 +224,15 @@ class HornRule:  # type: ignore
 
 
 # ---------------------------------------------------------------------------
+# Rule custom errors.
+# ---------------------------------------------------------------------------
+class RulesError(Exception):
+    """Base exception for errors during rule handling."""
+
+    pass
+
+
+# ---------------------------------------------------------------------------
 # Rule parsing.
 # ---------------------------------------------------------------------------
 ATOM_PATTERN = re.compile(r"(\?\w+)\s+(\S+)\s+(\S+)")
@@ -299,11 +324,11 @@ def parse_horn_rule(
 # Rule set handling
 # ---------------------------------------------------------------------------
 def parse_rule_set(
-    rules_df: pd.DataFrame,
-    ontology_file: Path,
+    rule_dataframe: pd.DataFrame,
+    term_mapping: dict[str, str],
     pca_threshold: float | None,
     default_namespace: str,
-) -> tuple[dict[str, HornRule], set[str], dict[str, str]]:
+) -> dict[str, HornRule]:
     """Parse a DataFrame into a dict of HornRules identified by rule_id.
 
     Args:
@@ -314,23 +339,21 @@ def parse_rule_set(
             - A dict of HornRules identified by rule_id.
             - A set of strings representing the predicates in the rules' head.
     """
-    term_mapping: dict[str, str] = DEFAULT_PREFIXES.copy()
-    custom_mapping = get_uri_mappings(ontology_file)
-    term_mapping.update(custom_mapping)
 
     if pca_threshold is not None:
-        rules_df["Classification"] = "NEGATIVE"
-        rules_df.loc[rules_df["PCA_Confidence"] >= pca_threshold, "Classification"] = (
-            "POSITIVE"
-        )
-        rules_df.loc[rules_df["PCA_Confidence"].isna(), "Classification"] = "UNKNOWN"
+        rule_dataframe["Classification"] = "NEGATIVE"
+        rule_dataframe.loc[
+            rule_dataframe["PCA_Confidence"] >= pca_threshold, "Classification"
+        ] = "POSITIVE"
+        rule_dataframe.loc[
+            rule_dataframe["PCA_Confidence"].isna(), "Classification"
+        ] = "UNKNOWN"
     else:
-        rules_df["Classification"] = "UNKNOWN"
+        rule_dataframe["Classification"] = "UNKNOWN"
 
     rules: dict[str, HornRule] = {}
-    intensional_predicates: set[str] = set()
 
-    for row_id, row in enumerate(rules_df.itertuples(index=False), start=1):
+    for row_id, row in enumerate(rule_dataframe.itertuples(index=False), start=1):
         rule_id = f"rule_{row_id}"
         rule = parse_horn_rule(
             row=row,
@@ -340,16 +363,15 @@ def parse_rule_set(
         )
 
         rules[rule.rule_id] = rule
-        intensional_predicates.add(rule.head.predicate)
 
-    return rules, intensional_predicates, term_mapping
+    return rules
 
 
 def check_uninferrable_preds(
     rules: dict[str, HornRule],
     intensional_predicates: set[str],
     extensional_predicates: set[str],
-) -> None:
+) -> set[str]:
     """Calls the method to see if there is any uninferrable intensional predicate in the
     rule set.
 
@@ -387,16 +409,7 @@ def check_uninferrable_preds(
         if not added_new:
             break
 
-    uninferrable_preds = intensional_predicates - deducible
-
-    if uninferrable_preds:
-        logger.error(
-            "Rule set not inferrable under complete rule assumption. "
-            "The following predicates cannot be deduced: %s.",
-            uninferrable_preds,
-        )
-    else:
-        logger.debug("All intensional predicates can be successfully deduced.")
+    return intensional_predicates - deducible
 
 
 def get_ruleset_dependencies(
@@ -436,12 +449,13 @@ def get_ruleset_dependencies(
     return rule_dependency
 
 
-def get_uri_mappings(ontology_file: Path) -> dict[str, str]:
+def get_term_mapping(ontology_file: Path) -> dict[str, str]:
     """Extracts term->namespace mappings from a Turtle file using line-by-line regex.
 
     Scales with O(1) memory footprint by avoiding in-memory graph construction.
     """
-    term_mapping: dict[str, str] = {}
+    term_mapping: dict[str, str] = DEFAULT_PREFIXES.copy()
+    custom_mapping: dict[str, str] = {}
     prefixes: dict[str, str] = {}
 
     # Matches: @prefix fr: <http://FrenchRoyalty.org/> .
@@ -471,13 +485,14 @@ def get_uri_mappings(ontology_file: Path) -> dict[str, str]:
             if match:
                 prefix, term = match.groups()
                 if prefix in prefixes:
-                    term_mapping[term] = prefixes[prefix]
-    logger.debug("Created term to prefix mapping.\n%s", term_mapping)
+                    custom_mapping[term] = prefixes[prefix]
+    logger.debug("Created term to prefix mapping.")
+    term_mapping.update(custom_mapping)
     return term_mapping
 
 
 def get_predicate_mapping(rules: dict[str, HornRule]) -> dict[str, set[str]]:
-    """Builds a mapping from a predicate to all the rules where it is present."""
+    """Returns a mapping from predicates to the ids of rules where they are present."""
 
     mapping: defaultdict[str, set[str]] = defaultdict(set)
 

@@ -37,25 +37,31 @@ class GraphMetrics:
     """A structured container for RDF graph metrics and properties."""
 
     profiles: dict[str, PredicateProfile]
-    total_triples: int
+    triple_count: int
 
     @classmethod
-    def from_uri(cls, sparql_client: SPARQLWrapper, graph_uri: str) -> "GraphMetrics":
+    def from_uri(cls, client: SPARQLWrapper, graph_uri: str) -> "GraphMetrics":
         """Instantiates GraphMetrics by delegating aggregation to the SPARQL endpoint.
 
         Scales efficiently by querying distributions per-predicate, avoiding massive
         data transfers and database ResultSetMaxRows limits.
         """
 
-        total_triples = get_total_triples(sparql_client, graph_uri)
+        triple_count = get_total_triples(client, graph_uri)
+        logger.debug(
+            "Retrieving metrics from %s with %d triples.", graph_uri, triple_count
+        )
         profiles: dict[str, PredicateProfile] = {}
 
-        predicates = get_preds_and_freqs(sparql_client, graph_uri) or {}
+        predicates = get_preds_and_freqs(client, graph_uri) or {}
 
         for predicate, frequency in predicates.items():
-            reflexivity = get_reflexivity(sparql_client, graph_uri, predicate)
-            domain = get_domain(sparql_client, graph_uri, predicate)
-            p_range = get_range(sparql_client, graph_uri, predicate)
+            if not predicate.startswith("<"):
+                predicate = f"<{predicate}>"
+
+            reflexivity = get_reflexivity(client, graph_uri, predicate)
+            domain = get_domain(client, graph_uri, predicate)
+            p_range = get_range(client, graph_uri, predicate)
 
             profiles[predicate] = PredicateProfile(
                 frequency=frequency,
@@ -66,7 +72,23 @@ class GraphMetrics:
 
         logger.debug("Loaded DB metrics for %d predicates.", len(profiles))
 
-        return cls(profiles=profiles, total_triples=total_triples)
+        for predicate, profile in profiles.items():
+            if "?f" in profile.domain.keys():
+                raise ValueError(f"Error ?f en {predicate} domain.")
+        #     logger.debug(
+        #         "Predicate %s (freq %d | reflx %d)",
+        #         predicate,
+        #         profile.frequency,
+        #         profile.reflexivity,
+        #     )
+        #     logger.debug("Domain:")
+        #     for subject, freq in profile.domain.items():
+        #         logger.debug("%s | %d", subject, freq)
+        #     logger.debug("Range:")
+        #     for obj, freq in profile.range.items():
+        #         logger.debug("%s | %d", obj, freq)
+
+        return cls(profiles=profiles, triple_count=triple_count)
 
     @classmethod
     def from_rdflib(cls, graph: Graph) -> "GraphMetrics":
@@ -81,7 +103,7 @@ class GraphMetrics:
 
         # Counters and mappings
         profiles: dict[str, PredicateProfile] = defaultdict(PredicateProfile)
-        total_triples = 0
+        triple_count = 0
 
         # Single pass through the graph
         for s, p, o in graph:
@@ -89,7 +111,7 @@ class GraphMetrics:
             p_str = f"<{str(p)}>"
             o_str = str(o)
 
-            total_triples += 1
+            triple_count += 1
             profiles[p_str].frequency += 1
             profiles[p_str].domain[s_str] += 1
             profiles[p_str].range[o_str] += 1
@@ -99,7 +121,7 @@ class GraphMetrics:
 
         metrics = GraphMetrics(
             profiles=dict(profiles),
-            total_triples=total_triples,
+            triple_count=triple_count,
         )
 
         reflexive_preds = 0

@@ -6,7 +6,7 @@ from typing import cast
 
 import requests
 from requests.auth import HTTPDigestAuth
-from SPARQLWrapper import GET, JSON, POST, SPARQLWrapper
+from SPARQLWrapper import GET, JSON, SPARQLWrapper
 
 from rules import HornRule, RuleSignature
 
@@ -16,15 +16,20 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 # SPARQL Query generation.
 # ---------------------------------------------------------------------------
-def build_rule_query(rule: RuleSignature, graph_uri: str) -> str:
+def build_rule_query(
+    rule: RuleSignature, graph_uri: str, include_head: bool = True
+) -> str:
     """Builds a SPARQL query for a rule."""
     var_set = set(rule.get_head_variables())
     proj = " ".join(var_set)
 
-    patterns = [f"{atom} ." for atom in rule.body] + [f"{rule.head} ."]
+    if include_head:
+        patterns = [f"{atom} ." for atom in rule.body] + [f"{rule.head} ."]
+    else:
+        patterns = [f"{atom} ." for atom in rule.body]
 
-    where_patterns = "\n      ".join(patterns)
-    return f"""
+    where_patterns = "\n        ".join(patterns)
+    query = f"""
     SELECT DISTINCT ?rule_id {proj}
     WHERE {{
       BIND ("{rule.rule_id}" AS ?rule_id)
@@ -34,53 +39,14 @@ def build_rule_query(rule: RuleSignature, graph_uri: str) -> str:
     }}
     """
 
-
-def build_ruleset_query(rules: dict[str, HornRule], include_head: bool = False) -> str:
-    """Builds a single SPARQL query to retrieve variables satisfying each rule.
-
-    Args:
-        rules: A list of HornRule objects containing body and head definitions.
-        namespace: The ontology or graph namespace used for SPARQL translation.
-        include_head: If True, includes the head triple pattern in the WHERE clause.
-
-    Returns:
-        A formatted SPARQL query string containing UNIONed subqueries.
-    """
-    subqueries: list[str] = []
-    global_vars: set[str] = {"?rule_id"}
-
-    for rule_id, rule in rules.items():
-        var_set = set(rule.get_head_variables())
-        global_vars.update(var_set)
-        proj = " ".join(var_set)
-
-        patterns = [f"{atom} ." for atom in rule.body]
-        if include_head:
-            patterns.append(f"{rule.head} .")
-
-        where_patterns = "\n      ".join(patterns)
-        subqueries.append(
-            f"  {{\n"
-            f'    SELECT ("{rule_id}" AS ?rule_id) {proj}\n'
-            f"    WHERE {{\n"
-            f"      {where_patterns}\n"
-            f"    }}\n"
-            f"  }}"
-        )
-
-    outer_proj = " ".join(global_vars)
-
-    subqueries_joined = "\n  UNION\n".join(subqueries)
-    query = f"SELECT {outer_proj}\nWHERE {{\n{subqueries_joined}\n}}"
-
-    logger.debug("Created ruleset query for %d rules:\n%s", len(rules), query)
+    logger.debug("Built query for rule %s:\n%s", rule.rule_id, query)
     return query
 
 
 def build_federated_query(
     rule: RuleSignature,
-    main_graph: str,
-    searchspace_graph: str,
+    ebd_uri: str,
+    searchspace_uri: str,
 ) -> str:
     """Builds a SPARQL query that routes patterns to specific named graphs.
 
@@ -90,28 +56,48 @@ def build_federated_query(
 
     Args:
         rule: The HornRule object containing the body patterns.
-        main_graph: The URI of the primary named graph.
-        searchspace_graph: The URI of the search space named graph.
+        ebd_uri: The URI of the primary named graph.
+        searchspace_uri: The URI of the search space named graph.
 
     Returns:
         A formatted SPARQL SELECT query string.
     """
+    t_predicate = rule.head.predicate
+    t_vars = set(rule.get_head_variables())
 
-    head_pred = rule.head.predicate
-    proj = " ".join(set(rule.get_head_variables()))
-    patterns: list[str] = []
+    if t_predicate in rule.get_body_predicates():
+        for atom in rule.body:
+            if atom.predicate == t_predicate:
+                s_var, o_var = atom.get_variables()
+                if s_var is not None:
+                    t_vars.add(s_var)
+                if o_var is not None:
+                    t_vars.add(o_var)
 
-    for atom in rule.body:
-        graph_str = searchspace_graph if atom.predicate == head_pred else main_graph
+    proj = " ".join(t_vars)
 
-        graph_block = f"""
-        GRAPH <{graph_str}> {{
-          {atom} .
-        }}"""
+    intensional_patterns: list[str] = []
+    extensional_patterns: list[str] = []
 
-        patterns.append(graph_block)
+    for atom in rule:
+        if atom.predicate != t_predicate:
+            extensional_patterns.append(f"{atom} .")
+        else:
+            intensional_patterns.append(f"{atom} .")
 
-    where_clause = " .\n".join(patterns)
+    extensional_join = "\n          ".join(extensional_patterns)
+    extensional_block = f"""
+      GRAPH <{ebd_uri}> {{
+          {extensional_join}
+      }}"""
+
+    intensional_join = "\n          ".join(intensional_patterns)
+    intensional_block = f"""
+      GRAPH <{searchspace_uri}> {{
+          {intensional_join}
+      }}"""
+
+    where_clause = " .\n    ".join((extensional_block, intensional_block))
 
     # Construct the final query string
     query = f"""
@@ -128,7 +114,7 @@ def build_federated_query(
 # Insert to database.
 # ---------------------------------------------------------------------------
 def insert_triples_sparql(
-    sparql_client: SPARQLWrapper,
+    client: SPARQLWrapper,
     graph_uri: str,
     triple_stream: Iterable[str],
     chunk_size: int,
@@ -136,7 +122,7 @@ def insert_triples_sparql(
     """Inserts triples into Virtuoso using SPARQL in batches.
 
     Args:
-        sparql_client: An instantiated and configured SPARQLWrapper client.
+        client: An instantiated and configured SPARQLWrapper client.
         graph_uri: The URI of the target named graph.
         triple_stream: An iterable yielding individual SPARQL triple strings.
         chunk_size: The maximum number of triples to insert per SPARQL query.
@@ -144,6 +130,7 @@ def insert_triples_sparql(
     Returns:
         The total number of triples successfully processed.
     """
+    client.setMethod("POST")
     count = 0
 
     def chunk_iter(iterable: Iterable[str], size: int) -> Iterable[tuple[str, ...]]:
@@ -162,8 +149,8 @@ def insert_triples_sparql(
           }}
         }}"""
 
-        sparql_client.setQuery(insert_query)
-        sparql_client.query()
+        client.setQuery(insert_query)
+        client.query()
 
         count += len(chunk)
 
@@ -199,6 +186,7 @@ def insert_triples_gsp(
 
     total_inserted = 0
     logger.debug("Inserting triples to %s via GSP.", graph_uri)
+
     with requests.Session() as session:
         session.auth = HTTPDigestAuth(*auth)
 
@@ -206,7 +194,8 @@ def insert_triples_gsp(
             batch = list(itertools.islice(triples, chunk_size))
             if not batch:
                 break
-            payload = "\n".join(batch)
+
+            payload = "\n".join(batch) + "\n"
             response = session.post(
                 url=crud_endpoint,
                 params=params,
@@ -224,40 +213,35 @@ def insert_triples_gsp(
 
 
 # ------------------------------- Fix ---------------------------------------
-
-
 def insert_graph_sparql(
-    sparql_client: SPARQLWrapper,
+    client: SPARQLWrapper,
     graph_uri: str,
-    auth: HTTPDigestAuth,
     nt_file: Path,
-    database_endpoint: str,
+    chunk_size: int,
 ) -> None:
     """Overwrites a graph from an .nt file to the database management system."""
 
-    clear_named_graph(graph_uri=graph_uri, sparql_client=sparql_client)
+    clear_named_graph(client, graph_uri)
 
-    headers = {"Content-Type": "application/n-triples"}
+    def _parse_line(text: str) -> str:
+        """Parses a line from a .nt file to a valid triple."""
+        stripped = text.strip()
+        if not stripped or stripped.startswith("#"):
+            return ""
+        return stripped
 
-    # Target the specific Virtuoso Graph Store CRUD endpoint
-    crud_endpoint = f"{database_endpoint.rstrip('/')}/sparql-graph-crud-auth"
+    def _triple_stream(file_path: Path) -> Iterator[str]:
+        """Streams the triples from an nt file."""
+        with file_path.open(encoding="utf-8") as f:
+            for line in f:
+                if triple := _parse_line(line):
+                    yield triple
 
-    with nt_file.open("rb") as f:
-        response = requests.put(
-            crud_endpoint,
-            params={"graph-uri": graph_uri},
-            data=f,
-            headers=headers,
-            auth=auth,
-        )
-
-    if response.status_code in (200, 201):
-        logger.debug("Successfully inserted the graph!")
-    else:
-        logger.error("Failed with status %s\n%s", response.status_code, response.text)
+    iterator = _triple_stream(nt_file)
+    insert_triples_sparql(client, graph_uri, iterator, chunk_size)
 
 
-def clear_named_graph(sparql_client: SPARQLWrapper, graph_uri: str) -> None:
+def clear_named_graph(client: SPARQLWrapper, graph_uri: str) -> None:
     """Removes all triples from a specified named graph.
 
     Args:
@@ -267,17 +251,17 @@ def clear_named_graph(sparql_client: SPARQLWrapper, graph_uri: str) -> None:
     Raises:
         Exception: If the SPARQL CLEAR operation fails.
     """
-    sparql_client.setMethod(POST)
+    client.setMethod("POST")
 
     # CLEAR SILENT empties the graph safely even if it doesn't exist yet
     query = f"CLEAR SILENT GRAPH <{graph_uri}>"
-    sparql_client.setQuery(query)
+    client.setQuery(query)
 
     try:
-        sparql_client.query()
+        client.query()
         logger.debug("Successfully cleared graph <%s>.", graph_uri)
-    except Exception as e:
-        logger.error("Failed to clear graph <%s>: %s", graph_uri, e)
+    except Exception:
+        logger.exception("Failed to clear graph <%s>: %s", graph_uri)
         raise
 
 
@@ -290,16 +274,17 @@ def clear_named_graph(sparql_client: SPARQLWrapper, graph_uri: str) -> None:
 SparqlBindings = list[dict[str, dict[str, str]]]
 
 
-def get_select_results(sparql_client: SPARQLWrapper, query: str) -> SparqlBindings:
+def get_select_results(client: SPARQLWrapper, query: str) -> SparqlBindings:
     """Handles the response for SELECT queries using SPARQLWrapper."""
-    sparql_client.setMethod(GET)
-    sparql_client.setReturnFormat(JSON)
-    sparql_client.setQuery(query)
+    client.setMethod(GET)
+    client.setReturnFormat(JSON)
+    client.setQuery(query)
 
     try:
-        response = sparql_client.queryAndConvert()
+        response = client.queryAndConvert()
 
         if isinstance(response, dict) and "results" in response:
+            logger.debug("SELECT response: %s", response)
             raw_bindings = response["results"].get("bindings", [])
             return cast(SparqlBindings, raw_bindings)
 
@@ -313,7 +298,7 @@ def get_select_results(sparql_client: SPARQLWrapper, query: str) -> SparqlBindin
 # ---------------------------------------------------------------------------
 # Query metrics.
 # ---------------------------------------------------------------------------
-def get_preds_and_freqs(sparql_client: SPARQLWrapper, graph_uri: str) -> dict[str, int]:
+def get_preds_and_freqs(client: SPARQLWrapper, graph_uri: str) -> dict[str, int]:
     """Retrieves all unique predicates in the graph and the frequency of each one."""
 
     predicate_frequencies: dict[str, int] = {}
@@ -327,21 +312,19 @@ def get_preds_and_freqs(sparql_client: SPARQLWrapper, graph_uri: str) -> dict[st
         GROUP BY ?predicate
         """
 
-    results = get_select_results(sparql_client, query)
+    results = get_select_results(client, query)
     if not results:
         return predicate_frequencies
 
     for row in results:
         predicate = row["predicate"]["value"]
-        frequency = int(row["?frequency"]["value"])
+        frequency = int(row["frequency"]["value"])
         predicate_frequencies[predicate] = frequency
 
     return predicate_frequencies
 
 
-def get_domain(
-    sparql_client: SPARQLWrapper, graph_uri: str, predicate: str
-) -> dict[str, int]:
+def get_domain(client: SPARQLWrapper, graph_uri: str, predicate: str) -> dict[str, int]:
     """Retrieves the distribution of subjects for a predicate in a graph."""
 
     domain: dict[str, int] = {}
@@ -356,10 +339,10 @@ def get_domain(
     GROUP BY ?subject
     """
 
-    if results := get_select_results(sparql_client, query):
+    if results := get_select_results(client, query):
         for row in results:
-            subject = row["?subject"]["value"]
-            frequency = int(row["?count"]["value"])
+            subject = row["subject"]["value"]
+            frequency = int(row["count"]["value"])
             domain[subject] = frequency
 
         return domain
@@ -368,9 +351,7 @@ def get_domain(
     return domain
 
 
-def get_range(
-    sparql_client: SPARQLWrapper, graph_uri: str, predicate: str
-) -> dict[str, int]:
+def get_range(client: SPARQLWrapper, graph_uri: str, predicate: str) -> dict[str, int]:
     """Retrieves the distribution of objects for a predicate in a graph."""
 
     p_range: dict[str, int] = {}
@@ -385,10 +366,10 @@ def get_range(
     GROUP BY ?obj
     """
 
-    if results := get_select_results(sparql_client, query):
+    if results := get_select_results(client, query):
         for row in results:
-            obj = row["?obj"]["value"]
-            frequency = int(row["?count"]["value"])
+            obj = row["obj"]["value"]
+            frequency = int(row["count"]["value"])
             p_range[obj] = frequency
         return p_range
 
@@ -396,9 +377,7 @@ def get_range(
     return p_range
 
 
-def get_reflexivity(
-    sparql_client: SPARQLWrapper, graph_uri: str, predicate: str
-) -> int:
+def get_reflexivity(client: SPARQLWrapper, graph_uri: str, predicate: str) -> int:
     """Retrieves how many triples with this predicate are reflexive (obj == subj)."""
 
     query = f"""
@@ -409,12 +388,12 @@ def get_reflexivity(
       }} 
     }}"""
 
-    if results := get_select_results(sparql_client, query):
+    if results := get_select_results(client, query):
         return int(results[0]["c"]["value"])
     return 0
 
 
-def get_support(sparql_client: SPARQLWrapper, rule: HornRule, graph_uri: str) -> int:
+def get_support(client: SPARQLWrapper, rule: HornRule, graph_uri: str) -> int:
     """Returns the support for the rule in the graph."""
 
     patterns = "\n".join([f"{atom} ." for atom in rule.body] + [f"{rule.head}"])
@@ -427,14 +406,14 @@ def get_support(sparql_client: SPARQLWrapper, rule: HornRule, graph_uri: str) ->
       }}
     }}"""
 
-    if results := get_select_results(sparql_client, query):
+    if results := get_select_results(client, query):
         return int(results[0]["supp"]["value"])
 
     logger.warning("Retrieved None for %s support in %s.", rule.rule_id, graph_uri)
     return 0
 
 
-def get_frequency(sparql_client: SPARQLWrapper, predicate: str, graph_uri: str) -> int:
+def get_frequency(client: SPARQLWrapper, predicate: str, graph_uri: str) -> int:
     """Returns the number of times a predicate appears in the graph."""
 
     query = f"""
@@ -445,14 +424,14 @@ def get_frequency(sparql_client: SPARQLWrapper, predicate: str, graph_uri: str) 
       }}
     }}"""
 
-    if results := get_select_results(sparql_client, query):
+    if results := get_select_results(client, query):
         return int(results[0]["frequency"]["value"])
 
     logger.warning("Retrieved None for %s frequency in %s.", predicate, graph_uri)
     return 0
 
 
-def get_total_triples(sparql_client: SPARQLWrapper, graph_uri: str) -> int:
+def get_total_triples(client: SPARQLWrapper, graph_uri: str) -> int:
     """Returns the total triples in a graph."""
 
     query = f"""
@@ -463,9 +442,12 @@ def get_total_triples(sparql_client: SPARQLWrapper, graph_uri: str) -> int:
       }}
     }}"""
 
-    if results := get_select_results(sparql_client, query):
-        return int(results[0]["total"]["value"])
+    if results := get_select_results(client, query):
+        total_triples = int(results[0]["total"]["value"])
+        if total_triples == 0:
+            logger.warning("Retrieved 0 triples from %s.", graph_uri)
 
+        return total_triples
     logger.warning("Retrieved None for total triples in %s.", graph_uri)
     return 0
 
@@ -478,3 +460,12 @@ if __name__ == "__main__":
     client.setHTTPAuth(DIGEST)
     client.setCredentials("dba", "dba")
     clear_named_graph(client, "http://FrenchRoyalty.org/")
+
+    insert_graph_sparql(
+        client=client,
+        graph_uri="http://FrenchRoyalty.org/",
+        nt_file=Path(
+            "/home/master/GitHub/fine-tuning-llms-with-kg/.data/FrenchRoyalty/french_royalty.nt"
+        ),
+        chunk_size=500,
+    )
