@@ -246,7 +246,7 @@ def _execute_stratification(
                     chunk_size=chunk_size,
                 ):
                     grounded_predicates.add(predicate)
-                    logger.info(
+                    logger.debug(
                         "Rule %s yielded %d triples for %s.", r_id, count, predicate
                     )
 
