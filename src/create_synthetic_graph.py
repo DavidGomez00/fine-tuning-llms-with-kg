@@ -289,7 +289,7 @@ def _execute_stratification(
         # Update predicates
         new_preds = get_closed_predicates(client, graph_uri, profiles) - closed_preds
         if new_preds:
-            logger.info("Closed predicates %s", new_preds)
+            logger.debug("Closed predicates %s", new_preds)
             closed_preds.update(new_preds)
             updated_closure = True
 
@@ -304,7 +304,7 @@ def _execute_stratification(
             logger.debug("Rules to check: %s", rules_to_check.keys())
 
             if closed_r := (get_closed_rules(client, graph_uri, rules_to_check)):
-                logger.info("Closed rules in this strata: %s", closed_r)
+                logger.debug("Closed rules in this strata: %s", closed_r)
                 closed_rule_ids.update(closed_r)
                 updated_closure = True
 
