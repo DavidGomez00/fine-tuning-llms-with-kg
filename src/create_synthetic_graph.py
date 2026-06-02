@@ -577,7 +577,6 @@ if __name__ == "__main__":
     #         client=client,
     #         term_mapping=term_mapping,
     #         rules=rules,
-    #         profiles=graph_metrics.profiles,
     #         graph_uri=graph_uri,
     #         crud_endpoint=URL(client.endpoint).with_name("sparql-graph-crud-auth"),
     #         use_searchspace=False,

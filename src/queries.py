@@ -20,66 +20,59 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 def build_rule_query(
     rule: RuleSignature,
-    ebd_uri: str,
+    graph_uri: str,
     searchspace_uri: str,
-    use_searchspace: bool,
     use_head: bool = True,
+    use_searchspace: bool = True,
 ) -> str:
-    """Builds a SPARQL query for a rule."""
+    """Builds a SPARQL SELECT query to find instantiations of a rule.
 
-    # If we are not using the external searchspace, we only query the EDB
-    if not use_searchspace:
-        searchspace_uri = ebd_uri
+    Args:
+        rule: The rule signature containing the head and body atoms.
+        graph_uri: The primary graph URI (extensional data) to query.
+        searchspace_uri: The secondary graph URI for recursive/intensional search.
+        use_head: If True, includes the rule's head in the query body when recursive.
+        use_searchspace: If True, includes searchspace_uri in the FROM datasets.
 
-    t_vars = set(rule.get_head_variables())
+    Returns:
+        A formatted SPARQL SELECT query string.
+    """
+
     t_predicate = rule.head.predicate
 
-    # If the rule is recursive, add the corresponding variables to the projection
-    if t_predicate in rule.get_body_predicates():
-        for atom in (a for a in rule.body if a.predicate == t_predicate):
-            s_var, o_var = atom.get_variables()
-            if s_var is not None:
-                t_vars.add(s_var)
-            if o_var is not None:
-                t_vars.add(o_var)
+    # If the rule is recursive, cleanly extract and add the corresponding variables
+    is_recursive = t_predicate in rule.get_body_predicates()
+    t_vars = set(rule.get_head_variables())
+
+    if is_recursive:
+        t_vars.update(
+            var
+            for atom in rule.body
+            if atom.predicate == t_predicate
+            for var in atom.get_variables()
+            if var is not None
+        )
 
     proj = " ".join(t_vars)
 
     # Use the corresponding graph for extensional / intensional predicates in the rule
-    intensional_patterns: list[str] = []
-    extensional_patterns: list[str] = []
+    body_patterns = [f"{atom} ." for atom in rule.body]
+    sources = {graph_uri}
 
-    for atom in rule.body:
-        if atom.predicate != t_predicate:
-            extensional_patterns.append(f"{atom} .")
-        else:
-            intensional_patterns.append(f"{atom} .")
+    if is_recursive and use_head:
+        body_patterns.append(f"{rule.head} .")
+        if use_searchspace:
+            sources.add(searchspace_uri)
 
-    blocks = []
-    if extensional_patterns:
-        extensional_join = "\n            ".join(extensional_patterns)
-        extensional_block = f"""
-          GRAPH <{ebd_uri}> {{
-            {extensional_join}
-          }}"""
-        blocks.append(extensional_block)
-    if intensional_patterns:
-        if use_head:
-            intensional_patterns.append(f"{rule.head} .")
-        intensional_join = "\n            ".join(intensional_patterns)
-        intensional_block = f"""
-          GRAPH <{searchspace_uri}> {{
-            {intensional_join}
-          }}"""
-        blocks.append(intensional_block)
-    where_clause = ".\n    ".join(blocks)
+    body_patterns_str = "\n      ".join(body_patterns)
+    sources_str = "\n    ".join(f"FROM <{g}>" for g in sorted(sources))
 
-    # Build the final query
     query = f"""
     SELECT DISTINCT ?rule_id {proj}
+    {sources_str}
     WHERE {{
-      BIND ("{rule.rule_id}" AS ?rule_id)      
-        {where_clause}
+      BIND ("{rule.rule_id}" AS ?rule_id)
+      {body_patterns_str}    
     }}
     """
 
@@ -524,8 +517,8 @@ def get_total_triples(client: SPARQLWrapper, graph_uri: str) -> int:
 def generates_new_triples(
     client: SPARQLWrapper,
     rule: HornRule,
-    graph_uri: str,
-    searchspace_uri: str,
+    target_graph: str,
+    searchspace_uri: str | None = None,
 ) -> bool:
     """Evaluates if applying a rule to a graph would generate novel triples.
 
@@ -541,6 +534,7 @@ def generates_new_triples(
     Returns:
         True if applying the rule generates new knowledge, False otherwise.
     """
+
     # Format the rule body atoms as standard SPARQL triple patterns
     body_patterns = "\n            ".join(f"{atom} ." for atom in rule.body)
 
@@ -548,7 +542,9 @@ def generates_new_triples(
     # We scope everything inside the specified named graph.
     query = f"""
     ASK WHERE {{
-      GRAPH <{graph_uri}> {{
+      GRAPH <{
+        target_graph: str,
+}> {{
         {body_patterns}
         FILTER NOT EXISTS {{
           {rule.head} .
