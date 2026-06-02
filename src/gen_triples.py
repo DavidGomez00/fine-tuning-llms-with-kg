@@ -16,7 +16,7 @@ from graph_metrics import PredicateProfile
 from queries import (
     SparqlBindings,
     build_rule_query,
-    get_select_results,
+    execute_select_query,
     insert_triples_gsp,
     insert_triples_sparql,
 )
@@ -85,24 +85,29 @@ def apply_rule(
     term_mapping: dict[str, str],
     profile: PredicateProfile,
     crud_endpoint: str,
+    use_searchspace: bool,
+    use_head: bool = True,
 ) -> SparqlBindings:
     """Applies a rule to a graph and retuns a raw triple Iterator that generates the
     resulted triples from the graph."""
 
     searchspace_uri = "http://SearchSpace.org/"
 
-    if rule.head.predicate in rule.get_body_predicates():
-        create_predicate_searchspace(
-            predicate=rule.head.predicate,
-            profile=profile,
-            searchspace_uri=searchspace_uri,
-            term_mapping=term_mapping,
-            client=client,
-            crud_endpoint=crud_endpoint,
-        )
+    if use_searchspace:
+        if rule.head.predicate in rule.get_body_predicates():
+            create_predicate_searchspace(
+                predicate=rule.head.predicate,
+                profile=profile,
+                searchspace_uri=searchspace_uri,
+                term_mapping=term_mapping,
+                client=client,
+                crud_endpoint=crud_endpoint,
+            )
 
-    query = build_rule_query(rule.signature, graph_uri, searchspace_uri)
-    return get_select_results(client, query)
+    query = build_rule_query(
+        rule.signature, graph_uri, searchspace_uri, use_searchspace, use_head
+    )
+    return execute_select_query(client, query)
 
 
 # ---------------------------------------------------------------------------

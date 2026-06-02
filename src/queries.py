@@ -18,11 +18,23 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 # SPARQL Query generation.
 # ---------------------------------------------------------------------------
-def build_rule_query(rule: RuleSignature, ebd_uri: str, searchspace_uri: str) -> str:
+def build_rule_query(
+    rule: RuleSignature,
+    ebd_uri: str,
+    searchspace_uri: str,
+    use_searchspace: bool,
+    use_head: bool = True,
+) -> str:
     """Builds a SPARQL query for a rule."""
+
+    # If we are not using the external searchspace, we only query the EDB
+    if not use_searchspace:
+        searchspace_uri = ebd_uri
+
     t_vars = set(rule.get_head_variables())
     t_predicate = rule.head.predicate
 
+    # If the rule is recursive, add the corresponding variables to the projection
     if t_predicate in rule.get_body_predicates():
         for atom in (a for a in rule.body if a.predicate == t_predicate):
             s_var, o_var = atom.get_variables()
@@ -33,6 +45,7 @@ def build_rule_query(rule: RuleSignature, ebd_uri: str, searchspace_uri: str) ->
 
     proj = " ".join(t_vars)
 
+    # Use the corresponding graph for extensional / intensional predicates in the rule
     intensional_patterns: list[str] = []
     extensional_patterns: list[str] = []
 
@@ -51,15 +64,17 @@ def build_rule_query(rule: RuleSignature, ebd_uri: str, searchspace_uri: str) ->
           }}"""
         blocks.append(extensional_block)
     if intensional_patterns:
-        intensional_patterns.append(f"{rule.head} .")
+        if use_head:
+            intensional_patterns.append(f"{rule.head} .")
         intensional_join = "\n            ".join(intensional_patterns)
         intensional_block = f"""
           GRAPH <{searchspace_uri}> {{
             {intensional_join}
           }}"""
         blocks.append(intensional_block)
-
     where_clause = ".\n    ".join(blocks)
+
+    # Build the final query
     query = f"""
     SELECT DISTINCT ?rule_id {proj}
     WHERE {{
@@ -68,7 +83,7 @@ def build_rule_query(rule: RuleSignature, ebd_uri: str, searchspace_uri: str) ->
     }}
     """
 
-    logger.debug("Built query for rule %s (%s):", rule.rule_id, rule.head)
+    logger.debug("Built query for rule %s (%s):\n%s", rule.rule_id, rule.head, query)
     return query
 
 
@@ -197,7 +212,8 @@ def insert_graph_sparql(
                     yield triple
 
     iterator = _triple_stream(nt_file)
-    insert_triples_sparql(client, graph_uri, iterator, chunk_size)
+    count = insert_triples_sparql(client, graph_uri, iterator, chunk_size)
+    logger.debug("Inserted %d triples to %s from .nt file.", count, graph_uri)
 
 
 def clear_graph_sparql(client: SPARQLWrapper, graph_uri: str) -> None:
@@ -290,7 +306,7 @@ def download_graph_raw(
 SparqlBindings = list[dict[str, dict[str, str]]]
 
 
-def get_select_results(client: SPARQLWrapper, query: str) -> SparqlBindings:
+def execute_select_query(client: SPARQLWrapper, query: str) -> SparqlBindings:
     """Handles the response for SELECT queries using SPARQLWrapper."""
     client.setMethod(GET)
     client.setReturnFormat(JSON)
@@ -307,6 +323,38 @@ def get_select_results(client: SPARQLWrapper, query: str) -> SparqlBindings:
 
     except Exception:
         logger.error("SPARQL execution failed for query:\n%s", query)
+        raise
+
+
+def execute_ask_query(client: SPARQLWrapper, query: str) -> bool:
+    """Executes a SPARQL ASK query and returns the boolean result.
+
+    Args:
+        client: An instantiated and configured SPARQLWrapper client.
+        query: The SPARQL ASK query string to execute.
+
+    Returns:
+        True if the graph pattern is satisfied, False otherwise.
+
+    Raises:
+        ValueError: If the query results do not contain a boolean response.
+        Exception: Reraises any exceptions encountered during query execution.
+    """
+    client.setMethod(GET)
+    client.setReturnFormat(JSON)
+    client.setQuery(query)
+
+    try:
+        response = client.queryAndConvert()
+
+        # Type guard for the expected JSON dictionary structure of an ASK query
+        if isinstance(response, dict) and "boolean" in response:
+            return bool(response["boolean"])
+
+        raise ValueError("Failed to retrieve boolean value from ASK query results.")
+
+    except Exception:
+        logger.exception("SPARQL execution failed for ASK query:\n%s", query)
         raise
 
 
@@ -327,7 +375,7 @@ def get_preds_and_freqs(client: SPARQLWrapper, graph_uri: str) -> dict[str, int]
         GROUP BY ?predicate
         """
 
-    results = get_select_results(client, query)
+    results = execute_select_query(client, query)
     if not results:
         return predicate_frequencies
 
@@ -354,7 +402,7 @@ def get_domain(client: SPARQLWrapper, graph_uri: str, predicate: str) -> dict[st
     GROUP BY ?subject
     """
 
-    if results := get_select_results(client, query):
+    if results := execute_select_query(client, query):
         for row in results:
             subject = row["subject"]["value"]
             frequency = int(row["count"]["value"])
@@ -381,7 +429,7 @@ def get_range(client: SPARQLWrapper, graph_uri: str, predicate: str) -> dict[str
     GROUP BY ?obj
     """
 
-    if results := get_select_results(client, query):
+    if results := execute_select_query(client, query):
         for row in results:
             obj = row["obj"]["value"]
             frequency = int(row["count"]["value"])
@@ -403,7 +451,7 @@ def get_reflexivity(client: SPARQLWrapper, graph_uri: str, predicate: str) -> in
       }} 
     }}"""
 
-    if results := get_select_results(client, query):
+    if results := execute_select_query(client, query):
         return int(results[0]["c"]["value"])
     return 0
 
@@ -427,7 +475,7 @@ def get_support(client: SPARQLWrapper, rule: HornRule, graph_uri: str) -> int:
       }}
     }}"""
 
-    if results := get_select_results(client, query):
+    if results := execute_select_query(client, query):
         return int(results[0]["supp"]["value"])
 
     logger.warning("Retrieved None for %s support in %s.", rule.rule_id, graph_uri)
@@ -445,7 +493,7 @@ def get_frequency(client: SPARQLWrapper, predicate: str, graph_uri: str) -> int:
       }}
     }}"""
 
-    if results := get_select_results(client, query):
+    if results := execute_select_query(client, query):
         return int(results[0]["frequency"]["value"])
 
     logger.warning("Retrieved None for %s frequency in %s.", predicate, graph_uri)
@@ -463,7 +511,7 @@ def get_total_triples(client: SPARQLWrapper, graph_uri: str) -> int:
       }}
     }}"""
 
-    if results := get_select_results(client, query):
+    if results := execute_select_query(client, query):
         total_triples = int(results[0]["total"]["value"])
         if total_triples == 0:
             logger.warning("Retrieved 0 triples from %s.", graph_uri)
@@ -473,12 +521,57 @@ def get_total_triples(client: SPARQLWrapper, graph_uri: str) -> int:
     return 0
 
 
+def generates_new_triples(
+    client: SPARQLWrapper,
+    rule: HornRule,
+    graph_uri: str,
+    searchspace_uri: str,
+) -> bool:
+    """Evaluates if applying a rule to a graph would generate novel triples.
+
+    This generates an ASK query that evaluates to True if the database contains
+    at least one instantiation of the rule's body where the corresponding head
+    does NOT already exist.
+
+    Args:
+        client: An instantiated and configured SPARQLWrapper client.
+        rule: The HornRule containing the body and head to evaluate.
+        graph_uri: The URI of the named graph to query against.
+
+    Returns:
+        True if applying the rule generates new knowledge, False otherwise.
+    """
+    # Format the rule body atoms as standard SPARQL triple patterns
+    body_patterns = "\n            ".join(f"{atom} ." for atom in rule.body)
+
+    # We use FILTER NOT EXISTS to ensure the head is not already present.
+    # We scope everything inside the specified named graph.
+    query = f"""
+    ASK WHERE {{
+      GRAPH <{graph_uri}> {{
+        {body_patterns}
+        FILTER NOT EXISTS {{
+          {rule.head} .
+        }}
+      }}
+    }}
+    """
+
+    logger.debug(
+        "Executing rule generation ASK query for rule %s:\n%s",
+        getattr(rule, "rule_id", "UNKNOWN"),
+        query,
+    )
+
+    return execute_ask_query(client, query)
+
+
 if __name__ == "__main__":
     from SPARQLWrapper import DIGEST
 
     from config import RunConfig
 
-    config_file = Path("configurations/gen_triples/simpsons.json")
+    config_file = Path("configurations/gen_triples/french_royalty.json")
     config = RunConfig.from_json(config_file)
 
     setup_logging(level=config.logging.level)
@@ -488,3 +581,9 @@ if __name__ == "__main__":
     client.setCredentials(config.virtuoso.user, config.virtuoso.password)
 
     # --- Execution ---
+    insert_graph_sparql(
+        client=client,
+        graph_uri="http://CompleteFR.org",
+        nt_file=config.data.input_dir / config.graph.nt_file,
+        chunk_size=50,
+    )

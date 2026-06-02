@@ -11,6 +11,15 @@ import pandas as pd
 logger = logging.getLogger(__name__)
 
 
+class CustomLogicFormatter(logging.Formatter):
+    """A formatter that applies custom logic to the final log string."""
+
+    def format(self, record: logging.LogRecord) -> str:
+        result = super().format(record)
+        custom_output = result.replace("69", "69(<- nice)")
+        return custom_output
+
+
 def setup_logging(level: int | str = logging.INFO) -> None:
     """Configures the root logger to output to the console.
 
@@ -27,6 +36,15 @@ def setup_logging(level: int | str = logging.INFO) -> None:
         datefmt="%Y-%m-%d %H:%M:%S",
         force=True,
     )
+
+    # custom_formatter = CustomLogicFormatter(
+    #     fmt="%(asctime)s | %(name)-8s | %(levelname)-6s | %(message)s",
+    #     datefmt="%Y-%m-%d %H:%M:%S",
+    # )
+
+    # root_logger = logging.getLogger()
+    # for handler in root_logger.handlers:
+    #     handler.setFormatter(custom_formatter)
 
     # Force urllib3 and its connectionpool child to be quiet
     logging.getLogger("urllib3").setLevel(logging.WARNING)
