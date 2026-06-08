@@ -1,0 +1,28 @@
+{
+  "data": {
+    "input_dir": ".data/FrenchRoyalty/",
+    "output_dir": ".experiments/GenTriples/FrenchRoyalty/",
+    "database_url": "http://localhost:8890/",
+    "sparql_endpoint": "sparql-auth",
+    "crud_endpoint": "sparql-graph-crud-auth"
+  },
+  "virtuoso": {
+    "user": "dba",
+    "password": "dba",
+    "chunk_size": 1000
+  },
+  "graph": {
+    "name": "FrechRoyalty",
+    "nt_file": "french_royalty.nt",
+    "ontology_file": "french_royalty.ttl",
+    "synthetic_graph_uri": "http://SyntheticFrenchRoyalty.org/",
+    "base_graph_uri": "http://FrenchRoyalty.org/"
+  },
+  "rules":{
+    "rules_file": "rules_Std_1.csv",
+    "pca_threshold": 1
+  },
+  "logging":{
+    "level":"DEBUG"
+  }
+}

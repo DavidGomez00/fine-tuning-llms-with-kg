@@ -126,13 +126,15 @@ class GraphConfig:
     name: str
     ontology_file: str
     nt_file: str
-    uri: str
+    base_graph_uri: str
+    synthetic_graph_uri: str
 
 
 @dataclass(frozen=True)
 class VirtuosoConfig:
     user: str = "dba"
     password: str = "dba"
+    chunk_size: int = 5000
 
 
 @dataclass(frozen=True)

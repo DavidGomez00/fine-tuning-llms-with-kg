@@ -1,5 +1,5 @@
+import csv
 import logging
-import re
 from pathlib import Path
 
 import pandas as pd
@@ -54,19 +54,9 @@ def setup_logging(level: int | str = logging.INFO) -> None:
 # ---------------------------------------------------------------------------
 # Triple parsing
 # ---------------------------------------------------------------------------
-
-uri_pattern = re.compile(r"[#\/:]")
-
-
-def get_local_name(term: str) -> str:
-    """Returns the term without the URI."""
-    return uri_pattern.split(term)[-1]
-
-
 def format_term(
     term: str,
-    term_mapping: dict[str, str],
-    default_ns: str = "http://ExplicitFormat.org",
+    term_mapping: dict[str, str] | None = None,
 ) -> str:
     """Ensures a term is wrapped in one set of brackets with the correct namespace."""
     if (term.startswith("<") and term.endswith(">")) or term.startswith("?"):
@@ -75,14 +65,13 @@ def format_term(
     if term.startswith("http"):
         return f"<{term}>"
 
-    namespace = term_mapping.get(term)
+    if term_mapping is not None:
+        namespace = term_mapping.get(term, term_mapping.get("default"))
+        if namespace is not None:
+            return f"<{namespace}{term}>"
 
-    if namespace is None:
-        namespace = default_ns
-        logger.warning("Prefix not found for term '%s'. Using default namespace", term)
-
-    # Assume it's a local name and add namespace + brackets
-    return f"<{namespace}{term}>"
+    message = "Default namespace not defined, aborting."
+    raise ValueError(f"Error parsing term {term}: {message}")
 
 
 def format_triple(
@@ -90,16 +79,18 @@ def format_triple(
     predicate: str,
     obj: str,
     term_mapping: dict[str, str],
-    default_ns: str = "http://ExplicitFormat.org",
 ) -> str:
     """Returns triple is in SPARQL format with the correct namespace and a final '.'."""
-    subject_str = format_term(subject, term_mapping, default_ns)
-    predicate_str = format_term(predicate, term_mapping, default_ns)
-    object_str = format_term(obj, term_mapping, default_ns)
+    subject_str = format_term(subject, term_mapping)
+    predicate_str = format_term(predicate, term_mapping)
+    object_str = format_term(obj, term_mapping)
 
     return f"{subject_str} {predicate_str} {object_str} ."
 
 
+# ---------------------------------------------------------------------------
+# File parsing.
+# ---------------------------------------------------------------------------
 def filter_file(
     input_file: Path,
     target_string: str,
@@ -124,9 +115,46 @@ def filter_file(
                 outfile.write(line)
 
 
-def filter_rules(rules_file: Path, pca_threshold: float) -> None:
-    rules_df = pd.read_csv(rules_file)
-    filtered_df = rules_df[rules_df["PCA_Confidence"] >= 0.9]
+def filter_rules(
+    rules_file: Path | str, pca_threshold: float = 0.0, std_threshold: float = 0.0
+) -> None:
+
+    rules_file = Path(rules_file)
+    rules_dataframe = pd.read_csv(rules_file)
+
+    if std_threshold:
+        metric = "Std"
+        threshold = std_threshold
+    else:
+        metric = "PCA"
+        threshold = pca_threshold
+
+    filtered_df = rules_dataframe[rules_dataframe[f"{metric}_Confidence"] >= threshold]
     filtered_df.to_csv(
-        rules_file.with_name(f"rules_PCA_{pca_threshold}.csv"), index=False
+        rules_file.with_name(f"rules_{metric}_{threshold}.csv"), index=False
     )
+
+
+def tsv_to_nt(tsv_file: Path, nt_file: Path, term_mapping: dict[str, str]):
+    """Parses a tsv file into a .nt file."""
+    with tsv_file.open(encoding="utf-8") as tsv_f:
+        with nt_file.open("w", encoding="utf-8") as nt_f:
+            rd = csv.reader(tsv_f, delimiter="\t")
+            for line in rd:
+                if not line:
+                    continue
+                if len(line) == 3:
+                    triple = format_triple(
+                        line[0], line[1], line[2], term_mapping
+                    ).strip()
+                    nt_f.write(f"{triple}\n")
+
+                else:
+                    logger.error("Parsed line: %s", line)
+                    raise ValueError("Error: Found != 3 elements in a non empty row.")
+
+    logger.debug(".nt file saved at %s", nt_file)
+
+
+if __name__ == "__main__":
+    filter_rules(Path(".data/FrenchRoyalty/french_royalty.csv"), std_threshold=1)

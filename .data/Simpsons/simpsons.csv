@@ -1,4 +1,8 @@
 Body,Head,Head_Coverage,Std_Confidence,PCA_Confidence,Positive_Examples,Body_size,PCA_Body_size,Functional_variable
-?a <http://example.org/hasChild> ?c  ?b <http://example.org/hasChild> ?c,?a <http://example.org/isMarriedTo> ?b,1.0,1.0,1.0,2,2,2,?a
-?a <http://example.org/isMarriedTo> ?b, ?b <http://example.org/isMarriedTo> ?a,1.0,1.0,1.0,2,2,2,?a
-?a <http://example.org/hasChild> ?b, ?a <http://example.org/livesIn> <http://example.org/Springfield>,1.0,1.0,1.0,4,4,4,?a
+?a <http://SimpsonFamily.org/isMarriedTo> ?b, ?b <http://SimpsonFamily.org/isMarriedTo> ?a,1.0,1.0,1.0,2,2,2,?a
+?a <http://SimpsonFamily.org/hasSibling> ?b, ?b <http://SimpsonFamily.org/hasSibling> ?a,1.0,1.0,1.0,2,2,2,?a
+?a <http://SimpsonFamily.org/hasChild> ?c  ?b <http://SimpsonFamily.org/hasChild> ?c, ?a <http://SimpsonFamily.org/isMarriedTo> ?b,1.0,1.0,1.0,4,4,4,?a
+?a <http://SimpsonFamily.org/hasChild> ?b  ?a <http://SimpsonFamily.org/hasChild> ?c, ?b <http://SimpsonFamily.org/hasSibling> ?c,1.0,1.0,1.0,4,4,4,?a
+?a <http://SimpsonFamily.org/hasChild> ?b  ?a <http://SimpsonFamily.org/loves> <http://SimpsonFamily.org/DuffBeer>, ?b <http://SimpsonFamily.org/knows> <http://SimpsonFamily.org/Moe>,1.0,1.0,1.0,2,1,1,?a
+?a <http://SimpsonFamily.org/hasChild> ?b  ?a <http://SimpsonFamily.org/livesIn> ?c, ?b <http://SimpsonFamily.org/livesIn> ?c,1.0,1.0,1.0,4,4,4,?a
+?a <http://SimpsonFamily.org/loves> <http://SimpsonFamily.org/DuffBeer>, ?a <http://SimpsonFamily.org/knows> <http://SimpsonFamily.org/Moe>,1.0,1.0,1.0,1,1,1,?a

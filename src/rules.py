@@ -108,7 +108,7 @@ class RuleSignature:
         Yields:
             Atom: Each atom composing the rule's body, followed by the head atom.
         """
-        yield from self.body
+        yield from sorted(self.body)
         yield self.head
 
     def to_natural_language(self) -> str:
@@ -149,6 +149,20 @@ class RuleSignature:
     def get_body_predicates(self) -> set[str]:
         """Return the set of unique predicates in the body atoms."""
         return {atom.predicate for atom in self.body}
+
+    def get_extensional_body(self, intesional_preds: set[str]) -> frozenset[Atom]:
+        """Returns the rule's body excluding atoms with intensional predicates."""
+        return frozenset(
+            {atom for atom in self.body if atom.predicate not in intesional_preds}
+        )
+
+    def get_extensional_preds(self, intensional_preds: set[str]) -> set[str]:
+        """Returns body predicates excluding the ones in 'intensional_preds'."""
+        return {
+            atom.predicate
+            for atom in self.body
+            if atom.predicate not in intensional_preds
+        }
 
 
 @dataclass(slots=True)
@@ -197,6 +211,10 @@ class HornRule:
         """Return the set of unique predicates in the body atoms."""
         return self.signature.get_body_predicates()
 
+    def get_extensional_body(self, intensional_preds: set[str]) -> frozenset[Atom]:
+        """Returns rule's body excluding atoms that contain intensional predicates."""
+        return self.signature.get_extensional_body(intensional_preds)
+
     def get_head_variables(self) -> list[str]:
         """Returns a list of the head variables."""
         return self.signature.get_head_variables()
@@ -208,6 +226,10 @@ class HornRule:
     def get_variables(self) -> set[str]:
         """Returns a set with all the variables present in the rule."""
         return self.signature.get_variables()
+
+    def get_extensional_preds(self, intensional_preds: set[str]) -> set[str]:
+        """Returns body predicates excluding the ones in 'intensional_preds'."""
+        return self.signature.get_extensional_preds(intensional_preds)
 
 
 # ---------------------------------------------------------------------------
@@ -228,9 +250,7 @@ class RuleRow(Protocol):
     Classification: str
 
 
-def parse_body(
-    body_str: str, term_mapping: dict[str, str], default_ns: str
-) -> frozenset[Atom]:
+def parse_body(body_str: str, term_mapping: dict[str, str]) -> frozenset[Atom]:
     """Parses a body string containing one or more atoms into a frozen set of atoms."""
     if not body_str:
         logger.warning("Parsing empty body. Is this supposed to happen?")
@@ -238,15 +258,15 @@ def parse_body(
 
     return frozenset(
         Atom(
-            format_term(m.group(1), term_mapping, default_ns),
-            format_term(m.group(2), term_mapping, default_ns),
-            format_term(m.group(3), term_mapping, default_ns),
+            format_term(m.group(1), term_mapping),
+            format_term(m.group(2), term_mapping),
+            format_term(m.group(3), term_mapping),
         )
         for m in ATOM_PATTERN.finditer(body_str)
     )
 
 
-def parse_head(head_str: str, term_mapping: dict[str, str], default_ns: str) -> Atom:
+def parse_head(head_str: str, term_mapping: dict[str, str]) -> Atom:
     """Parses a head string into an Atom."""
     if not head_str:
         raise ValueError("Head string format is not valid: Empty string.")
@@ -256,9 +276,9 @@ def parse_head(head_str: str, term_mapping: dict[str, str], default_ns: str) -> 
         raise ValueError("Head string format is not valid: Too few components.")
 
     return Atom(
-        format_term(parts[0], term_mapping, default_ns),
-        format_term(parts[1], term_mapping, default_ns),
-        format_term(parts[2], term_mapping, default_ns),
+        format_term(parts[0], term_mapping),
+        format_term(parts[1], term_mapping),
+        format_term(parts[2], term_mapping),
     )
 
 
@@ -266,7 +286,6 @@ def parse_horn_rule(
     row: RuleRow,
     rule_id: str,
     term_mapping: dict[str, str],
-    default_namespace: str = "http:DefaultNamespace.org/",
 ) -> HornRule:
     """Extracts a HornRule object from a pandas DataFrame row.
 
@@ -285,8 +304,8 @@ def parse_horn_rule(
     rule = HornRule(
         signature=RuleSignature(
             rule_id=rule_id,
-            head=parse_head(str(row.Head), term_mapping, default_namespace),
-            body=parse_body(str(row.Body), term_mapping, default_namespace),
+            head=parse_head(str(row.Head), term_mapping),
+            body=parse_body(str(row.Body), term_mapping),
         ),
         support=_parse_metric(row.Positive_Examples),
         head_coverage=_parse_metric(row.Head_Coverage),
@@ -305,8 +324,8 @@ def parse_rule_set(
     rule_dataframe: pd.DataFrame,
     term_mapping: dict[str, str],
     pca_threshold: float | None,
-    default_namespace: str,
 ) -> dict[str, HornRule]:
+    # TODO: Add csv reading for pandas here
     """Parse a DataFrame into a dict of HornRules identified by rule_id.
 
     Args:
@@ -337,7 +356,6 @@ def parse_rule_set(
             row=row,
             rule_id=rule_id,
             term_mapping=term_mapping,
-            default_namespace=default_namespace,
         )
 
         rules[rule.rule_id] = rule
@@ -390,44 +408,104 @@ def check_uninferrable_preds(
     return intensional_predicates - deducible
 
 
-def get_ruleset_dependencies(
-    rules: dict[str, HornRule],
-    intensional_predicates: set[str],
-) -> dict[str, set[str]]:
-    """Builds a dictionary that represents rule dependencies in a ruleset."""
+def get_dependencies_intensional(rules: dict[str, HornRule]) -> dict[str, set[str]]:
+    """Builds a dictionary that represents rule dependencies in a ruleset based on the
+    head of the rule. A rule depends on other rules if they are more restrictive than it
+    and produce the same head."""
 
-    # TODO: Implement dependencies between recursive rules!
+    if any(rule.support is None for rule in rules.values()):
+        raise ValueError("Can't determine rule dependencies for rules without support.")
+
+    intensional_preds = {rule.head.predicate for rule in rules.values()}
+
     # Group rules by head predicate
     by_head: dict[str, list[str]] = defaultdict(list)
     for rule_id, rule in rules.items():
-        if rule.head.predicate in intensional_predicates:
+        if rule.head.predicate in intensional_preds:
             by_head[rule.head.predicate].append(rule_id)
+    by_head = dict(by_head)  # Secure the dict type
 
-    # Initialize dependencies
+    # Determine dependencies
     rule_dependency: dict[str, set[str]] = {r_id: set() for r_id in rules}
 
-    # Process subsumptions
-    for head_predicate, rule_ids in by_head.items():
-        if not rule_ids:
-            logger.warning("No rules generate %s, skipping.", head_predicate)
-            logger.warning("This should have not happened.")
-            continue
+    for _, rule_ids in by_head.items():
+        # Sort the rules that generate the same predicate by body length
+        sorted_ids = sorted(
+            rule_ids, key=lambda r_id: len(rules[r_id].get_body_predicates())
+        )
 
-        sorted_ids = sorted(rule_ids, key=lambda x: len(rules[x].get_body_predicates()))
-
+        # Scan the rules from shortest to largest
         for i, current_id in enumerate(sorted_ids):
-            current_body = rules[current_id].get_body_predicates()
+            current_rule = rules[current_id]
+            current_body = current_rule.get_body_predicates()
+            current_support = current_rule.support
 
             for next_id in sorted_ids[i + 1 :]:
-                next_body = rules[next_id].get_body_predicates()
+                next_rule = rules[next_id]
+                next_body = next_rule.get_body_predicates()
+                next_support = next_rule.support
+
+                # The rule only depends on others if they share the complete body of the
+                # current rule
                 if current_body.issubset(next_body):
-                    rule_dependency[current_id].add(next_id)
+                    # If they happen to have the same body, the lesser support is more
+                    # restrictive
+                    if (
+                        len(next_body) == len(current_body)
+                        and current_support >= next_support
+                    ):
+                        rule_dependency[current_id].add(next_id)
+                    else:
+                        rule_dependency[next_id].add(current_id)
 
     logger.info("Created dependency graph for %d rules.", len(rules))
     return rule_dependency
 
 
-def get_term_mapping(ontology_file: Path) -> dict[str, str]:
+def get_extensional_dependencies(
+    rules: dict[str, HornRule],
+):
+    """Builds a dictionary that represents extensional predicate dependencies. A rule is
+    dependent of any other rule extensional-wise if they share an extensional predicate.
+
+    From all the rules that share an extensional predicate, the larger rules are more
+    restrictive.
+    """
+
+    intensional_preds = {rule.head.predicate for rule in rules.values()}
+
+    rule_dependency: dict[str, set[str]] = {r_id: set() for r_id in rules}
+
+    # Sort from smallest to largest body counting only extensional preds
+    sorted_ids = sorted(
+        (rule_id for rule_id in rules.keys()),
+        key=lambda r_id: len(rules[r_id].get_extensional_body(intensional_preds)),
+    )
+
+    for i, current_id in enumerate(sorted_ids):
+        current_rule = rules[current_id]
+        current_ext_preds = current_rule.get_extensional_preds(intensional_preds)
+
+        if not (current_ext_preds):
+            continue
+
+        for next_id in sorted_ids[i + 1 :]:
+            next_rule = rules[next_id]
+            next_ext_preds = next_rule.get_extensional_preds(intensional_preds)
+
+            if any(pred in next_ext_preds for pred in current_ext_preds):
+                c_length = len(current_rule.get_extensional_body(intensional_preds))
+                n_length = len(next_rule.get_extensional_body(intensional_preds))
+
+                if c_length == n_length and next_rule.support > current_rule.support:
+                    rule_dependency[next_id].add(current_id)
+                else:
+                    rule_dependency[current_id].add(next_id)
+
+    return rule_dependency
+
+
+def get_term_mapping(ontology_file: Path, default_namespace: str) -> dict[str, str]:
     """Extracts term->namespace mappings from a Turtle file using line-by-line regex.
 
     Scales with O(1) memory footprint by avoiding in-memory graph construction.
@@ -466,6 +544,7 @@ def get_term_mapping(ontology_file: Path) -> dict[str, str]:
                     custom_mapping[term] = prefixes[prefix]
     logger.debug("Created term to prefix mapping.")
     term_mapping.update(custom_mapping)
+    term_mapping.update({"default": default_namespace})
     return term_mapping
 
 

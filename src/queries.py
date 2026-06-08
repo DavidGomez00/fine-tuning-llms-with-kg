@@ -18,14 +18,36 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 # SPARQL Query generation.
 # ---------------------------------------------------------------------------
-def build_rule_query(
+def build_rule_query(rule: RuleSignature, sources: dict[str, str | list[str]]) -> str:
+    """Creates a query for the rule signature."""
+
+    # Get the variables from the atomns with extensional predicates
+    variables = rule.get_variables()
+    proj = " ".join(sorted(list(variables)))
+
+    if not (source := sources.get("target")):
+        raise ValueError("Invalid sources to form query.")
+
+    patterns_str = "\n      ".join([f"{atom} ." for atom in sorted(rule.body)])
+    source_str = f"FROM <{source}>"
+
+    query = f"""
+    SELECT DISTINCT ?rule_id {proj}
+    {source_str}
+    WHERE {{
+      BIND ("{rule.rule_id}" AS ?rule_id)
+      {patterns_str}
+    }}
+    """
+    return query
+
+
+def build_filtered_query(
     rule: RuleSignature,
-    graph_uri: str,
-    searchspace_uri: str,
-    use_head: bool = True,
-    use_searchspace: bool = True,
-) -> str:
-    """Builds a SPARQL SELECT query to find instantiations of a rule.
+    sources: dict[str, str | list[str]],
+    use_head: bool,
+) -> tuple[str, str]:
+    """Builds SPARQL SELECT queries to find instantiations of a rule.
 
     Args:
         rule: The rule signature containing the head and body atoms.
@@ -35,49 +57,105 @@ def build_rule_query(
         use_searchspace: If True, includes searchspace_uri in the FROM datasets.
 
     Returns:
-        A formatted SPARQL SELECT query string.
+        TODO
     """
 
-    t_predicate = rule.head.predicate
+    # Source Graphs
+    target = sources.get("target", "")
+    sources_block = "\n    ".join(
+        f"FROM <{g}>" for g in sorted([target] + [s for s in sources.get("others", [])])
+    )
 
-    # If the rule is recursive, cleanly extract and add the corresponding variables
-    is_recursive = t_predicate in rule.get_body_predicates()
-    t_vars = set(rule.get_head_variables())
+    if not target:
+        raise ValueError("Expected a value for target graph.")
 
-    if is_recursive:
-        t_vars.update(
+    # Patterns and variables
+    body_patterns = [f"{atom} ." for atom in sorted(rule.body)]
+    proj_variables = set(rule.get_head_variables())
+
+    diff_values_filter = ""
+    if len(rule.get_variables()) > 1:
+        expressions = [
+            f"{v1} != {v2}"
+            for v1, v2 in itertools.combinations(sorted(set(rule.get_variables())), 2)
+        ]
+        diff_values_filter = f"FILTER ({' && '.join(expressions)})"
+
+    h_predicate = rule.head.predicate
+
+    # In case of recursive rules
+    if h_predicate in rule.get_body_predicates():
+        proj_variables.update(
             var
             for atom in rule.body
-            if atom.predicate == t_predicate
+            if atom.predicate == h_predicate
             for var in atom.get_variables()
             if var is not None
         )
 
-    proj = " ".join(t_vars)
+        if use_head:
+            body_patterns.append(f"{rule.head} .")
 
-    # Use the corresponding graph for extensional / intensional predicates in the rule
-    body_patterns = [f"{atom} ." for atom in rule.body]
-    sources = {graph_uri}
+    # Filtered setup
+    flags = []
+    bind_statements = []
+    not_exists_statements = []
 
-    if is_recursive and use_head:
-        body_patterns.append(f"{rule.head} .")
-        if use_searchspace:
-            sources.add(searchspace_uri)
+    for i, atom in enumerate(sorted([a for a in rule if a.predicate == h_predicate])):
+        flag_variable = f"?is_new_{i}"
+        flags.append(flag_variable)
 
-    body_patterns_str = "\n      ".join(body_patterns)
-    sources_str = "\n    ".join(f"FROM <{g}>" for g in sorted(sources))
+        # Bind statement so Python can read the boolean flag
+        bind_str = (
+            f"BIND (\n"
+            f"        NOT EXISTS {{ GRAPH <{target}> {{ {atom} . }} }}\n"
+            f"        AS {flag_variable}\n"
+            f"      )"
+        )
+        bind_statements.append(bind_str)
 
-    query = f"""
-    SELECT DISTINCT ?rule_id {proj}
-    {sources_str}
-    WHERE {{
-      BIND ("{rule.rule_id}" AS ?rule_id)
-      {body_patterns_str}    
-    }}
-    """
+        # Used to strictly compel Virtuoso to drop the rows natively
+        not_exists_statements.append(
+            f"NOT EXISTS {{ GRAPH <{target}> {{ {atom} . }} }}"
+        )
 
-    logger.debug("Built query for rule %s (%s):\n%s", rule.rule_id, rule.head, query)
-    return query
+    proj = " ".join(sorted(proj_variables) + flags)
+
+    # Filtered query
+    pattern_block = "\n      ".join(body_patterns)
+    filter_block = ""
+    if not_exists_statements:
+        pure_or_conditions = " || ".join(not_exists_statements)
+        filter_block = f"FILTER (\n        {pure_or_conditions}\n      )"
+
+    bind_block = "\n      ".join(bind_statements)
+    filtered_query = (
+        f"    SELECT DISTINCT ?rule_id {proj}\n"
+        f"    {sources_block}\n"
+        f"    WHERE {{\n"
+        f"      {pattern_block}\n"
+        f'      BIND ("{rule.rule_id}" AS ?rule_id)\n'
+        f"      {bind_block}\n"
+        f"      {filter_block}\n"
+        f"      {diff_values_filter}\n"
+        f"    }}"
+    )
+
+    # Ask query
+    ask_query = (
+        f"  ASK\n"
+        f"  {sources_block}\n"
+        f"  WHERE {{\n"
+        f"    SELECT (1 AS ?_force)\n"
+        f"    WHERE {{\n"
+        f"      {pattern_block}\n\n"
+        f"      {filter_block}\n"
+        f"      {diff_values_filter}\n"
+        f"    }}\n"
+        f"  }}"
+    )
+
+    return filtered_query, ask_query
 
 
 # ---------------------------------------------------------------------------
@@ -95,13 +173,13 @@ def insert_triples_sparql(
         client: An instantiated and configured SPARQLWrapper client.
         graph_uri: The URI of the target named graph.
         triple_stream: An iterable yielding individual SPARQL triple strings.
-        chunk_size: The maximum number of triples to insert per SPARQL query.
+        chunk_size: Maximum number of triples to insert per SPARQL query.
 
     Returns:
-        The total number of triples successfully processed.
+        The number of new triples added to the graph. Relies on the upstream generator
+        to strictly yield novel triples.
     """
-    client.setMethod("POST")
-    count = 0
+    total_inserted = 0
 
     def chunk_iter(iterable: Iterable[str], size: int) -> Iterable[tuple[str, ...]]:
         """Yields successive chunks of a given size from an iterable."""
@@ -110,29 +188,27 @@ def insert_triples_sparql(
             yield chunk
 
     for chunk in chunk_iter(triple_stream, chunk_size):
-        triples_payload = "\n".join(chunk)
+        if unique_chunk := set(chunk):
+            triples_payload = "\n".join(unique_chunk)
 
-        insert_query = f"""
-        INSERT DATA {{
-          GRAPH <{graph_uri}> {{
-            {triples_payload}
-          }}
-        }}"""
+            query = f"""
+            INSERT DATA {{
+            GRAPH <{graph_uri}> {{
+                {triples_payload}
+            }}
+            }}"""
 
-        client.setQuery(insert_query)
-        client.query()
+            execute_insert_query(client, query)
+            total_inserted += len(unique_chunk)
 
-        count += len(chunk)
-
-    return count
+    return total_inserted
 
 
 def insert_triples_gsp(
+    client: SPARQLWrapper,
     graph_uri: str,
     triples: Iterator[str],
-    client: SPARQLWrapper,
-    crud_endpoint: str,
-    chunk_size: int = 50000,
+    chunk_size: int = 10000,
 ) -> None:
     """Inserts triples into Virtuoso using the Graph Store HTTP Protocol.
 
@@ -140,7 +216,6 @@ def insert_triples_gsp(
     overflows and drastically speeding up ingestion.
 
     Args:
-        crud_endpoint: Virtuoso CRUD URL ("http://.../sparql-graph-crud").
         graph_uri: Target named graph URI.
         triples: Iterator yielding N-Triple formatted strings.
         chunk_size: Number of triples to send per HTTP POST request.
@@ -153,7 +228,6 @@ def insert_triples_gsp(
     headers = {"Content-Type": "application/n-triples"}
 
     total_inserted = 0
-    logger.debug("Inserting triples to %s via GSP.", graph_uri)
 
     with requests.Session() as session:
         session.auth = HTTPDigestAuth(*(client.user, client.passwd))
@@ -165,7 +239,7 @@ def insert_triples_gsp(
 
             payload = "\n".join(batch) + "\n"
             response = session.post(
-                url=crud_endpoint,
+                url=URL(client.endpoint).with_name("sparql-graph-crud-auth"),
                 params=params,
                 headers=headers,
                 data=payload,
@@ -173,20 +247,29 @@ def insert_triples_gsp(
             response.raise_for_status()
             total_inserted += len(batch)
 
-    logger.debug(
-        "Successfully uploaded %d triples to <%s> via GSP.",
-        total_inserted,
-        graph_uri,
-    )
 
-
-def insert_graph_sparql(
+def insert_graph_from_nt_sparql(
     client: SPARQLWrapper,
     graph_uri: str,
-    nt_file: Path,
     chunk_size: int,
+    nt_file: Path | str,
 ) -> None:
-    """Overwrites a graph from an .nt file to the database management system."""
+    """Overwrites a graph with contents from an .nt file or a URI.
+
+    Args:
+        client: The SPARQL wrapper client used to execute queries.
+        graph_uri: The URI of the named graph to overwrite.
+        chunk_size: The number of triples to insert per batch.
+        nt_file: The local file path to the .nt file.
+        from_uri: The remote URI pointing to an .nt file.
+
+    Raises:
+        ValueError: If neither `nt_file` nor `from_uri` is provided.
+    """
+
+    nt_file = Path(nt_file)
+    if not nt_file.is_file():
+        raise ValueError("Invalid input file: %s", nt_file)
 
     clear_graph_sparql(client, graph_uri)
 
@@ -198,15 +281,16 @@ def insert_graph_sparql(
         return stripped
 
     def _triple_stream(file_path: Path) -> Iterator[str]:
-        """Streams the triples from an nt file."""
+        """Streams the triples locally from an .nt file."""
         with file_path.open(encoding="utf-8") as f:
             for line in f:
                 if triple := _parse_line(line):
                     yield triple
 
     iterator = _triple_stream(nt_file)
-    count = insert_triples_sparql(client, graph_uri, iterator, chunk_size)
-    logger.debug("Inserted %d triples to %s from .nt file.", count, graph_uri)
+
+    n = insert_triples_sparql(client, graph_uri, iterator, chunk_size)
+    logger.debug("Inserted %d triples to <%s> from '%s'.", n, graph_uri, nt_file.name)
 
 
 def clear_graph_sparql(client: SPARQLWrapper, graph_uri: str) -> None:
@@ -227,7 +311,6 @@ def clear_graph_sparql(client: SPARQLWrapper, graph_uri: str) -> None:
 
     try:
         client.query()
-        logger.debug("Successfully cleared graph <%s>.", graph_uri)
     except Exception:
         logger.exception("Failed to clear graph <%s>: %s", graph_uri)
         raise
@@ -293,14 +376,51 @@ def download_graph_raw(
     logger.info(f"Successfully saved {total_triples} triples to {output_file}.")
 
 
+def initialize_from_source(
+    source: str, new_graph_uri: str, client: SPARQLWrapper, chunk_size: int
+) -> None:
+    """Overwrites the new graph URI's content with the source's content.
+
+    Args:
+        source: .nt file or URI.
+        new_graph_uri: URI where the source content will be written.
+        client: Wrapper for SPARQL queries.
+        chunk_size: Maximum number of triples to insert per SPARQL query.
+
+    Raises:
+        ValueError: If the source format is not valid.
+    """
+    if source.endswith(".nt"):
+        clear_graph_sparql(client, new_graph_uri)
+        insert_graph_from_nt_sparql(
+            client=client,
+            graph_uri=new_graph_uri,
+            nt_file=source,
+            chunk_size=chunk_size,
+        )
+
+    else:
+        uri = source.removeprefix("<").removesuffix(">")
+        if uri.startswith("http://"):
+            clear_graph_sparql(client, new_graph_uri)
+            copy_graph_sparql(
+                client=client,
+                source_graph_uri=uri,
+                target_graph_uri=new_graph_uri,
+            )
+        else:
+            raise ValueError("Invalid source, expected a .nt file or a Graph URI.")
+
+
 # ---------------------------------------------------------------------------
 # SPARQL query response handling.
 # ---------------------------------------------------------------------------
-SparqlBindings = list[dict[str, dict[str, str]]]
+SparqlBinding = dict[str, dict[str, str]]
 
 
-def execute_select_query(client: SPARQLWrapper, query: str) -> SparqlBindings:
-    """Handles the response for SELECT queries using SPARQLWrapper."""
+def execute_select_query(client: SPARQLWrapper, query: str) -> list[SparqlBinding]:
+    """Executes a SELECT query and returns the bindings."""
+    # TODO (optim): Maybe we want this as an iterator
     client.setMethod(GET)
     client.setReturnFormat(JSON)
     client.setQuery(query)
@@ -310,7 +430,7 @@ def execute_select_query(client: SPARQLWrapper, query: str) -> SparqlBindings:
 
         if isinstance(response, dict) and "results" in response:
             raw_bindings = response["results"].get("bindings", [])
-            return cast(SparqlBindings, raw_bindings)
+            return cast(list[SparqlBinding], raw_bindings)
 
         raise ValueError("Failed to retrieve bindings from query results.")
 
@@ -321,10 +441,6 @@ def execute_select_query(client: SPARQLWrapper, query: str) -> SparqlBindings:
 
 def execute_ask_query(client: SPARQLWrapper, query: str) -> bool:
     """Executes a SPARQL ASK query and returns the boolean result.
-
-    Args:
-        client: An instantiated and configured SPARQLWrapper client.
-        query: The SPARQL ASK query string to execute.
 
     Returns:
         True if the graph pattern is satisfied, False otherwise.
@@ -349,6 +465,53 @@ def execute_ask_query(client: SPARQLWrapper, query: str) -> bool:
     except Exception:
         logger.exception("SPARQL execution failed for ASK query:\n%s", query)
         raise
+
+
+def execute_insert_query(client: SPARQLWrapper, query: str) -> None:
+    """Execute an INSERT query."""
+    client.setMethod("POST")
+    client.setQuery(query)
+
+    try:
+        client.query()
+
+    except Exception:
+        logger.exception("Failed to insert chunk! Query:\n%s", query)
+        raise
+
+
+def copy_graph_sparql(
+    client: SPARQLWrapper, source_graph_uri: str, target_graph_uri: str
+) -> None:
+    """Copy all contents from a graph to another."""
+
+    query = f"""
+    COPY GRAPH <{source_graph_uri}> TO GRAPH <{target_graph_uri}>
+    """
+
+    client.setQuery(query)
+    client.setMethod("POST")
+
+    try:
+        client.query()
+        logger.debug(
+            "Successfully copied <%s> to <%s>.", source_graph_uri, target_graph_uri
+        )
+    except Exception:
+        logger.exception(
+            "Failed to copy <%s> to <%s>.", source_graph_uri, target_graph_uri
+        )
+        raise
+
+
+def from_binding_row(term: str, bindings_row: SparqlBinding) -> tuple[str, str]:
+    """Safely extracts a term from a single binding row."""
+    if term.startswith("?"):
+        var_name = term.lstrip("?")
+        val = bindings_row.get(var_name, {}).get("value", var_name)
+        v_type = bindings_row.get(var_name, {}).get("type", "uri")
+        return val, v_type
+    return term, "uri"
 
 
 # ---------------------------------------------------------------------------
@@ -397,7 +560,7 @@ def get_domain(client: SPARQLWrapper, graph_uri: str, predicate: str) -> dict[st
 
     if results := execute_select_query(client, query):
         for row in results:
-            subject = row["subject"]["value"]
+            subject = f"<{row['subject']['value']}>"
             frequency = int(row["count"]["value"])
             domain[subject] = frequency
 
@@ -424,7 +587,7 @@ def get_range(client: SPARQLWrapper, graph_uri: str, predicate: str) -> dict[str
 
     if results := execute_select_query(client, query):
         for row in results:
-            obj = row["obj"]["value"]
+            obj = f"<{row['obj']['value']}>"
             frequency = int(row["count"]["value"])
             p_range[obj] = frequency
         return p_range
@@ -493,7 +656,7 @@ def get_frequency(client: SPARQLWrapper, predicate: str, graph_uri: str) -> int:
     return 0
 
 
-def get_total_triples(client: SPARQLWrapper, graph_uri: str) -> int:
+def count_triples(client: SPARQLWrapper, graph_uri: str) -> int:
     """Returns the total triples in a graph."""
 
     query = f"""
@@ -514,61 +677,19 @@ def get_total_triples(client: SPARQLWrapper, graph_uri: str) -> int:
     return 0
 
 
-def generates_new_triples(
-    client: SPARQLWrapper,
-    rule: HornRule,
-    target_graph: str,
-    searchspace_uri: str | None = None,
-) -> bool:
-    """Evaluates if applying a rule to a graph would generate novel triples.
-
-    This generates an ASK query that evaluates to True if the database contains
-    at least one instantiation of the rule's body where the corresponding head
-    does NOT already exist.
-
-    Args:
-        client: An instantiated and configured SPARQLWrapper client.
-        rule: The HornRule containing the body and head to evaluate.
-        graph_uri: The URI of the named graph to query against.
-
-    Returns:
-        True if applying the rule generates new knowledge, False otherwise.
-    """
-
-    # Format the rule body atoms as standard SPARQL triple patterns
-    body_patterns = "\n            ".join(f"{atom} ." for atom in rule.body)
-
-    # We use FILTER NOT EXISTS to ensure the head is not already present.
-    # We scope everything inside the specified named graph.
-    query = f"""
-    ASK WHERE {{
-      GRAPH <{
-        target_graph: str,
-}> {{
-        {body_patterns}
-        FILTER NOT EXISTS {{
-          {rule.head} .
-        }}
-      }}
-    }}
-    """
-
-    logger.debug(
-        "Executing rule generation ASK query for rule %s:\n%s",
-        getattr(rule, "rule_id", "UNKNOWN"),
-        query,
-    )
-
-    return execute_ask_query(client, query)
-
-
 if __name__ == "__main__":
+    import pandas as pd
     from SPARQLWrapper import DIGEST
 
     from config import RunConfig
 
-    config_file = Path("configurations/gen_triples/french_royalty.json")
+    config_file = Path("configurations/complete_graph/french_royalty.json")
     config = RunConfig.from_json(config_file)
+
+    input_dir = config.data.input_dir
+    graph_uri = config.graph.base_graph_uri
+    ontology_file = input_dir / config.graph.ontology_file
+    rule_file = input_dir / config.rules.rules_file
 
     setup_logging(level=config.logging.level)
 
@@ -576,10 +697,25 @@ if __name__ == "__main__":
     client.setHTTPAuth(DIGEST)
     client.setCredentials(config.virtuoso.user, config.virtuoso.password)
 
-    # --- Execution ---
-    insert_graph_sparql(
+    rule_dataframe = pd.read_csv(rule_file)
+
+    initialize_from_source(
         client=client,
-        graph_uri="http://CompleteFR.org",
-        nt_file=config.data.input_dir / config.graph.nt_file,
-        chunk_size=50,
+        source=str(input_dir / config.graph.nt_file),
+        new_graph_uri=graph_uri,
+        chunk_size=1000,
     )
+
+    # term_mapping = get_term_mapping(
+    #     ontology_file=ontology_file, default_namespace=graph_uri
+    # )
+    # rules = parse_rule_set(
+    #     rule_dataframe=rule_dataframe, term_mapping=term_mapping, pca_threshold=1
+    # )
+
+    # for rule_id, rule in rules.items():
+    #     logger.info("%s", rule_id)
+    #     logger.info(
+    #         "Rule support: %d",
+    #         get_support(client=client, rule=rule, graph_uri=graph_uri),
+    #     )

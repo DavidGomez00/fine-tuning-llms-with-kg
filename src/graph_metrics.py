@@ -3,17 +3,16 @@
 import logging
 from collections import defaultdict
 from dataclasses import dataclass, field
-from pathlib import Path
 
 from rdflib import Graph
 from SPARQLWrapper import SPARQLWrapper
 
 from queries import (
+    count_triples,
     get_domain,
     get_preds_and_freqs,
     get_range,
     get_reflexivity,
-    get_total_triples,
 )
 
 logger = logging.getLogger(__name__)
@@ -47,7 +46,7 @@ class GraphMetrics:
         data transfers and database ResultSetMaxRows limits.
         """
 
-        triple_count = get_total_triples(client, graph_uri)
+        triple_count = count_triples(client, graph_uri)
         logger.debug(
             "Retrieving metrics from %s with %d triples.", graph_uri, triple_count
         )
@@ -131,14 +130,3 @@ class GraphMetrics:
 
         logger.debug("Loaded graph metrics for %d predicates.", len(profiles))
         return metrics
-
-
-# ---------------------------------------------------------------------------
-# Knowledge Graph Loading
-# ---------------------------------------------------------------------------
-def load_knowledge_graph(kg_file: Path) -> Graph:
-    """Loads a knowledge graph to a rdflib.Graph."""
-    format = "nt" if kg_file.name.endswith(".nt") else "turtle"
-    graph = Graph().parse(kg_file, format=format)
-    logger.debug("Loaded %s knowledge graph with %d triples", kg_file.name, len(graph))
-    return graph
