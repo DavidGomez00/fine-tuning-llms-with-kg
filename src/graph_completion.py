@@ -133,7 +133,7 @@ if __name__ == "__main__":
     simpsons_config = Path("configurations/simpsons.json")
     fr_config = Path("configurations/french_royalty.json")
     run_graph_completion_experimnent(
-        simpsons_config,
-        source=".data/Simpsons/simpsons.nt",
-        complete_graph_uri="http://SimpsonFamily.org/",
+        fr_config,
+        source=".data/FrenchRoyalty/french_royalty.nt",
+        complete_graph_uri="http://FrenchRoyalty.org/",
     )

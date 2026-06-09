@@ -90,7 +90,25 @@ def random_triples(
     if len(available_objects) < required_count:
         raise ValueError(f"Error: Ran out of objects for '{predicate}'")
 
-    chosen_objects = random.sample(available_objects, required_count)
+    keep_trying = True
+    while keep_trying:
+        chosen_objects = random.sample(available_objects, required_count)
+
+        # Check that the selection is valid
+        aux_profile = copy.deepcopy(profile)
+        for obj in chosen_objects:
+            obj_str = format_term(obj)
+            decrement_counts(aux_profile.range, obj_str)
+        aux_profile.frequency -= len(chosen_objects)
+        del aux_profile.domain[subject_str]
+
+        if max(aux_profile.domain.values(), default=0) > len(aux_profile.range) or max(
+            aux_profile.range.values(), default=0
+        ) > len(aux_profile.domain):
+            keep_trying = True
+            logger.debug("Selection not valid, trying again")
+        else:
+            keep_trying = False
 
     for obj in chosen_objects:
         yield format_triple(subject, predicate, obj, term_mapping)
@@ -98,7 +116,7 @@ def random_triples(
         decrement_counts(profile.range, obj_str)
         profile.frequency -= 1
 
-    del profile.domain[subject]
+    del profile.domain[subject_str]
 
 
 def insert_random_triples(
@@ -271,6 +289,7 @@ def check_direct_matches(
     profiles: dict[str, PredicateProfile],
     term_mapping: dict[str, str],
     chunk_size: int,
+    closed_preds: set[str],
 ) -> int:
     """Retrieves the triples that must be added to the EDB from a set of rules and
     profiles and inserts them into the EDB.
@@ -278,13 +297,17 @@ def check_direct_matches(
     Returns the number of triples inserted to the EDB."""
 
     def direct_triples(
-        profiles: dict[str, PredicateProfile], term_mapping: dict[str, str]
+        profiles: dict[str, PredicateProfile],
+        term_mapping: dict[str, str],
+        closed_preds: set[str],
     ) -> Iterator[str]:
         """Yields triples that must be added to the EDB."""
         while True:
             progress_made = False
 
             for predicate, profile in profiles.items():
+                if predicate in closed_preds:
+                    continue
                 # Check for direct matches on domain
                 for subject, frequency in list(profile.domain.items()):
                     obj_choices = list(profile.range.keys() - {subject})
@@ -312,7 +335,9 @@ def check_direct_matches(
             if not progress_made:
                 break
 
-    triples = direct_triples(profiles=profiles, term_mapping=term_mapping)
+    triples = direct_triples(
+        profiles=profiles, term_mapping=term_mapping, closed_preds=closed_preds
+    )
     return insert_triples_sparql(
         client=client,
         graph_uri=edb_uri,
@@ -427,13 +452,16 @@ def create_extensional_graph(
     }
 
     logger.info("Generating EDB...")
+    check_rules = True
     step = 0
     while True:
         step += 1
         progress = False
 
         # Step 1: Check direct matches
-        if d_count := check_direct_matches(**kwargs, profiles=edb_profiles):
+        if d_count := check_direct_matches(
+            **kwargs, profiles=edb_profiles, closed_preds=closed_preds
+        ):
             progress = True
             logger.debug("[Step %d]: Added %d triples directly.", step, d_count)
 
@@ -449,48 +477,57 @@ def create_extensional_graph(
                     break
 
         # Step 2: Check rule bodies
-        for r_id, r in relevant_rules.items():
-            if r_id in checked_rules:
-                continue
-            if rule_dependency[r_id] - checked_rules:
-                continue
-            if (r.get_predicates() - intensional_preds) - closed_preds:
-                # Use this rule
-                r_count = check_triples_from_rule(
-                    **kwargs,
-                    rule=r,
-                    intensional_preds=intensional_preds,
-                    closed_preds=closed_preds,
-                    edb_profiles=edb_profiles,
-                )
-                checked_rules.add(r_id)
-                progress = True
-
-                if r_count:
-                    logger.debug(
-                        "[Step %d]: Adding %d triples from %s",
-                        step,
-                        r_count,
-                        r.rule_id,
+        if check_rules:
+            for r_id, r in relevant_rules.items():
+                if r_id in checked_rules:
+                    continue
+                if rule_dependency[r_id] - checked_rules:
+                    continue
+                if (r.get_predicates() - intensional_preds) - closed_preds:
+                    # Use this rule
+                    r_count = check_triples_from_rule(
+                        **kwargs,
+                        rule=r,
+                        intensional_preds=intensional_preds,
+                        closed_preds=closed_preds,
+                        edb_profiles=edb_profiles,
                     )
-                    if update_closed_preds(edb_profiles, closed_preds):
-                        closed = len(closed_preds)
-                        n_open = len(edb_profiles) - closed
-                        logger.info(
-                            "[Step %d]: Closed ext. predicactes: [%d/%d].",
-                            step,
-                            closed,
-                            len(edb_profiles),
-                        )
+                    checked_rules.add(r_id)
+                    if len(checked_rules) == len(relevant_rules):
+                        check_rules = False
+                    logger.debug(
+                        "[Step %d]: Checked rules [%d/%d]",
+                        step,
+                        len(checked_rules),
+                        len(relevant_rules),
+                    )
+                    progress = True
 
-                        if not n_open:
-                            logger.info("All ext. predicates closed.")
-                            break
-                break
+                    if r_count:
+                        logger.debug(
+                            "[Step %d]: Adding %d triples from %s",
+                            step,
+                            r_count,
+                            r.rule_id,
+                        )
+                        if update_closed_preds(edb_profiles, closed_preds):
+                            closed = len(closed_preds)
+                            n_open = len(edb_profiles) - closed
+                            logger.info(
+                                "[Step %d]: Closed ext. predicactes: [%d/%d].",
+                                step,
+                                closed,
+                                len(edb_profiles),
+                            )
+
+                            if not n_open:
+                                logger.info("All ext. predicates closed.")
+                                break
+                    break
 
         # # Step 3: Assign randomly
         if not progress:
-            predicate = random.sample(edb_profiles.keys() - closed_preds, 1)[0]
+            predicate = random.sample(list(edb_profiles.keys() - closed_preds), 1)[0]
             profile = edb_profiles[predicate]
 
             ran_count = insert_random_triples(
@@ -852,7 +889,5 @@ def filter_and_format_triples(
 
 if __name__ == "__main__":
     simpsons_config = Path("configurations/SyntheticGraphGeneration/simpsons.json")
-    fr_config = Path(
-        "configurations/SyntheticGraphGeneration/french_royalty_std=1.json"
-    )
+    fr_config = Path("configurations/french_royalty.json")
     run_edb_generation_experiment(fr_config)
