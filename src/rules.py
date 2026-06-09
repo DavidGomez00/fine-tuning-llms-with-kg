@@ -321,11 +321,10 @@ def parse_horn_rule(
 # Rule set handling
 # ---------------------------------------------------------------------------
 def parse_rule_set(
-    rule_dataframe: pd.DataFrame,
+    rules_file: Path,
     term_mapping: dict[str, str],
     pca_threshold: float | None,
 ) -> dict[str, HornRule]:
-    # TODO: Add csv reading for pandas here
     """Parse a DataFrame into a dict of HornRules identified by rule_id.
 
     Args:
@@ -336,6 +335,7 @@ def parse_rule_set(
             - A dict of HornRules identified by rule_id.
             - A set of strings representing the predicates in the rules' head.
     """
+    rule_dataframe = pd.read_csv(rules_file)
 
     if pca_threshold is not None:
         rule_dataframe["Classification"] = "NEGATIVE"

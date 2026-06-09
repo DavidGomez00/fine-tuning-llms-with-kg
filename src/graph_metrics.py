@@ -48,7 +48,7 @@ class GraphMetrics:
 
         triple_count = count_triples(client, graph_uri)
         logger.debug(
-            "Retrieving metrics from %s with %d triples.", graph_uri, triple_count
+            "Retrieving metrics from <%s> (%d triples).", graph_uri, triple_count
         )
         profiles: dict[str, PredicateProfile] = {}
 

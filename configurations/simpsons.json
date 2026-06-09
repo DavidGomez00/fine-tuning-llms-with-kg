@@ -15,8 +15,9 @@
     "name": "SimpsonFamily",
     "nt_file": "simpsons.nt",
     "ontology_file": "simpsons.ttl",
-    "base_graph_uri": "http://SimpsonFamily.org/",
-    "synthetic_graph_uri": "http://SyntheticSimpsonFamily.org/"
+    "base_uri": "http://SimpsonFamily.org/",
+    "edb_uri": "http://SimpsonFamilyEDB.org/",
+    "synthetic_uri": "http://SyntheticSimpsonFamily.org/"
   },
   "rules":{
     "rules_file": "simpsons.csv",
