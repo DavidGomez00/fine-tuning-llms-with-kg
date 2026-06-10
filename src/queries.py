@@ -9,8 +9,8 @@ from requests.auth import HTTPDigestAuth
 from SPARQLWrapper import GET, JSON, SPARQLWrapper
 from yarl import URL
 
-from rules import HornRule, RuleSignature
-from utils import format_term, format_triple, setup_logging
+from rules import HornRule, RuleSignature, format_term, format_triple
+from utils import setup_logging
 
 logger = logging.getLogger(__name__)
 
@@ -32,14 +32,24 @@ def build_rule_query(rule: RuleSignature, sources: dict[str, str | list[str]]) -
     """Creates a query for the rule signature."""
 
     # Get the variables from the atomns with extensional predicates
-    variables = rule.get_variables()
+    variables = rule.get_body_variables()
     proj = " ".join(sorted(list(variables)))
 
-    if not (source := sources.get("target")):
-        raise ValueError("Invalid sources to form query.")
-
     patterns_str = "\n      ".join([f"{atom} ." for atom in sorted(rule.body)])
-    source_str = f"FROM <{source}>"
+
+    unique_values_str = ""
+    if len(rule.get_variables()) > 1:
+        expressions = [
+            f"{v1} != {v2}"
+            for v1, v2 in itertools.combinations(sorted(set(rule.get_variables())), 2)
+        ]
+        unique_values_str = f"FILTER ({' && '.join(expressions)})"
+
+    # Define the Graph sources for the query
+    if t_source := sources.get("target") is None:
+        raise ValueError("Target source not specified.")
+    sources = [t_source] + [s for s in sources.get("others", [])]
+    source_str = "\n".join(f"FROM <{g}>" for g in sources)
 
     query = f"""
     SELECT DISTINCT ?rule_id {proj}
@@ -47,6 +57,7 @@ def build_rule_query(rule: RuleSignature, sources: dict[str, str | list[str]]) -
     WHERE {{
       BIND ("{rule.rule_id}" AS ?rule_id)
       {patterns_str}
+      {unique_values_str}
     }}
     """
     return query
@@ -83,13 +94,13 @@ def build_filtered_query(
     body_patterns = [f"{atom} ." for atom in sorted(rule.body)]
     proj_variables = set(rule.get_head_variables())
 
-    diff_values_filter = ""
+    unique_values_str = ""
     if len(rule.get_variables()) > 1:
         expressions = [
             f"{v1} != {v2}"
             for v1, v2 in itertools.combinations(sorted(set(rule.get_variables())), 2)
         ]
-        diff_values_filter = f"FILTER ({' && '.join(expressions)})"
+        unique_values_str = f"FILTER ({' && '.join(expressions)})"
 
     h_predicate = rule.head.predicate
 
@@ -147,7 +158,7 @@ def build_filtered_query(
         f'      BIND ("{rule.rule_id}" AS ?rule_id)\n'
         f"      {bind_block}\n"
         f"      {filter_block}\n"
-        f"      {diff_values_filter}\n"
+        f"      {unique_values_str}\n"
         f"    }}"
     )
 
@@ -160,7 +171,7 @@ def build_filtered_query(
         f"    WHERE {{\n"
         f"      {pattern_block}\n\n"
         f"      {filter_block}\n"
-        f"      {diff_values_filter}\n"
+        f"      {unique_values_str}\n"
         f"    }}\n"
         f"  }}"
     )
@@ -698,7 +709,7 @@ def count_triples(client: SPARQLWrapper, graph_uri: str) -> int:
 # --
 def get_existing_triples(
     client: SPARQLWrapper,
-    edb_uri: str,
+    graph_uri: str,
     candidate_triples: Iterable[str],
     term_mapping: dict[str, str],
     chunk_size: int,
@@ -713,7 +724,7 @@ def get_existing_triples(
         query = f"""
             SELECT ?s ?p ?o
             WHERE {{
-                GRAPH <{edb_uri}> {{
+                GRAPH <{graph_uri}> {{
                     ?s ?p ?o .
                     VALUES (?s ?p ?o) {{ {values_clause} }}
                 }}
@@ -736,18 +747,18 @@ def get_existing_triples(
 
 
 if __name__ == "__main__":
-    import pandas as pd
     from SPARQLWrapper import DIGEST
 
     from config import RunConfig
+    from rules import get_term_mapping, parse_rule_set
 
-    config_file = Path("configurations/complete_graph/french_royalty.json")
-    config = RunConfig.from_json(config_file)
+    french_config = Path("configurations/french_royalty.json")
+    config = RunConfig.from_json(french_config)
 
     input_dir = config.data.input_dir
-    graph_uri = config.graph.base_graph_uri
+    graph_uri = config.graph.base_uri
     ontology_file = input_dir / config.graph.ontology_file
-    rule_file = input_dir / config.rules.rules_file
+    rules_file = input_dir / config.rules.rules_file
 
     setup_logging(level=config.logging.level)
 
@@ -755,25 +766,23 @@ if __name__ == "__main__":
     client.setHTTPAuth(DIGEST)
     client.setCredentials(config.virtuoso.user, config.virtuoso.password)
 
-    rule_dataframe = pd.read_csv(rule_file)
+    # initialize_graph(
+    #     client=client,
+    #     source=str(input_dir / config.graph.nt_file),
+    #     new_graph_uri=graph_uri,
+    #     chunk_size=1000,
+    # )
 
-    initialize_graph(
-        client=client,
-        source=str(input_dir / config.graph.nt_file),
-        new_graph_uri=graph_uri,
-        chunk_size=1000,
+    term_mapping = get_term_mapping(
+        ontology_file=ontology_file, default_namespace=graph_uri
+    )
+    rules = parse_rule_set(
+        rules_file=rules_file, term_mapping=term_mapping, pca_threshold=1
     )
 
-    # term_mapping = get_term_mapping(
-    #     ontology_file=ontology_file, default_namespace=graph_uri
-    # )
-    # rules = parse_rule_set(
-    #     rule_dataframe=rule_dataframe, term_mapping=term_mapping, pca_threshold=1
-    # )
-
-    # for rule_id, rule in rules.items():
-    #     logger.info("%s", rule_id)
-    #     logger.info(
-    #         "Rule support: %d",
-    #         get_support(client=client, rule=rule, graph_uri=graph_uri),
-    #     )
+    for rule_id, rule in rules.items():
+        logger.info("%s", rule_id)
+        logger.info(
+            "Rule support: %d",
+            get_support(client=client, rule=rule, graph_uri=graph_uri),
+        )

@@ -69,8 +69,6 @@ class GraphMetrics:
                 reflexivity=reflexivity,
             )
 
-        logger.debug("Loaded DB metrics for %d predicates.", len(profiles))
-
         for predicate, profile in profiles.items():
             if "?f" in profile.domain.keys():
                 raise ValueError(f"Error ?f en {predicate} domain.")

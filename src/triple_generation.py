@@ -7,23 +7,27 @@ metrics and logical rules to produce a complete, synthetic N-Triples dataset.
 import itertools
 import logging
 import random
+import uuid
 from collections.abc import Iterator
 from typing import Any, NamedTuple, TypedDict
 
 from SPARQLWrapper import SPARQLWrapper
 
+from edb_generation import triples_from_bindings
 from graph_metrics import PredicateProfile
 from queries import (
     SparqlBinding,
     build_filtered_query,
+    build_rule_query,
+    clear_graph_sparql,
     execute_ask_query,
     from_binding_row,
+    get_existing_triples,
     insert_triples_gsp,
     insert_triples_sparql,
     run_select_query,
 )
-from rules import Atom, HornRule
-from utils import format_triple
+from rules import Atom, HornRule, format_triple
 
 logger = logging.getLogger(__name__)
 
@@ -35,9 +39,9 @@ class RawTriple(NamedTuple):
     """Represents an extracted, unformatted triple."""
 
     predicate: str
-    subject_val: str
-    object_val: str
-    object_type: str
+    subject: str
+    obj: str
+    obj_type: str
 
 
 # ---------------------------------------------------------------------------
@@ -51,7 +55,7 @@ def decrement_counts(counts: dict[str, int], term: str) -> None:
             del counts[term]
     else:
         logger.warning(
-            "Decrementing the count of %s when it does not exist in counter", term
+            "Decrementing the count of %s when it does not exist in counter.", term
         )
 
 
@@ -68,6 +72,39 @@ def update_closed_preds(
             new = True
 
     return new
+
+
+def is_assignment_solvable(profile: PredicateProfile, subject: str, obj: str) -> bool:
+    """Checks if assigning a (subject, object) pair maintains graph solvability.
+
+    Simulates the assigment to evaluate the Gale-Ryser / Havel-Hakimi conditions without
+    mutating or copying the profile object.
+
+    Args:
+        profile: Predicate profile tracking available domains and ranges.
+        subject: Subject term to be assigned.
+        obj: Object term to be assigned.
+
+    Returns:
+        True if the assignment leaves the graph in a solvable state, False otherwise.
+    """
+    if subject not in profile.domain or obj not in profile.range:
+        logger.warning("Bad triple: (%s, %s).\n%s", subject, obj, profile)
+        return False
+
+    s_domain_len = len(profile.domain) - (1 if profile.domain.get(subject) == 1 else 0)
+    s_range_len = len(profile.range) - (1 if profile.range.get(obj) == 1 else 0)
+
+    max_domain_freq = max(
+        (count - 1 if k == subject else count for k, count in profile.domain.items()),
+        default=0,
+    )
+    max_range_freq = max(
+        (count - 1 if k == obj else count for k, count in profile.range.items()),
+        default=0,
+    )
+
+    return max_domain_freq <= s_range_len and max_range_freq <= s_domain_len
 
 
 # -----------------------------------------------------------------------------
@@ -124,6 +161,119 @@ def apply_rule(
     client: SPARQLWrapper,
     graph_uri: str,
     rule: HornRule,
+    term_mapping: dict[str, str],
+    chunk_size: int,
+    profile: PredicateProfile | None = None,
+) -> int:
+    """Generates and inserts triples to 'graph_uri'. If a profile is provided, restricts
+    triple generation to profile constraints.
+
+    Args:
+        client: SPARQLWrapper client.
+        graph_uri: URI of the graph where data is queried and inserted.
+        rule: Rule represented as a Horn Rule.
+        profile: Contains the constraints of the head predicate.
+        chunk_size: Maximum number of triples to insert per SPARQL query.
+        term_mapping: Mapping from a term to its corresponding prefix.
+
+    Returns:
+        Number of novel triples inserted to the graph.
+    """
+
+    ignore_profile = profile is None
+
+    graph_sources: GraphSources = {
+        "target": graph_uri,
+        "others": [],
+    }
+
+    query = build_rule_query(rule=rule.signature, sources=graph_sources)
+
+    # filtered_query, ask_query = build_filtered_query(
+    #     rule=rule.signature,
+    #     sources=graph_sources,
+    #     use_head=False,
+    # )
+
+    # logger.debug("Querying %s:\n%s", rule.rule_id, filtered_query)
+
+    # if not execute_ask_query(client, ask_query):
+    #     logger.debug("%s does not produce new triples.", rule.rule_id)
+    #     return 0
+
+    raw_bindings = run_select_query(client, query)
+    potential_triples = triples_from_bindings(
+        bindings=raw_bindings, atoms=[rule.head], term_mapping=term_mapping
+    )
+
+    existing_triples = get_existing_triples(
+        client=client,
+        graph_uri=graph_uri,
+        candidate_triples=potential_triples,
+        term_mapping=term_mapping,
+        chunk_size=chunk_size,
+    )
+
+    def filter_triples() -> Iterator[str]:
+        """Helper generator that yields only new and valid triples."""
+        for triple in potential_triples:
+            if triple in existing_triples:
+                continue
+
+            if ignore_profile:
+                yield triple
+            
+            else:
+                if (
+                    profile.frequency <= 0
+                    or profile.domain.get()
+                    
+                )
+
+
+    # Filter the retrieved bindings
+    triple_stream = _filter_bindings(
+        client=client,
+        edb_uri=edb_uri,
+        rule=rule,
+        raw_bindings=bindings,
+        term_mapping=term_mapping,
+        searchspace_profiles=searchspace_profiles,
+        intensional_preds=intensional_preds,
+        closed_preds=closed_preds,
+    )
+
+    if not raw_bindings:
+        logger.warning("No bindings found for %s.", rule.rule_id)
+        return 0
+
+    if profile is None:
+        triple_iterator = triples_from_binds(
+            raw_bindings=raw_bindings,
+            rule=rule,
+            term_mapping=term_mapping,
+        )
+
+    else:
+        triple_iterator = filter_triples_from_binds(
+            raw_bindings=raw_bindings,
+            profile=profile,
+            rule=rule,
+            term_mapping=term_mapping,
+        )
+
+    return insert_triples_sparql(
+        graph_uri=graph_uri,
+        client=client,
+        triple_stream=triple_iterator,
+        chunk_size=chunk_size,
+    )
+
+
+def generate_triples_from_rule(
+    client: SPARQLWrapper,
+    graph_uri: str,
+    rule: HornRule,
     use_head: bool,
     term_mapping: dict[str, str],
     chunk_size: int,
@@ -149,38 +299,54 @@ def apply_rule(
         "others": [],
     }
 
-    if profile is not None and predicate in rule.get_body_predicates():
-        searchspace_uri = "http://SearchSpace.org/"
+    is_recursive = predicate in rule.get_body_predicates()
+    if profile is not None and is_recursive:
+        # Concurrency-safe unique URI
+        searchspace_uri = f"http://SearchSpace.org/{uuid.uuid4().hex}"
         graph_sources["others"].append(searchspace_uri)
 
-        create_searchspace(
-            client=client,
-            profiles={predicate: profile},
-            searchspace_uri=searchspace_uri,
+        try:
+            create_searchspace(
+                client=client,
+                profiles={predicate: profile},
+                term_mapping=term_mapping,
+                searchspace_uri=searchspace_uri,
+            )
+
+            filtered_query, ask_query = build_filtered_query(
+                rule=rule.signature,
+                sources=graph_sources,
+                use_head=use_head,
+            )
+
+            # logger.debug("Querying %s:\n%s", rule.rule_id, filtered_query)
+
+            if not execute_ask_query(client, ask_query):
+                logger.debug("%s does not produce new triples.", rule.rule_id)
+                return 0
+
+            raw_bindings = run_select_query(client, filtered_query)
+            if not raw_bindings:
+                logger.warning("No bindings found for %s.", rule.rule_id)
+                return 0
+
+        finally:
+            # Guarantee cleanup even if the query engine timeouts or filtering fails
+            clear_graph_sparql(client=client, graph_uri=searchspace_uri)
+
+    if profile is None:
+        triple_iterator = triples_from_binds(
+            raw_bindings=raw_bindings,
+            rule=rule,
             term_mapping=term_mapping,
         )
-
-    filtered_query, ask_query = build_filtered_query(
-        rule=rule.signature,
-        sources=graph_sources,
-        use_head=use_head,
-    )
-
-    if not execute_ask_query(client, ask_query):
-        logger.debug("%s does not produce new triples.", rule.rule_id)
-        return 0
-
-    raw_bindings = run_select_query(client, filtered_query)
-    if not raw_bindings:
-        logger.warning("%s produces new triples, but no bindings found.", rule.rule_id)
-        return 0
-
-    triple_iterator = filter_and_format_triples(
-        raw_bindings=raw_bindings,
-        profile=profile,
-        rule=rule,
-        term_mapping=term_mapping,
-    )
+    else:
+        triple_iterator = filter_triples_from_binds(
+            raw_bindings=raw_bindings,
+            profile=profile,
+            rule=rule,
+            term_mapping=term_mapping,
+        )
 
     count = insert_triples_sparql(
         graph_uri=graph_uri,
@@ -193,7 +359,6 @@ def apply_rule(
         logger.warning("Found bindings for %s, but still count is 0.", rule.rule_id)
         return 0
 
-    logger.info("%s added %d triples for %s.", rule.rule_id, count, predicate)
     return count
 
 
@@ -222,11 +387,10 @@ def apply_rules(
         new triples in the graph_uri, thus not applied.
     """
     applied_rules: dict[str, HornRule] = {}
-    logger.debug("Applying %d rules.", len(rules))
 
     for rule_id, rule in rules.items():
         predicate = rule.head.predicate
-        profile = profiles.get(predicate) if profiles else None
+        profile = profiles.get(predicate) if profiles else None  # TODO: fix
 
         count = apply_rule(
             client=client,
@@ -261,56 +425,81 @@ def _extract_raw_triple(atom: Atom, bindings_row: dict[str, Any]) -> RawTriple |
     return RawTriple(atom.predicate, subject_val, object_val, object_type)
 
 
-def filter_and_format_triples(
+def filter_triples_from_binds(
     raw_bindings: list[SparqlBinding],
-    profile: PredicateProfile | None,
+    profile: PredicateProfile,
     rule: HornRule,
     term_mapping: dict[str, str],
 ) -> Iterator[str]:
-    """Filters raw triples against profile constraints and yields RDF strings."""
-    h_predicate = rule.head.predicate
+    """Yields novel and valid triples from a list of bindings following profile
+    restrictions."""
+    predicate = rule.head.predicate
+
+    shuffled_bindings = list(raw_bindings)
+    random.shuffle(shuffled_bindings)
+
+    target_atoms = sorted([a for a in rule.signature if a.predicate == predicate])
+
+    for bindings_row in shuffled_bindings:
+        if profile.frequency <= 0:
+            break
+
+        bind_triples: set[tuple[str, str, str]] = set()
+        use_bind = True
+        for i, atom in enumerate(target_atoms):
+            if not _is_novel_atom(i, bindings_row):
+                continue
+
+            subject = from_binding_row(atom.subject, bindings_row)[0]
+            obj = from_binding_row(atom.obj, bindings_row)[0]
+
+            triple_count = len(bind_triples)
+            subject_count = len([t for t in bind_triples if t[0] == subject])
+            obj_count = len([t for t in bind_triples if t[2] == obj])
+
+            bind_triples.add((subject, predicate, obj))
+            if (
+                profile.frequency - triple_count <= 0
+                or profile.domain.get(subject, 0) - subject_count <= 0
+                or profile.range.get(obj, 0) - obj_count <= 0
+                or not is_assignment_solvable(profile, subject, obj)
+            ):
+                use_bind = False  # Don't add any triple if we can't use the binding row
+                break
+
+        if use_bind:
+            for triple in bind_triples:
+                subject, predicate, obj = triple
+                yield format_triple(subject, predicate, obj, term_mapping)
+
+                profile.frequency -= 1
+                decrement_counts(profile.range, obj)
+                decrement_counts(profile.domain, subject)
+
+                if profile.frequency <= 0:
+                    break
+
+
+def triples_from_binds(
+    raw_bindings: list[SparqlBinding],
+    rule: HornRule,
+    term_mapping: dict[str, str],
+) -> Iterator[str]:
+    """Yields novel triples in RDF format from a list of bindings."""
+    predicate = rule.head.predicate
 
     # Shuffle to avoid deterministic bias if multiple valid options exist
     shuffled_bindings = list(raw_bindings)
     random.shuffle(shuffled_bindings)
 
     # Establish the same target atoms and ordering as the query builder
-    target_atoms = sorted([a for a in rule.signature if a.predicate == h_predicate])
-
-    created = 0
+    target_atoms = sorted([a for a in rule.signature if a.predicate == predicate])
 
     for bindings_row in shuffled_bindings:
-        if profile is not None and created >= profile.frequency:
-            logger.debug("%s is closed, can't add more triples.", h_predicate)
-            break
-
-        triples: set[RawTriple] = set()
-
         for i, atom in enumerate(target_atoms):
             if not _is_novel_atom(i, bindings_row):
                 continue
 
-            if raw_triple := _extract_raw_triple(atom, bindings_row):
-                # TODO: If we were to filter the triples, this must be done here
-                triples.add(raw_triple)
-
-            else:
-                message = f"Missing bindings for {atom} in rule {rule.rule_id}. "
-                logger.warning(message)
-                continue
-
-        for t in triples:
-            if profile is not None and created >= profile.frequency:
-                logger.info("%s is closed, can't add more triples.", h_predicate)
-                break
-
-            # TODO: This does not take into account possible literals
-            if formatted_triple := format_triple(
-                subject=t.subject_val,
-                predicate=t.predicate,
-                obj=t.object_val,
-                term_mapping=term_mapping,
-            ):
-                yield formatted_triple
-                created += 1
-                # TODO: Update global state
+            subject = from_binding_row(atom.subject, bindings_row)[0]
+            obj = from_binding_row(atom.obj, bindings_row)[0]
+            yield format_triple(subject, predicate, obj, term_mapping)

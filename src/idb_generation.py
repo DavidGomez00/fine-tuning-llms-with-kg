@@ -7,7 +7,7 @@ from queries import (
     count_triples,
     get_frequency,
     get_support,
-    initialize_from_source,
+    initialize_graph,
 )
 from rules import (
     HornRule,
@@ -16,7 +16,7 @@ from rules import (
     get_predicate_mapping,
 )
 from triple_generation import (
-    apply_rules,
+    apply_rule,
 )
 
 logger = logging.getLogger(__name__)
@@ -89,12 +89,10 @@ def update_closure(
     update = False
 
     if new_preds := get_closed_preds(client, graph_uri, profiles_to_check):
-        logger.debug("Closed predicates %s", new_preds)
         closed_preds.update(new_preds)
         update = True
 
     if closed_rules := get_closed_rules(client, graph_uri, rules_to_check):
-        logger.debug("Closed rules %s", closed_rules)
         closed_rule_ids.update(closed_rules)
         update = True
 
@@ -102,29 +100,26 @@ def update_closure(
 
 
 # ---------------------------------------------------------------------------
-# Synthetic Graph Generation.
+# IDB Generation.
 # ---------------------------------------------------------------------------
-
-
 def generate_idb(
     client: SPARQLWrapper,
     rules: dict[str, HornRule],
     term_mapping: dict[str, str],
-    source: str,
+    edb_uri: str,
     synthetic_uri: str,
     chunk_size: int,
+    profiles: dict[str, PredicateProfile],
 ) -> None:
-    """"""
+    """Generates a synthetic DB from an EDB by creating intensional triples using the
+    rules."""
 
-    initialize_from_source(
-        source=source,
+    initialize_graph(
+        source=edb_uri,
         new_graph_uri=synthetic_uri,
         client=client,
         chunk_size=chunk_size,
     )
-
-    graph_metrics = GraphMetrics.from_uri(client, synthetic_uri)
-    profiles = graph_metrics.profiles
 
     intensional_preds = {rule.head.predicate for rule in rules.values()}
     extensional_preds = profiles.keys() - intensional_preds
@@ -144,75 +139,75 @@ def generate_idb(
     intensional_dependencies = get_dependencies_intensional(rules=rules)
 
     closed_rule_ids: set[str] = set()
-    closed_preds: set[str] = set()
+    closed_preds: set[str] = set(extensional_preds)
     grounded_predicates = set(extensional_preds)
-
-    def is_ready(rule_id: str) -> bool:
-        """Evaluates if a rule should be included in the iteration. A rule is considered
-        ready when its body is grounded, its support is not closed, and it does not
-        depend on other rules."""
-
-        rule = rules[rule_id]
-        head_predicate = rule.head.predicate
-
-        if rule_id in closed_rule_ids or head_predicate in closed_preds:
-            return False
-
-        body_predicates = rule.get_body_predicates() - {head_predicate}
-        if not body_predicates.issubset(grounded_predicates):
-            return False
-
-        for r_id in intensional_dependencies.get(rule_id, []):
-            if r_id not in closed_rule_ids:
-                return False
-
-        return True
 
     # Stratify and apply rules iteratively
     predicate_to_rules = get_predicate_mapping(rules)
 
-    logger.info("Generating synthetic graph...")
-    iter = 0
-    prev_size = count_triples(client, synthetic_uri)
+    logger.info(
+        "Generating IDB... Rules [%d/%d] | Predicates [%d/%d].",
+        len(closed_rule_ids),
+        len(rules),
+        len(closed_preds),
+        len(profiles),
+    )
+    step = 0
     while True:
-        iter += 1
-        available_rules = {r_id: r for r_id, r in rules.items() if is_ready(r_id)}
-        if not available_rules:
-            logger.info("No rules to apply.")
+        step += 1
+
+        applied_rules: dict[str, HornRule] = {}
+        added_triples = 0
+        for rule_id, rule in rules.items():
+            predicate = rule.head.predicate
+            profile = profiles[predicate]
+
+            if rule_id in closed_rule_ids or predicate in closed_preds:
+                continue
+
+            body_predicates = rule.get_body_predicates() - {predicate}
+            if not body_predicates.issubset(grounded_predicates):
+                continue
+
+            dependency_ids = intensional_dependencies.get(rule_id, [])
+            if any(r_id not in closed_rule_ids for r_id in dependency_ids):
+                continue
+
+            if count := apply_rule(
+                client=client,
+                graph_uri=graph_uri,
+                rule=rule,
+                use_head=True,
+                term_mapping=term_mapping,
+                chunk_size=chunk_size,
+                profile=profile,
+            ):
+                logger.debug(
+                    "[Step %d]: %s added %d triples for %s.",
+                    step,
+                    rule_id,
+                    count,
+                    predicate,
+                )
+                added_triples += count
+                grounded_predicates.add(predicate)
+
+            applied_rules[rule_id] = rule
+
+        logger.info("[Step %d]: Added %d triples.", step, added_triples)
+        if not added_triples:
+            logger.info("[Step %d]: Reached stale state.", step)
             break
-
-        logger.info("--- Iter %d ---", iter)
-
-        applied_rules = apply_rules(
-            client=client,
-            graph_uri=synthetic_uri,
-            rules=available_rules,
-            use_head=True,
-            term_mapping=term_mapping,
-            chunk_size=chunk_size,
-            profiles=profiles,
-        )
-
-        if not applied_rules:
-            logger.info("No rules applied in this itreation.")
-            break
-
-        graph_size = count_triples(client, synthetic_uri)
-
-        if not (new_triples := graph_size - prev_size):
-            logger.info("No triples produced in this iteration.")
-            break
-
-        logger.info("Added %d triples.", new_triples)
-        prev_size = graph_size
 
         # Determine which rules should be checked for closure
-        affected_rule_ids: set[str] = set()
-        for predicate in {r.head.predicate for r in applied_rules.values()}:
-            affected_rule_ids.update(predicate_to_rules[predicate])
+        pending_rule_ids = {
+            id
+            for r in applied_rules.values()
+            for id in predicate_to_rules[r.head.predicate]
+            if id not in closed_rule_ids
+        }
 
-        if pending_rule_ids := set(affected_rule_ids) - closed_rule_ids:
-            rules_to_check = {r_id: rules[r_id] for r_id in pending_rule_ids}
+        rules_to_check = {r_id: rules[r_id] for r_id in pending_rule_ids}
 
         if update_closure(
             client=client,
@@ -223,7 +218,8 @@ def generate_idb(
             closed_rule_ids=closed_rule_ids,
         ):
             logger.info(
-                "Closed: Rules [%d/%d] | Predicates [%d/%d].",
+                "[Step %d]: Closed - Rules [%d/%d] | Predicates [%d/%d].",
+                step,
                 len(closed_rule_ids),
                 len(rules),
                 len(closed_preds),
@@ -237,3 +233,65 @@ def generate_idb(
         if not (rules.keys() - closed_rule_ids):
             logger.info("All rules closed.")
             break
+
+
+if __name__ == "__main__":
+    import time
+    from pathlib import Path
+
+    from SPARQLWrapper import DIGEST
+
+    from config import RunConfig
+    from queries import count_triples
+    from rules import get_term_mapping, parse_rule_set
+    from utils import setup_logging
+
+    simpson_config = Path("configurations/simpsons.json")
+    french_config = Path("configurations/french_royalty.json")
+
+    config = RunConfig.from_json(french_config)
+    setup_logging(level=config.logging.level)
+    logger.info("Confifuration correctly initialized.")
+
+    graph_uri = config.graph.base_uri
+    edb_uri = config.graph.edb_uri
+    synthetic_uri = config.graph.synthetic_uri
+
+    logger.debug("BASE GRAPH URI: <%s>", graph_uri)
+
+    input_dir = config.data.input_dir
+
+    ontology_file = input_dir / config.graph.ontology_file
+    term_mapping = get_term_mapping(ontology_file, default_namespace=graph_uri)
+
+    rules_file = input_dir / config.rules.rules_file
+    rules = parse_rule_set(rules_file, term_mapping=term_mapping, pca_threshold=1)
+
+    client = SPARQLWrapper(str(config.data.database_url / config.data.sparql_endpoint))
+    client.setHTTPAuth(DIGEST)
+    client.setCredentials(config.virtuoso.user, config.virtuoso.password)
+
+    graph_metrics = GraphMetrics.from_uri(client, graph_uri)
+
+    logger.info("Starting IDB generation from <%s>...", edb_uri)
+    start_time = time.time()
+    generate_idb(
+        client=client,
+        rules=rules,
+        term_mapping=term_mapping,
+        edb_uri=edb_uri,
+        chunk_size=config.virtuoso.chunk_size,
+        synthetic_uri=synthetic_uri,
+        profiles=graph_metrics.profiles,
+    )
+    logger.info("Finished execution at %d s.", time.time() - start_time)
+    logger.info(
+        "Original graph <%s> has %d triples.",
+        graph_uri,
+        count_triples(client, graph_uri),
+    )
+    logger.info(
+        "Synthetic Graph at <%s> with %d triples.",
+        synthetic_uri,
+        count_triples(client, synthetic_uri),
+    )

@@ -14,8 +14,6 @@ from typing import Protocol
 
 import pandas as pd
 
-from utils import format_term
-
 logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
@@ -29,6 +27,41 @@ DEFAULT_PREFIXES: dict[str, str] = {
     "sameAs": "http://www.w3.org/2002/07/owl#",
     "name": "http://xmlns.com/foaf/0.1/",
 }
+
+
+def format_term(
+    term: str,
+    term_mapping: dict[str, str] | None = None,
+) -> str:
+    """Ensures a term is wrapped in one set of brackets with the correct namespace."""
+    if (term.startswith("<") and term.endswith(">")) or term.startswith("?"):
+        return term
+
+    if term.startswith("http"):
+        return f"<{term}>"
+
+    if term_mapping is not None:
+        namespace = term_mapping.get(term, term_mapping.get("default"))
+        if namespace is not None:
+            return f"<{namespace}{term}>"
+
+    message = "Default namespace not defined, aborting."
+    raise ValueError(f"Error parsing term {term}: {message}")
+
+
+def format_triple(
+    subject: str,
+    predicate: str,
+    obj: str,
+    term_mapping: dict[str, str],
+) -> str:
+    """Returns triple is in SPARQL format with the correct namespace and a final '.'."""
+    subject_str = format_term(subject, term_mapping)
+    predicate_str = format_term(predicate, term_mapping)
+    object_str = format_term(obj, term_mapping)
+
+    return f"{subject_str} {predicate_str} {object_str} ."
+
 
 # ---------------------------------------------------------------------------
 # Dataclasses
@@ -132,6 +165,15 @@ class RuleSignature:
         return {
             term
             for atom in (self.head, *self.body)
+            for term in (atom.subject, atom.obj)
+            if term.startswith("?")
+        }
+
+    def get_body_variables(self) -> set[str]:
+        """Return unique variables starting with '?' in the rule's body."""
+        return {
+            term
+            for atom in self.body
             for term in (atom.subject, atom.obj)
             if term.startswith("?")
         }
