@@ -676,13 +676,15 @@ if __name__ == "__main__":
     from rules import get_term_mapping, parse_rule_set
     from utils import setup_logging
 
+    # Config setup
     simpson_config = Path("configurations/simpsons.json")
     french_config = Path("configurations/french_royalty.json")
+    config = RunConfig.from_json(simpson_config)
 
-    config = RunConfig.from_json(french_config)
     setup_logging(level=config.logging.level)
     logger.info("Confifuration correctly initialized.")
 
+    #
     graph_uri = config.graph.base_uri
     edb_uri = config.graph.edb_uri
 

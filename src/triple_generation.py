@@ -189,19 +189,11 @@ def apply_rule(
 
     query = build_rule_query(rule=rule.signature, sources=graph_sources)
 
-    # filtered_query, ask_query = build_filtered_query(
-    #     rule=rule.signature,
-    #     sources=graph_sources,
-    #     use_head=False,
-    # )
-
-    # logger.debug("Querying %s:\n%s", rule.rule_id, filtered_query)
-
-    # if not execute_ask_query(client, ask_query):
-    #     logger.debug("%s does not produce new triples.", rule.rule_id)
-    #     return 0
-
     raw_bindings = run_select_query(client, query)
+    if not raw_bindings:
+        logger.warning("No bindings found when applying %s.", rule.rule_id)
+        return 0
+
     potential_triples = triples_from_bindings(
         bindings=raw_bindings, atoms=[rule.head], term_mapping=term_mapping
     )
@@ -222,50 +214,26 @@ def apply_rule(
 
             if ignore_profile:
                 yield triple
-            
+
             else:
+                subject, predicate, obj = triple.strip(".").split(sep=" ")
+                logger.debug(
+                    "Subject: %s | Predicate: %s | Object: %s", subject, predicate, obj
+                )
                 if (
                     profile.frequency <= 0
-                    or profile.domain.get()
-                    
-                )
+                    or profile.domain.get(subject, 0) <= 0
+                    or profile.range.get(subject, 0) <= 0
+                    or not is_assignment_solvable(profile, subject, obj)
+                ):
+                    continue
 
-
-    # Filter the retrieved bindings
-    triple_stream = _filter_bindings(
-        client=client,
-        edb_uri=edb_uri,
-        rule=rule,
-        raw_bindings=bindings,
-        term_mapping=term_mapping,
-        searchspace_profiles=searchspace_profiles,
-        intensional_preds=intensional_preds,
-        closed_preds=closed_preds,
-    )
-
-    if not raw_bindings:
-        logger.warning("No bindings found for %s.", rule.rule_id)
-        return 0
-
-    if profile is None:
-        triple_iterator = triples_from_binds(
-            raw_bindings=raw_bindings,
-            rule=rule,
-            term_mapping=term_mapping,
-        )
-
-    else:
-        triple_iterator = filter_triples_from_binds(
-            raw_bindings=raw_bindings,
-            profile=profile,
-            rule=rule,
-            term_mapping=term_mapping,
-        )
+    triple_stream = filter_triples()
 
     return insert_triples_sparql(
         graph_uri=graph_uri,
         client=client,
-        triple_stream=triple_iterator,
+        triple_stream=triple_stream,
         chunk_size=chunk_size,
     )
 
@@ -300,6 +268,7 @@ def generate_triples_from_rule(
     }
 
     is_recursive = predicate in rule.get_body_predicates()
+
     if profile is not None and is_recursive:
         # Concurrency-safe unique URI
         searchspace_uri = f"http://SearchSpace.org/{uuid.uuid4().hex}"

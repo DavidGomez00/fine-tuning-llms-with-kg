@@ -704,9 +704,9 @@ def count_triples(client: SPARQLWrapper, graph_uri: str) -> int:
     return 0
 
 
-#
-#
-# --
+# ---------------------------------------------------------------------------
+# Helpers ofr IDB/EDB generation.
+# ---------------------------------------------------------------------------
 def get_existing_triples(
     client: SPARQLWrapper,
     graph_uri: str,
