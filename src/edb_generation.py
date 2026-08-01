@@ -29,6 +29,7 @@ from triple_generation import (
     create_searchspace,
     decrement_counts,
     is_assignment_solvable,
+    triples_from_bindings,
     update_closed_preds,
 )
 
@@ -280,31 +281,6 @@ def _select_valid_bindings(
         logger.warning("Could not find a valid combination to satisfy rule support.")
 
     return added_bindings
-
-
-def triples_from_bindings(
-    bindings: list[SparqlBinding], atoms: list[Atom], term_mapping: dict[str, str]
-) -> Iterator[str]:
-    """Maps bindings to RDF formatted triples using the patterns in 'atoms'.
-
-    Args:
-        bindings: A list of SPARQL binding rows to evaluate.
-        atoms: A list of body atoms providing the triple patterns.
-        term_mapping: Mapping of terms to their string representations.
-
-    Returns:
-        A set of all possible formatted triple strings.
-    """
-    return (
-        format_triple(
-            subject=from_binding_row(atom.subject, binding_row)[0],
-            predicate=atom.predicate,
-            obj=from_binding_row(atom.obj, binding_row)[0],
-            term_mapping=term_mapping,
-        )
-        for atom in atoms
-        for binding_row in bindings
-    )
 
 
 def check_triples_from_rule(
@@ -679,29 +655,32 @@ if __name__ == "__main__":
     # Config setup
     simpson_config = Path("configurations/simpsons.json")
     french_config = Path("configurations/french_royalty.json")
+
+    ##### TO RUN ANOTHER GRAPH EDIT THIS vvvv ##
     config = RunConfig.from_json(simpson_config)
 
+    # Logging
     setup_logging(level=config.logging.level)
     logger.info("Confifuration correctly initialized.")
 
-    #
+    # Graph settings
     graph_uri = config.graph.base_uri
     edb_uri = config.graph.edb_uri
-
     logger.debug("BASE GRAPH URI: <%s>", graph_uri)
 
+    # Input files
     input_dir = config.data.input_dir
-
     ontology_file = input_dir / config.graph.ontology_file
     term_mapping = get_term_mapping(ontology_file, default_namespace=graph_uri)
-
     rules_file = input_dir / config.rules.rules_file
     rules = parse_rule_set(rules_file, term_mapping=term_mapping, pca_threshold=1)
 
+    # SPARQLWrapper client
     client = SPARQLWrapper(str(config.data.database_url / config.data.sparql_endpoint))
     client.setHTTPAuth(DIGEST)
     client.setCredentials(config.virtuoso.user, config.virtuoso.password)
 
+    # Generate EDB
     logger.info("Starting EDB generation from <%s>...", graph_uri)
     start_time = time.time()
     generate_edb(

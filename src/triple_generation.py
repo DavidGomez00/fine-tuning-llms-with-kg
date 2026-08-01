@@ -13,7 +13,6 @@ from typing import Any, NamedTuple, TypedDict
 
 from SPARQLWrapper import SPARQLWrapper
 
-from edb_generation import triples_from_bindings
 from graph_metrics import PredicateProfile
 from queries import (
     SparqlBinding,
@@ -155,6 +154,31 @@ def create_searchspace(
 class GraphSources(TypedDict):
     target: str
     others: list[str]
+
+
+def triples_from_bindings(
+    bindings: list[SparqlBinding], atoms: list[Atom], term_mapping: dict[str, str]
+) -> Iterator[str]:
+    """Maps bindings to RDF formatted triples using the patterns in 'atoms'.
+
+    Args:
+        bindings: A list of SPARQL binding rows to evaluate.
+        atoms: A list of body atoms providing the triple patterns.
+        term_mapping: Mapping of terms to their string representations.
+
+    Returns:
+        A set of all possible formatted triple strings.
+    """
+    return (
+        format_triple(
+            subject=from_binding_row(atom.subject, binding_row)[0],
+            predicate=atom.predicate,
+            obj=from_binding_row(atom.obj, binding_row)[0],
+            term_mapping=term_mapping,
+        )
+        for atom in atoms
+        for binding_row in bindings
+    )
 
 
 def apply_rule(

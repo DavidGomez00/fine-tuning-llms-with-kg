@@ -5,7 +5,8 @@ from pathlib import Path
 from SPARQLWrapper import DIGEST, SPARQLWrapper
 
 from config import RunConfig
-from idb_generation import generate_edb, generate_idb
+from edb_generation import generate_edb
+from idb_generation import generate_idb
 from queries import count_triples
 from rules import get_term_mapping, parse_rule_set
 from utils import setup_logging
