@@ -16,7 +16,7 @@
     "nt_file": "french_royalty.nt",
     "ontology_file": "french_royalty.ttl",
     "synthetic_graph_uri": "http://SyntheticFrenchRoyalty.org/",
-    "base_graph_uri": "http://FrenchRoyalty.org/"
+    "base_graph_uri": "http://FrenchRoyalty.org/graph/base"
   },
   "rules":{
     "rules_file": "rules_Std_1.csv",
