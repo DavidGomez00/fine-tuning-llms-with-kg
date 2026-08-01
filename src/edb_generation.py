@@ -476,7 +476,7 @@ def generate_edb(
     term_mapping: dict[str, str],
     edb_uri: str,
     chunk_size: int,
-    source: str,
+    profiles: dict[str, PredicateProfile],
 ) -> None:
     """Generates an EDB from a graph, ensuring a similar graph can be produced.
 
@@ -486,27 +486,18 @@ def generate_edb(
         term_mapping: Mapping of terms to their string representations.
         edb_uri: The URI where the Extensional Database (EDB) will be generated.
         chunk_size: Maximum number of triples to insert per SPARQL query.
-        source: The source graph URI to extract metrics from.
-
-    Raises:
-        ValueError: If the source is not a valid URI.
+        profiles: The metrics for each predicate in the original graph.
     """
-    # Extract metrics from the original data
-    clean_source = source.strip("<>")
-    if not clean_source.startswith(("http://", "https://")):
-        raise ValueError(f"Source to generate an EDB must be a URI. Got: '{source}'")
-
-    graph_metrics = GraphMetrics.from_uri(client, source)
-    profiles = graph_metrics.profiles
+    # Instantiate a new graph
+    initialize_graph(
+        client=client,
+        source=None,
+        new_graph_uri=edb_uri,
+        chunk_size=chunk_size,
+    )
 
     intensional_preds = {r.head.predicate for r in rules.values()}
     extensional_preds = profiles.keys() - intensional_preds
-
-    # Instantiate a new graph
-    initialize_graph(
-        client=client, source=None, new_graph_uri=edb_uri, chunk_size=chunk_size
-    )
-    logger.info("Cleared <%s>.", edb_uri)
 
     if not extensional_preds:
         logger.warning("Retrieved 0 extensional predicates, EDB will be empty.")
@@ -647,7 +638,6 @@ if __name__ == "__main__":
     from SPARQLWrapper import DIGEST
 
     from config import RunConfig
-    from graph_metrics import GraphMetrics
     from queries import count_triples
     from rules import get_term_mapping, parse_rule_set
     from utils import setup_logging
@@ -664,9 +654,8 @@ if __name__ == "__main__":
     logger.info("Confifuration correctly initialized.")
 
     # Graph settings
-    graph_uri = config.graph.base_uri
+    graph_uri = config.graph.complete_uri
     edb_uri = config.graph.edb_uri
-    logger.debug("BASE GRAPH URI: <%s>", graph_uri)
 
     # Input files
     input_dir = config.data.input_dir
@@ -680,6 +669,9 @@ if __name__ == "__main__":
     client.setHTTPAuth(DIGEST)
     client.setCredentials(config.virtuoso.user, config.virtuoso.password)
 
+    # Graph metrics
+    graph_metrics = GraphMetrics.from_uri(client, graph_uri)
+
     # Generate EDB
     logger.info("Starting EDB generation from <%s>...", graph_uri)
     start_time = time.time()
@@ -689,7 +681,7 @@ if __name__ == "__main__":
         term_mapping=term_mapping,
         edb_uri=edb_uri,
         chunk_size=config.virtuoso.chunk_size,
-        source=graph_uri,
+        profiles=graph_metrics.profiles,
     )
     logger.info("Finished execution at %d s.", time.time() - start_time)
     logger.info("EDB at <%s> with %d triples.", edb_uri, count_triples(client, edb_uri))

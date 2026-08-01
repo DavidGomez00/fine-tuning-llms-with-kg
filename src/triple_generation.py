@@ -203,25 +203,45 @@ def apply_rule(
     Returns:
         Number of novel triples inserted to the graph.
     """
-
-    ignore_profile = profile is None
-
     graph_sources: GraphSources = {
         "target": graph_uri,
         "others": [],
     }
 
-    query = build_rule_query(rule=rule.signature, sources=graph_sources)
+    use_profile = profile is not None
 
+    # Query the graph
+    # Include the head of the rule in the query if we are using profiles (e.i., creating
+    # a synthetic graph) and the rule is recursive.
+    use_head = False
+    if any(a.predicate == rule.head.predicate for a in rule.body) and use_profile:
+        use_head = True
+
+    if use_head:
+        # TODO: Create searchspace
+        searchspace_uri = "example.org"
+        graph_sources.update({"others": [f"{searchspace_uri}"]})
+
+    query = build_rule_query(
+        rule=rule.signature, sources=graph_sources, use_head=use_head
+    )
     raw_bindings = run_select_query(client, query)
+    logger.debug("\n%s%sRetrieved %d bindings.", rule.rule_id, query, len(raw_bindings))
     if not raw_bindings:
         logger.warning("No bindings found when applying %s.", rule.rule_id)
         return 0
 
+    # Extract the triples from the retrieved bindings
     potential_triples = triples_from_bindings(
         bindings=raw_bindings, atoms=[rule.head], term_mapping=term_mapping
     )
 
+    # TODO: Remove. Checking all potential triples:
+    for t in potential_triples:
+        logger.debug("%s", t)
+    return 0
+
+    # Get the existing triples in the graph
     existing_triples = get_existing_triples(
         client=client,
         graph_uri=graph_uri,
@@ -234,9 +254,10 @@ def apply_rule(
         """Helper generator that yields only new and valid triples."""
         for triple in potential_triples:
             if triple in existing_triples:
+                logger.debug("%s already in existing triples.", triple)
                 continue
 
-            if ignore_profile:
+            if not use_profile:
                 yield triple
 
             else:
@@ -250,8 +271,12 @@ def apply_rule(
                     or profile.range.get(subject, 0) <= 0
                     or not is_assignment_solvable(profile, subject, obj)
                 ):
+                    logger.debug("%s violates profile constraints.", triple)
                     continue
 
+                yield triple  # TODO: Is there any other check to do?
+
+    # Yield triples that do not exist already
     triple_stream = filter_triples()
 
     return insert_triples_sparql(
@@ -378,6 +403,8 @@ def apply_rules(
     Returns:
         A dict with the rules that were applied, excludes the rules that do not produce
         new triples in the graph_uri, thus not applied.
+
+    TODO: obsolete?
     """
     applied_rules: dict[str, HornRule] = {}
 

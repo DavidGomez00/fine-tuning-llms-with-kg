@@ -100,7 +100,7 @@ def update_closure(
 
 
 # ---------------------------------------------------------------------------
-# IDB Generation.
+# Complete the Synthetic graph.
 # ---------------------------------------------------------------------------
 def generate_idb(
     client: SPARQLWrapper,
@@ -111,17 +111,27 @@ def generate_idb(
     chunk_size: int,
     profiles: dict[str, PredicateProfile],
 ) -> None:
-    """Generates a synthetic DB from an EDB by creating intensional triples using the
-    rules."""
+    """Generates a synthetic DB from an EDB by creating triples using the rules.
 
+    Args:
+        client: Wrapper for SPARQL queries.
+        rules: Mapping of rule IDs to HornRule objects.
+        term_mapping: Mapping of terms to their string representations.
+        edb_uri: The URI where the Extensional Database (EDB) will be generated.
+        synthetic_uri: The URI where the Synthetic Database will be completed.
+        chunk_size: Maximum number of triples to insert per SPARQL query.
+        profiles: The metrics for each predicate in the original graph.
+    """
+    # Instatiate the synthetic graph starting from the EDB
     initialize_graph(
+        client=client,
         source=edb_uri,
         new_graph_uri=synthetic_uri,
-        client=client,
         chunk_size=chunk_size,
     )
 
-    intensional_preds = {rule.head.predicate for rule in rules.values()}
+    # Check that the rules allow to deduce the complete synthetic graph
+    intensional_preds = {r.head.predicate for r in rules.values()}
     extensional_preds = profiles.keys() - intensional_preds
 
     if uninferrable_preds := check_uninferrable_preds(
@@ -136,17 +146,18 @@ def generate_idb(
         logger.error(error_msg)
         raise RuntimeError(error_msg)
 
+    # Get intensional dependencies
     intensional_dependencies = get_dependencies_intensional(rules=rules)
 
+    # Stratify and apply rules iteratively
     closed_rule_ids: set[str] = set()
     closed_preds: set[str] = set(extensional_preds)
-    grounded_predicates = set(extensional_preds)
 
-    # Stratify and apply rules iteratively
+    grounded_predicates = set(extensional_preds)
     predicate_to_rules = get_predicate_mapping(rules)
 
     logger.info(
-        "Generating IDB... Rules [%d/%d] | Predicates [%d/%d].",
+        "Completing Synthetic graph from EDB... Rules [%d/%d] | Predicates [%d/%d].",
         len(closed_rule_ids),
         len(rules),
         len(closed_preds),
@@ -158,6 +169,8 @@ def generate_idb(
 
         applied_rules: dict[str, HornRule] = {}
         added_triples = 0
+
+        # Check if we can apply this rule
         for rule_id, rule in rules.items():
             predicate = rule.head.predicate
             profile = profiles[predicate]
@@ -173,25 +186,27 @@ def generate_idb(
             if any(r_id not in closed_rule_ids for r_id in dependency_ids):
                 continue
 
-            if count := apply_rule(
+            # Apply the rule and generate triples from it
+            count = apply_rule(
                 client=client,
-                graph_uri=graph_uri,
+                graph_uri=synthetic_uri,
                 rule=rule,
-                use_head=True,
                 term_mapping=term_mapping,
                 chunk_size=chunk_size,
                 profile=profile,
-            ):
-                logger.debug(
-                    "[Step %d]: %s added %d triples for %s.",
-                    step,
-                    rule_id,
-                    count,
-                    predicate,
-                )
-                added_triples += count
+            )
+            logger.debug(
+                "[Step %d]: %s added %d triples for %s.",
+                step,
+                rule_id,
+                count,
+                predicate,
+            )
+            added_triples += count
+            if count:
                 grounded_predicates.add(predicate)
 
+            # Keep track of the rules appliead
             applied_rules[rule_id] = rule
 
         logger.info("[Step %d]: Added %d triples.", step, added_triples)
@@ -206,9 +221,9 @@ def generate_idb(
             for id in predicate_to_rules[r.head.predicate]
             if id not in closed_rule_ids
         }
-
         rules_to_check = {r_id: rules[r_id] for r_id in pending_rule_ids}
 
+        # Update the closure for the rules and predicates
         if update_closure(
             client=client,
             graph_uri=synthetic_uri,
@@ -246,33 +261,38 @@ if __name__ == "__main__":
     from rules import get_term_mapping, parse_rule_set
     from utils import setup_logging
 
+    # Config setup
     simpson_config = Path("configurations/simpsons.json")
     french_config = Path("configurations/french_royalty.json")
 
-    config = RunConfig.from_json(french_config)
+    ##### TO RUN ANOTHER GRAPH EDIT THIS vvvv ##
+    config = RunConfig.from_json(simpson_config)
+
+    # Logging
     setup_logging(level=config.logging.level)
     logger.info("Confifuration correctly initialized.")
 
-    graph_uri = config.graph.base_uri
+    # Graph settings
+    graph_uri = config.graph.complete_uri
     edb_uri = config.graph.edb_uri
     synthetic_uri = config.graph.synthetic_uri
 
-    logger.debug("BASE GRAPH URI: <%s>", graph_uri)
-
+    # Input files
     input_dir = config.data.input_dir
-
     ontology_file = input_dir / config.graph.ontology_file
     term_mapping = get_term_mapping(ontology_file, default_namespace=graph_uri)
-
     rules_file = input_dir / config.rules.rules_file
     rules = parse_rule_set(rules_file, term_mapping=term_mapping, pca_threshold=1)
 
+    # SPARQLWrapper client
     client = SPARQLWrapper(str(config.data.database_url / config.data.sparql_endpoint))
     client.setHTTPAuth(DIGEST)
     client.setCredentials(config.virtuoso.user, config.virtuoso.password)
 
+    # Graph metrics
     graph_metrics = GraphMetrics.from_uri(client, graph_uri)
 
+    # Generate IDB
     logger.info("Starting IDB generation from <%s>...", edb_uri)
     start_time = time.time()
     generate_idb(

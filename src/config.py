@@ -127,6 +127,7 @@ class GraphConfig:
     ontology_file: str
     nt_file: str
     base_uri: str
+    complete_uri: str
     edb_uri: str
     synthetic_uri: str
 

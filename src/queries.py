@@ -28,7 +28,9 @@ def chunk_iter(iterable: Iterable[str], size: int) -> Iterable[tuple[str, ...]]:
 # ---------------------------------------------------------------------------
 # SPARQL Query generation.
 # ---------------------------------------------------------------------------
-def build_rule_query(rule: RuleSignature, sources: dict[str, str | list[str]]) -> str:
+def build_rule_query(
+    rule: RuleSignature, sources: dict[str, str | list[str]], use_head: bool = False
+) -> str:
     """Creates a query for the rule signature."""
 
     # Get the variables from the atomns with extensional predicates
@@ -36,6 +38,9 @@ def build_rule_query(rule: RuleSignature, sources: dict[str, str | list[str]]) -
     proj = " ".join(sorted(list(variables)))
 
     patterns_str = "\n      ".join([f"{atom} ." for atom in sorted(rule.body)])
+
+    if use_head:
+        patterns_str += f"\n      {rule.head} ."
 
     unique_values_str = ""
     if len(rule.get_variables()) > 1:
@@ -46,7 +51,8 @@ def build_rule_query(rule: RuleSignature, sources: dict[str, str | list[str]]) -
         unique_values_str = f"FILTER ({' && '.join(expressions)})"
 
     # Define the Graph sources for the query
-    if t_source := sources.get("target") is None:
+    t_source = sources.get("target", None)
+    if t_source is None:
         raise ValueError("Target source not specified.")
     sources = [t_source] + [s for s in sources.get("others", [])]
     source_str = "\n".join(f"FROM <{g}>" for g in sources)
@@ -408,6 +414,7 @@ def initialize_graph(
 
     if source is None:
         clear_graph_sparql(client, new_graph_uri)
+        logger.debug("Initializated empty graph at <%s>.", new_graph_uri)
         return
 
     clean_source = str(source).strip("<>")
