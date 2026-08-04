@@ -37,15 +37,6 @@ def setup_logging(level: int | str = logging.INFO) -> None:
         force=True,
     )
 
-    # custom_formatter = CustomLogicFormatter(
-    #     fmt="%(asctime)s | %(name)-8s | %(levelname)-6s | %(message)s",
-    #     datefmt="%Y-%m-%d %H:%M:%S",
-    # )
-
-    # root_logger = logging.getLogger()
-    # for handler in root_logger.handlers:
-    #     handler.setFormatter(custom_formatter)
-
     # Force urllib3 and its connectionpool child to be quiet
     logging.getLogger("urllib3").setLevel(logging.WARNING)
     logging.getLogger("urllib3.connectionpool").setLevel(logging.WARNING)
