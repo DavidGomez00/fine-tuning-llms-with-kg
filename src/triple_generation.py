@@ -211,20 +211,7 @@ def apply_rule(
     use_profile = profile is not None
 
     # Query the graph
-    # Include the head of the rule in the query if we are using profiles (e.i., creating
-    # a synthetic graph) and the rule is recursive.
-    use_head = False
-    if any(a.predicate == rule.head.predicate for a in rule.body) and use_profile:
-        use_head = True
-
-    if use_head:
-        # TODO: Create searchspace
-        searchspace_uri = "example.org"
-        graph_sources.update({"others": [f"{searchspace_uri}"]})
-
-    query = build_rule_query(
-        rule=rule.signature, sources=graph_sources, use_head=use_head
-    )
+    query = build_rule_query(rule=rule.signature, sources=graph_sources)
     raw_bindings = run_select_query(client, query)
     logger.debug("\n%s%sRetrieved %d bindings.", rule.rule_id, query, len(raw_bindings))
     if not raw_bindings:

@@ -28,9 +28,7 @@ def chunk_iter(iterable: Iterable[str], size: int) -> Iterable[tuple[str, ...]]:
 # ---------------------------------------------------------------------------
 # SPARQL Query generation.
 # ---------------------------------------------------------------------------
-def build_rule_query(
-    rule: RuleSignature, sources: dict[str, str | list[str]], use_head: bool = False
-) -> str:
+def build_rule_query(rule: RuleSignature, sources: dict[str, str | list[str]]) -> str:
     """Creates a query for the rule signature."""
 
     # Get the variables from the atomns with extensional predicates
@@ -38,9 +36,6 @@ def build_rule_query(
     proj = " ".join(sorted(list(variables)))
 
     patterns_str = "\n      ".join([f"{atom} ." for atom in sorted(rule.body)])
-
-    if use_head:
-        patterns_str += f"\n      {rule.head} ."
 
     unique_values_str = ""
     if len(rule.get_variables()) > 1:
