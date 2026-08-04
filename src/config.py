@@ -126,8 +126,10 @@ class GraphConfig:
     name: str
     ontology_file: str
     nt_file: str
-    base_graph_uri: str
-    synthetic_graph_uri: str
+    base_uri: str
+    complete_uri: str
+    edb_uri: str
+    synthetic_uri: str
 
 
 @dataclass(frozen=True)

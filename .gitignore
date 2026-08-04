@@ -4,6 +4,10 @@
 *.pyo
 *.pyd
 
+
+# vscode
+.vscode/*
+
 # Environment variable file
 .env
 

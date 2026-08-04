@@ -48,7 +48,7 @@ class GraphMetrics:
 
         triple_count = count_triples(client, graph_uri)
         logger.debug(
-            "Retrieving metrics from %s with %d triples.", graph_uri, triple_count
+            "Retrieving metrics from <%s> (%d triples).", graph_uri, triple_count
         )
         profiles: dict[str, PredicateProfile] = {}
 
@@ -68,8 +68,6 @@ class GraphMetrics:
                 range=p_range,
                 reflexivity=reflexivity,
             )
-
-        logger.debug("Loaded DB metrics for %d predicates.", len(profiles))
 
         for predicate, profile in profiles.items():
             if "?f" in profile.domain.keys():

@@ -9,10 +9,20 @@ from requests.auth import HTTPDigestAuth
 from SPARQLWrapper import GET, JSON, SPARQLWrapper
 from yarl import URL
 
-from rules import HornRule, RuleSignature
+from rules import HornRule, RuleSignature, format_term, format_triple
 from utils import setup_logging
 
 logger = logging.getLogger(__name__)
+
+
+# ---------------------------------------------------------------------------
+# Utils
+# ---------------------------------------------------------------------------
+def chunk_iter(iterable: Iterable[str], size: int) -> Iterable[tuple[str, ...]]:
+    """Yields successive chunks of a given size from an iterable."""
+    iterator = iter(iterable)
+    while chunk := tuple(itertools.islice(iterator, size)):
+        yield chunk
 
 
 # ---------------------------------------------------------------------------
@@ -22,14 +32,25 @@ def build_rule_query(rule: RuleSignature, sources: dict[str, str | list[str]]) -
     """Creates a query for the rule signature."""
 
     # Get the variables from the atomns with extensional predicates
-    variables = rule.get_variables()
+    variables = rule.get_body_variables()
     proj = " ".join(sorted(list(variables)))
 
-    if not (source := sources.get("target")):
-        raise ValueError("Invalid sources to form query.")
-
     patterns_str = "\n      ".join([f"{atom} ." for atom in sorted(rule.body)])
-    source_str = f"FROM <{source}>"
+
+    unique_values_str = ""
+    if len(rule.get_variables()) > 1:
+        expressions = [
+            f"{v1} != {v2}"
+            for v1, v2 in itertools.combinations(sorted(set(rule.get_variables())), 2)
+        ]
+        unique_values_str = f"FILTER ({' && '.join(expressions)})"
+
+    # Define the Graph sources for the query
+    t_source = sources.get("target", None)
+    if t_source is None:
+        raise ValueError("Target source not specified.")
+    sources = [t_source] + [s for s in sources.get("others", [])]
+    source_str = "\n".join(f"FROM <{g}>" for g in sources)
 
     query = f"""
     SELECT DISTINCT ?rule_id {proj}
@@ -37,6 +58,7 @@ def build_rule_query(rule: RuleSignature, sources: dict[str, str | list[str]]) -
     WHERE {{
       BIND ("{rule.rule_id}" AS ?rule_id)
       {patterns_str}
+      {unique_values_str}
     }}
     """
     return query
@@ -73,13 +95,13 @@ def build_filtered_query(
     body_patterns = [f"{atom} ." for atom in sorted(rule.body)]
     proj_variables = set(rule.get_head_variables())
 
-    diff_values_filter = ""
+    unique_values_str = ""
     if len(rule.get_variables()) > 1:
         expressions = [
             f"{v1} != {v2}"
             for v1, v2 in itertools.combinations(sorted(set(rule.get_variables())), 2)
         ]
-        diff_values_filter = f"FILTER ({' && '.join(expressions)})"
+        unique_values_str = f"FILTER ({' && '.join(expressions)})"
 
     h_predicate = rule.head.predicate
 
@@ -137,7 +159,7 @@ def build_filtered_query(
         f'      BIND ("{rule.rule_id}" AS ?rule_id)\n'
         f"      {bind_block}\n"
         f"      {filter_block}\n"
-        f"      {diff_values_filter}\n"
+        f"      {unique_values_str}\n"
         f"    }}"
     )
 
@@ -150,7 +172,7 @@ def build_filtered_query(
         f"    WHERE {{\n"
         f"      {pattern_block}\n\n"
         f"      {filter_block}\n"
-        f"      {diff_values_filter}\n"
+        f"      {unique_values_str}\n"
         f"    }}\n"
         f"  }}"
     )
@@ -180,12 +202,6 @@ def insert_triples_sparql(
         to strictly yield novel triples.
     """
     total_inserted = 0
-
-    def chunk_iter(iterable: Iterable[str], size: int) -> Iterable[tuple[str, ...]]:
-        """Yields successive chunks of a given size from an iterable."""
-        iterator = iter(iterable)
-        while chunk := tuple(itertools.islice(iterator, size)):
-            yield chunk
 
     for chunk in chunk_iter(triple_stream, chunk_size):
         if unique_chunk := set(chunk):
@@ -376,22 +392,40 @@ def download_graph_raw(
     logger.info(f"Successfully saved {total_triples} triples to {output_file}.")
 
 
-def initialize_from_source(
-    source: str, new_graph_uri: str, client: SPARQLWrapper, chunk_size: int
+def initialize_graph(
+    client: SPARQLWrapper, source: str | None, new_graph_uri: str, chunk_size: int
 ) -> None:
     """Overwrites the new graph URI's content with the source's content.
 
     Args:
-        source: .nt file or URI.
-        new_graph_uri: URI where the source content will be written.
         client: Wrapper for SPARQL queries.
+        source: A .nt file path or a Graph URI. If None, the graph is only cleared.
+        new_graph_uri: URI where the source content will be written.
         chunk_size: Maximum number of triples to insert per SPARQL query.
 
     Raises:
-        ValueError: If the source format is not valid.
+        ValueError: If the source format is not valid (neither a .nt file nor a URI).
     """
-    if source.endswith(".nt"):
+
+    if source is None:
         clear_graph_sparql(client, new_graph_uri)
+        logger.debug("Initializated empty graph at <%s>.", new_graph_uri)
+        return
+
+    clean_source = str(source).strip("<>")
+    clean_target = new_graph_uri.strip("<>")
+    is_nt_file = clean_source.endswith(".nt")
+    is_uri = clean_source.startswith(("http:", "https:"))
+
+    if not (is_nt_file or is_uri):
+        raise ValueError(f"Invalid source '{source}'. Expected a .nt file or a URI.")
+
+    if is_uri and clean_source == clean_target:
+        return
+
+    clear_graph_sparql(client, new_graph_uri)
+
+    if is_nt_file:
         insert_graph_from_nt_sparql(
             client=client,
             graph_uri=new_graph_uri,
@@ -400,16 +434,11 @@ def initialize_from_source(
         )
 
     else:
-        uri = source.removeprefix("<").removesuffix(">")
-        if uri.startswith("http://"):
-            clear_graph_sparql(client, new_graph_uri)
-            copy_graph_sparql(
-                client=client,
-                source_graph_uri=uri,
-                target_graph_uri=new_graph_uri,
-            )
-        else:
-            raise ValueError("Invalid source, expected a .nt file or a Graph URI.")
+        copy_graph_sparql(
+            client=client,
+            source_graph_uri=clean_source,
+            target_graph_uri=new_graph_uri,
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -418,7 +447,7 @@ def initialize_from_source(
 SparqlBinding = dict[str, dict[str, str]]
 
 
-def execute_select_query(client: SPARQLWrapper, query: str) -> list[SparqlBinding]:
+def run_select_query(client: SPARQLWrapper, query: str) -> list[SparqlBinding]:
     """Executes a SELECT query and returns the bindings."""
     # TODO (optim): Maybe we want this as an iterator
     client.setMethod(GET)
@@ -504,12 +533,12 @@ def copy_graph_sparql(
         raise
 
 
-def from_binding_row(term: str, bindings_row: SparqlBinding) -> tuple[str, str]:
+def from_binding_row(term: str, binding_row: SparqlBinding) -> tuple[str, str]:
     """Safely extracts a term from a single binding row."""
     if term.startswith("?"):
         var_name = term.lstrip("?")
-        val = bindings_row.get(var_name, {}).get("value", var_name)
-        v_type = bindings_row.get(var_name, {}).get("type", "uri")
+        val = format_term(binding_row.get(var_name, {}).get("value", var_name))
+        v_type = binding_row.get(var_name, {}).get("type", "uri")
         return val, v_type
     return term, "uri"
 
@@ -531,7 +560,7 @@ def get_preds_and_freqs(client: SPARQLWrapper, graph_uri: str) -> dict[str, int]
         GROUP BY ?predicate
         """
 
-    results = execute_select_query(client, query)
+    results = run_select_query(client, query)
     if not results:
         return predicate_frequencies
 
@@ -558,7 +587,7 @@ def get_domain(client: SPARQLWrapper, graph_uri: str, predicate: str) -> dict[st
     GROUP BY ?subject
     """
 
-    if results := execute_select_query(client, query):
+    if results := run_select_query(client, query):
         for row in results:
             subject = f"<{row['subject']['value']}>"
             frequency = int(row["count"]["value"])
@@ -585,7 +614,7 @@ def get_range(client: SPARQLWrapper, graph_uri: str, predicate: str) -> dict[str
     GROUP BY ?obj
     """
 
-    if results := execute_select_query(client, query):
+    if results := run_select_query(client, query):
         for row in results:
             obj = f"<{row['obj']['value']}>"
             frequency = int(row["count"]["value"])
@@ -607,7 +636,7 @@ def get_reflexivity(client: SPARQLWrapper, graph_uri: str, predicate: str) -> in
       }} 
     }}"""
 
-    if results := execute_select_query(client, query):
+    if results := run_select_query(client, query):
         return int(results[0]["c"]["value"])
     return 0
 
@@ -631,7 +660,7 @@ def get_support(client: SPARQLWrapper, rule: HornRule, graph_uri: str) -> int:
       }}
     }}"""
 
-    if results := execute_select_query(client, query):
+    if results := run_select_query(client, query):
         return int(results[0]["supp"]["value"])
 
     logger.warning("Retrieved None for %s support in %s.", rule.rule_id, graph_uri)
@@ -649,7 +678,7 @@ def get_frequency(client: SPARQLWrapper, predicate: str, graph_uri: str) -> int:
       }}
     }}"""
 
-    if results := execute_select_query(client, query):
+    if results := run_select_query(client, query):
         return int(results[0]["frequency"]["value"])
 
     logger.warning("Retrieved None for %s frequency in %s.", predicate, graph_uri)
@@ -667,7 +696,7 @@ def count_triples(client: SPARQLWrapper, graph_uri: str) -> int:
       }}
     }}"""
 
-    if results := execute_select_query(client, query):
+    if results := run_select_query(client, query):
         total_triples = int(results[0]["total"]["value"])
         if total_triples == 0:
             logger.warning("Retrieved 0 triples from %s.", graph_uri)
@@ -677,19 +706,61 @@ def count_triples(client: SPARQLWrapper, graph_uri: str) -> int:
     return 0
 
 
+# ---------------------------------------------------------------------------
+# Helpers ofr IDB/EDB generation.
+# ---------------------------------------------------------------------------
+def get_existing_triples(
+    client: SPARQLWrapper,
+    graph_uri: str,
+    candidate_triples: Iterable[str],
+    term_mapping: dict[str, str],
+    chunk_size: int,
+) -> set[str]:
+    """Return triples from 'candidate_triples' that exist in 'edb_uri'."""
+    existing_triples = set()
+
+    for chunk in chunk_iter(candidate_triples, chunk_size):
+        formatted_values = (f"({triple.strip(' .')})" for triple in chunk)
+        values_clause = " ".join(formatted_values)
+
+        query = f"""
+            SELECT ?s ?p ?o
+            WHERE {{
+                GRAPH <{graph_uri}> {{
+                    ?s ?p ?o .
+                    VALUES (?s ?p ?o) {{ {values_clause} }}
+                }}
+            }}
+        """
+
+        bindings = run_select_query(client, query)
+
+        existing_triples.update(
+            format_triple(
+                subject=from_binding_row("s", binding_row)[0],
+                predicate=from_binding_row("p", binding_row)[0],
+                obj=from_binding_row("o", binding_row)[0],
+                term_mapping=term_mapping,
+            )
+            for binding_row in bindings
+        )
+
+    return existing_triples
+
+
 if __name__ == "__main__":
-    import pandas as pd
     from SPARQLWrapper import DIGEST
 
     from config import RunConfig
+    from rules import get_term_mapping, parse_rule_set
 
-    config_file = Path("configurations/complete_graph/french_royalty.json")
-    config = RunConfig.from_json(config_file)
+    french_config = Path("configurations/french_royalty.json")
+    config = RunConfig.from_json(french_config)
 
     input_dir = config.data.input_dir
-    graph_uri = config.graph.base_graph_uri
+    graph_uri = config.graph.base_uri
     ontology_file = input_dir / config.graph.ontology_file
-    rule_file = input_dir / config.rules.rules_file
+    rules_file = input_dir / config.rules.rules_file
 
     setup_logging(level=config.logging.level)
 
@@ -697,25 +768,23 @@ if __name__ == "__main__":
     client.setHTTPAuth(DIGEST)
     client.setCredentials(config.virtuoso.user, config.virtuoso.password)
 
-    rule_dataframe = pd.read_csv(rule_file)
+    # initialize_graph(
+    #     client=client,
+    #     source=str(input_dir / config.graph.nt_file),
+    #     new_graph_uri=graph_uri,
+    #     chunk_size=1000,
+    # )
 
-    initialize_from_source(
-        client=client,
-        source=str(input_dir / config.graph.nt_file),
-        new_graph_uri=graph_uri,
-        chunk_size=1000,
+    term_mapping = get_term_mapping(
+        ontology_file=ontology_file, default_namespace=graph_uri
+    )
+    rules = parse_rule_set(
+        rules_file=rules_file, term_mapping=term_mapping, pca_threshold=1
     )
 
-    # term_mapping = get_term_mapping(
-    #     ontology_file=ontology_file, default_namespace=graph_uri
-    # )
-    # rules = parse_rule_set(
-    #     rule_dataframe=rule_dataframe, term_mapping=term_mapping, pca_threshold=1
-    # )
-
-    # for rule_id, rule in rules.items():
-    #     logger.info("%s", rule_id)
-    #     logger.info(
-    #         "Rule support: %d",
-    #         get_support(client=client, rule=rule, graph_uri=graph_uri),
-    #     )
+    for rule_id, rule in rules.items():
+        logger.info("%s", rule_id)
+        logger.info(
+            "Rule support: %d",
+            get_support(client=client, rule=rule, graph_uri=graph_uri),
+        )

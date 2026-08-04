@@ -4,7 +4,7 @@ from pathlib import Path
 from SPARQLWrapper import SPARQLWrapper
 
 from graph_metrics import GraphMetrics
-from queries import count_triples, initialize_from_source
+from queries import count_triples, initialize_graph
 from rules import HornRule
 from triple_generation import apply_rules
 
@@ -64,51 +64,20 @@ def complete_graph(
             break
 
 
-def run_graph_completion_experimnent(
-    config_file: Path,
+def store_comlete_graph(
+    client: SPARQLWrapper,
+    rules: dict[str, HornRule],
     source: str,
     complete_graph_uri: str,
 ) -> None:
     """Runs a graph completion experiment"""
-    import time
+    if source == complete_graph_uri:
+        raise ValueError("Source and output URI cannot be the same.")
 
-    import pandas as pd
-    from SPARQLWrapper import DIGEST
-
-    from config import RunConfig
-    from rules import get_term_mapping, parse_rule_set
-    from utils import setup_logging
-
-    ## ------ Setup ------
-    config = RunConfig.from_json(config_file)
-    setup_logging(level=config.logging.level)
-    logger.info("Confifuration correctly initialized.")
-
-    client = SPARQLWrapper(str(config.data.database_url / config.data.sparql_endpoint))
-    client.setHTTPAuth(DIGEST)
-    client.setCredentials(config.virtuoso.user, config.virtuoso.password)
-
-    input_dir = config.data.input_dir
-    rules_file = config.rules.rules_file
-
-    ## ------ Previous evaluation of rules and Graph Metrics ------
-    initialize_from_source(
+    initialize_graph(
         client=client, source=source, new_graph_uri=complete_graph_uri, chunk_size=1000
     )
     source_count = count_triples(client, complete_graph_uri)
-
-    rule_dataframe = pd.read_csv(input_dir / rules_file)
-
-    term_mapping = get_term_mapping(
-        ontology_file=input_dir / config.graph.ontology_file,
-        default_namespace=complete_graph_uri,
-    )
-
-    rules = parse_rule_set(
-        rule_dataframe=rule_dataframe,
-        term_mapping=term_mapping,
-        pca_threshold=config.rules.pca_threshold,
-    )
 
     start_time = time.time()
 
@@ -130,6 +99,8 @@ def run_graph_completion_experimnent(
 
 
 if __name__ == "__main__":
+    import time
+
     simpsons_config = Path("configurations/simpsons.json")
     fr_config = Path("configurations/french_royalty.json")
     run_graph_completion_experimnent(
