@@ -101,43 +101,10 @@ def store_comlete_graph(
 if __name__ == "__main__":
     import time
 
-    from SPARQLWrapper import DIGEST
-
-    from config import RunConfig
-    from rules import get_term_mapping, parse_rule_set
-    from utils import setup_logging
-
     simpsons_config = Path("configurations/simpsons.json")
     fr_config = Path("configurations/french_royalty.json")
-
-    ## ------ Setup ------
-    config = RunConfig.from_json(simpsons_config)
-    setup_logging(level=config.logging.level)
-    logger.info("Confifuration correctly initialized.")
-
-    input_dir = config.data.input_dir
-    nt_file = input_dir / config.graph.nt_file
-    graph_uri = config.graph.base_uri
-
-    ontology_file = input_dir / config.graph.ontology_file
-    term_mapping = get_term_mapping(
-        ontology_file=ontology_file, default_namespace=graph_uri
-    )
-
-    rules_file = input_dir / config.rules.rules_file
-    rules = parse_rule_set(
-        rules_file=rules_file,
-        term_mapping=term_mapping,
-        pca_threshold=config.rules.pca_threshold,
-    )
-
-    client = SPARQLWrapper(str(config.data.database_url / config.data.sparql_endpoint))
-    client.setHTTPAuth(DIGEST)
-    client.setCredentials(config.virtuoso.user, config.virtuoso.password)
-
-    store_comlete_graph(
-        client=client,
-        rules=rules,
-        source=nt_file,
-        complete_graph_uri=graph_uri,
+    run_graph_completion_experimnent(
+        config_file=simpsons_config,
+        source=".data/Simpsons/simpsons.nt",
+        complete_graph_uri="http://SimpsonFamily-Complete.org/",
     )

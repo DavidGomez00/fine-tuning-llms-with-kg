@@ -19,3 +19,5 @@
 <http://SimpsonFamily.org/Marge>	<http://SimpsonFamily.org/isMarriedTo>	<http://SimpsonFamily.org/Homer> .
 <http://SimpsonFamily.org/Marge>	<http://SimpsonFamily.org/livesIn>	<http://SimpsonFamily.org/Springfield> .
 <http://SimpsonFamily.org/Homer>	<http://SimpsonFamily.org/loves>	<http://SimpsonFamily.org/Marge> .
+<http://SimpsonFamily.org/Lisa>	<http://SimpsonFamily.org/knows>	<http://SimpsonFamily.org/Moe> .
+<http://SimpsonFamily.org/Bart>	<http://SimpsonFamily.org/knows>	<http://SimpsonFamily.org/Moe> .
