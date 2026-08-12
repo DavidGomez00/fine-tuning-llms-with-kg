@@ -13,7 +13,6 @@
 
 # Logs
 *.log
-.aider*
 
 # Gemini files
 .gemini
