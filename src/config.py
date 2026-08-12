@@ -126,6 +126,7 @@ class GraphConfig:
     name: str
     ontology_file: str
     nt_file: str
+    namespace: str
     base_uri: str
     complete_uri: str
     edb_uri: str

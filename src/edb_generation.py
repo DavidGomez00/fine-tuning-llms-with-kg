@@ -478,7 +478,7 @@ def generate_edb(
     chunk_size: int,
     profiles: dict[str, PredicateProfile],
 ) -> None:
-    """Generates an EDB from a graph, ensuring a similar graph can be produced.
+    """Generates an EDB from a set of rules and predicate profiles.
 
     Args:
         client: Wrapper for SPARQL queries.

@@ -453,7 +453,9 @@ def check_uninferrable_preds(
 def get_dependencies_intensional(rules: dict[str, HornRule]) -> dict[str, set[str]]:
     """Builds a dictionary that represents rule dependencies in a ruleset based on the
     head of the rule. A rule depends on other rules if they are more restrictive than it
-    and produce the same head."""
+    and produce the same head.
+    TODO: This is not relevant for complete rules, but incomplete rules need priorities.
+    """
 
     if any(rule.support is None for rule in rules.values()):
         raise ValueError("Can't determine rule dependencies for rules without support.")
@@ -494,13 +496,14 @@ def get_dependencies_intensional(rules: dict[str, HornRule]) -> dict[str, set[st
                     # restrictive
                     if (
                         len(next_body) == len(current_body)
-                        and current_support >= next_support
+                        and current_support < next_support
                     ):
-                        rule_dependency[current_id].add(next_id)
-                    else:
                         rule_dependency[next_id].add(current_id)
+                    else:
+                        rule_dependency[current_id].add(next_id)
 
     logger.info("Created dependency graph for %d rules.", len(rules))
+    logger.debug("Intensional dependencies: %s", rule_dependency)
     return rule_dependency
 
 

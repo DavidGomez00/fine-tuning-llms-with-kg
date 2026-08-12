@@ -1,12 +1,11 @@
 import logging
-from pathlib import Path
 
 from SPARQLWrapper import SPARQLWrapper
 
 from graph_metrics import GraphMetrics
-from queries import count_triples, initialize_graph
+from queries import initialize_graph
 from rules import HornRule
-from triple_generation import apply_rules
+from triple_generation import apply_rule
 
 logger = logging.getLogger(__name__)
 
@@ -16,95 +15,70 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 def complete_graph(
     client: SPARQLWrapper,
-    rules: dict[str, HornRule],
+    rules: list[HornRule],
     term_mapping: dict[str, str],
+    base_uri: str,
+    complete_uri: str,
     chunk_size: int,
-    complete_graph_uri: str,
 ) -> None:
     """Completes a graph using only the given rules assuming they are all complete."""
 
-    graph_metrics: GraphMetrics = GraphMetrics.from_uri(client, complete_graph_uri)
-    grounded_preds = graph_metrics.profiles.keys()
+    # Initialize complete graph from base URI
+    initialize_graph(
+        client=client,
+        source=base_uri,
+        new_graph_uri=complete_uri,
+        chunk_size=chunk_size,
+    )
 
-    def is_ready(r_id: str) -> bool:
-        """Returns True if a rule should be included in the iteration. A rule is
-        included when its body is grounded."""
-        rule = rules[r_id]
-        body_preds = rule.get_body_predicates() - {rule.head.predicate}
+    # Get the initial grounded preds
+    graph_metrics = GraphMetrics.from_uri(client, complete_uri)
+    grounded_preds = set(graph_metrics.profiles.keys())
 
+    def is_ready(rule: HornRule) -> bool:
+        """Returns True if the body from 'rule' is grounded."""
+        body_preds = rule.get_body_predicates()
         return True if body_preds.issubset(grounded_preds) else False
 
-    iter = 0
-    prev_size = count_triples(client, complete_graph_uri)
+    state = dict()
+    for rule in rules:
+        state[rule.rule_id] = 0
+
+    step = 0
     while True:
-        iter += 1
-        available_rules = {r_id: r for r_id, r in rules.items() if is_ready(r_id)}
+        step += 1
+        available_rules = [rule for rule in rules if is_ready(rule)]
         if not available_rules:
-            logger.info("No rules to apply.")
+            logger.info("[Step %d]: No rules to apply. Completion ended.", step)
             break
 
-        logger.info("--- Iter %d ---", iter)
+        added = 0
+        for rule in available_rules:
+            count = apply_rule(
+                client=client,
+                graph_uri=complete_uri,
+                rule=rule,
+                term_mapping=term_mapping,
+                chunk_size=chunk_size,
+            )
 
-        apply_rules(
-            client=client,
-            graph_uri=complete_graph_uri,
-            rules=available_rules,
-            use_head=False,
-            term_mapping=term_mapping,
-            chunk_size=chunk_size,
+            logger.debug("%s added %d triples.", rule.rule_id, count)
+            state[rule.rule_id] += count
+            added += count
+            if count:
+                grounded_preds.add(rule.head.predicate)
+
+        if not added:
+            logger.info(
+                "[Step %d]: No more triples to add. Graph completion ended.", step
+            )
+            break
+
+        state_msg = "\n".join(
+            [
+                f"\t{rule.rule_id}: {state[rule.rule_id]}"
+                for rule in rules
+                if state[rule.rule_id] > 0
+            ]
         )
-
-        graph_size = count_triples(client, complete_graph_uri)
-
-        if new_triples := graph_size - prev_size:
-            logger.info("Added %d triples.", new_triples)
-            prev_size = graph_size
-        else:
-            logger.info("No triples produced in this iteration.")
-            break
-
-
-def store_comlete_graph(
-    client: SPARQLWrapper,
-    rules: dict[str, HornRule],
-    source: str,
-    complete_graph_uri: str,
-) -> None:
-    """Runs a graph completion experiment"""
-    if source == complete_graph_uri:
-        raise ValueError("Source and output URI cannot be the same.")
-
-    initialize_graph(
-        client=client, source=source, new_graph_uri=complete_graph_uri, chunk_size=1000
-    )
-    source_count = count_triples(client, complete_graph_uri)
-
-    start_time = time.time()
-
-    complete_graph(
-        client=client,
-        rules=rules,
-        term_mapping=term_mapping,
-        chunk_size=config.virtuoso.chunk_size,
-        complete_graph_uri=complete_graph_uri,
-    )
-
-    final_time = time.time() - start_time
-
-    new_count = count_triples(client, complete_graph_uri)
-
-    logger.info("Original graph has %d triples.", source_count)
-    logger.info("Complete graph at <%s> has %d triples.", complete_graph_uri, new_count)
-    logger.info("Execution finished in %d s.", final_time)
-
-
-if __name__ == "__main__":
-    import time
-
-    simpsons_config = Path("configurations/simpsons.json")
-    fr_config = Path("configurations/french_royalty.json")
-    run_graph_completion_experimnent(
-        config_file=simpsons_config,
-        source=".data/Simpsons/simpsons.nt",
-        complete_graph_uri="http://SimpsonFamily-Complete.org/",
-    )
+        logger.info("[Step %d]\n%s", step, state_msg)

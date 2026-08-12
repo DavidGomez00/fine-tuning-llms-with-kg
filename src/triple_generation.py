@@ -189,87 +189,96 @@ def apply_rule(
     chunk_size: int,
     profile: PredicateProfile | None = None,
 ) -> int:
-    """Generates and inserts triples to 'graph_uri'. If a profile is provided, restricts
-    triple generation to profile constraints.
+    """Inserts novel triples generated from the rule to 'graph_uri'. If a profile is
+    provided, restricts triple generation to profile constraints.
 
     Args:
         client: SPARQLWrapper client.
         graph_uri: URI of the graph where data is queried and inserted.
         rule: Rule represented as a Horn Rule.
-        profile: Contains the constraints of the head predicate.
-        chunk_size: Maximum number of triples to insert per SPARQL query.
         term_mapping: Mapping from a term to its corresponding prefix.
+        chunk_size: Maximum number of triples to insert per SPARQL query.
+        profile: Contains the constraints of the head predicate.
 
     Returns:
         Number of novel triples inserted to the graph.
     """
-    graph_sources: GraphSources = {
-        "target": graph_uri,
-        "others": [],
-    }
 
-    use_profile = profile is not None
+    # Retrieve bindings. If using profile, generates a searchspace.
+    try:
+        graph_sources: GraphSources = {
+            "target": graph_uri,
+            "others": [],
+        }
+        searchspace_uri = "http://Searchspace.org/"
 
-    # Query the graph
-    query = build_rule_query(rule=rule.signature, sources=graph_sources)
-    raw_bindings = run_select_query(client, query)
-    logger.debug("\n%s%sRetrieved %d bindings.", rule.rule_id, query, len(raw_bindings))
-    if not raw_bindings:
-        logger.warning("No bindings found when applying %s.", rule.rule_id)
-        return 0
+        use_profile = profile is not None
 
-    # Extract the triples from the retrieved bindings
-    potential_triples = triples_from_bindings(
-        bindings=raw_bindings, atoms=[rule.head], term_mapping=term_mapping
-    )
+        if use_profile and rule.head.predicate in rule.get_body_predicates():
+            # Create a searchspace
+            create_searchspace(
+                client=client,
+                profiles={rule.head.predicate: profile},
+                term_mapping=term_mapping,
+                searchspace_uri=searchspace_uri,
+            )
+            # Add the searchspace as a source
+            graph_sources.update({"others": [searchspace_uri]})
 
-    # TODO: Remove. Checking all potential triples:
-    for t in potential_triples:
-        logger.debug("%s", t)
-    return 0
+        # Query the graph
+        query = build_rule_query(rule=rule.signature, sources=graph_sources)
+        if not (raw_bindings := run_select_query(client, query)):
+            return 0
 
-    # Get the existing triples in the graph
+    # Clear the searchspace
+    finally:
+        clear_graph_sparql(client, searchspace_uri)
+
+    # Get the candidate triples that already exist in the graph
     existing_triples = get_existing_triples(
         client=client,
         graph_uri=graph_uri,
-        candidate_triples=potential_triples,
+        candidate_triples=triples_from_bindings(
+            bindings=raw_bindings,
+            atoms=[rule.head],
+            term_mapping=term_mapping,
+        ),
         term_mapping=term_mapping,
         chunk_size=chunk_size,
     )
 
     def filter_triples() -> Iterator[str]:
-        """Helper generator that yields only new and valid triples."""
-        for triple in potential_triples:
+        """Helper generator. Yields novel and constraint-valid triples."""
+        for triple in triples_from_bindings(
+            bindings=raw_bindings,
+            atoms=[rule.head],
+            term_mapping=term_mapping,
+        ):
             if triple in existing_triples:
-                logger.debug("%s already in existing triples.", triple)
+                # logger.debug("%s already exists in the graph.", triple)
                 continue
 
-            if not use_profile:
-                yield triple
-
-            else:
-                subject, predicate, obj = triple.strip(".").split(sep=" ")
-                logger.debug(
-                    "Subject: %s | Predicate: %s | Object: %s", subject, predicate, obj
-                )
+            if use_profile:
+                subject, predicate, obj = triple.strip(" .").split(sep=" ")
+                # logger.debug(
+                #    "Subject: %s | Predicate: %s | Object: %s", subject, predicate, obj
+                # )
                 if (
                     profile.frequency <= 0
                     or profile.domain.get(subject, 0) <= 0
                     or profile.range.get(subject, 0) <= 0
                     or not is_assignment_solvable(profile, subject, obj)
                 ):
-                    logger.debug("%s violates profile constraints.", triple)
+                    # logger.debug("%s violates profile constraints.", triple)
                     continue
 
-                yield triple  # TODO: Is there any other check to do?
+            yield triple
 
-    # Yield triples that do not exist already
-    triple_stream = filter_triples()
-
+    # Yield triples that do not exist already in the graph
     return insert_triples_sparql(
         graph_uri=graph_uri,
         client=client,
-        triple_stream=triple_stream,
+        triple_stream=filter_triples(),
         chunk_size=chunk_size,
     )
 
@@ -365,54 +374,6 @@ def generate_triples_from_rule(
         return 0
 
     return count
-
-
-def apply_rules(
-    client: SPARQLWrapper,
-    graph_uri: str,
-    rules: dict[str, HornRule],
-    use_head: bool,
-    term_mapping: dict[str, str],
-    chunk_size: int,
-    profiles: dict[str, PredicateProfile] | None = None,
-) -> dict[str, HornRule]:
-    """Applies each rule once only if it will produce new triples in 'graph_uri'.
-
-    Args:
-        client: SPARQLWrapper client.
-        graph_uri: URI of the graph that is queried for the rules.
-        rules: Dict mapping each rule id to its represnetation as a Horn Rule.
-        profiles: Dict mapping each predicate to its metrics as a PredicateProfile.
-        use_head: If True will use rule's head to form the query when recursive.
-        chunk_size: Maximum number of triples to insert per SPARQL query.
-        term_mapping: Mapping from a term to its corresponding prefix.
-
-    Returns:
-        A dict with the rules that were applied, excludes the rules that do not produce
-        new triples in the graph_uri, thus not applied.
-
-    TODO: obsolete?
-    """
-    applied_rules: dict[str, HornRule] = {}
-
-    for rule_id, rule in rules.items():
-        predicate = rule.head.predicate
-        profile = profiles.get(predicate) if profiles else None  # TODO: fix
-
-        count = apply_rule(
-            client=client,
-            graph_uri=graph_uri,
-            rule=rule,
-            use_head=use_head,
-            term_mapping=term_mapping,
-            chunk_size=chunk_size,
-            profile=profile,
-        )
-
-        if count:
-            applied_rules[rule_id] = rule
-
-    return applied_rules
 
 
 def _is_novel_atom(index: int, binding_row: SparqlBinding) -> bool:

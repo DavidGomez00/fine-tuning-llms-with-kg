@@ -50,7 +50,7 @@ def build_rule_query(rule: RuleSignature, sources: dict[str, str | list[str]]) -
     if t_source is None:
         raise ValueError("Target source not specified.")
     sources = [t_source] + [s for s in sources.get("others", [])]
-    source_str = "\n".join(f"FROM <{g}>" for g in sources)
+    source_str = "\n    ".join(f"FROM <{g}>" for g in sources)
 
     query = f"""
     SELECT DISTINCT ?rule_id {proj}
@@ -716,7 +716,7 @@ def get_existing_triples(
     term_mapping: dict[str, str],
     chunk_size: int,
 ) -> set[str]:
-    """Return triples from 'candidate_triples' that exist in 'edb_uri'."""
+    """Return triples from 'candidate_triples' that already exist in 'edb_uri'."""
     existing_triples = set()
 
     for chunk in chunk_iter(candidate_triples, chunk_size):
@@ -737,9 +737,9 @@ def get_existing_triples(
 
         existing_triples.update(
             format_triple(
-                subject=from_binding_row("s", binding_row)[0],
-                predicate=from_binding_row("p", binding_row)[0],
-                obj=from_binding_row("o", binding_row)[0],
+                subject=from_binding_row("?s", binding_row)[0],
+                predicate=from_binding_row("?p", binding_row)[0],
+                obj=from_binding_row("?o", binding_row)[0],
                 term_mapping=term_mapping,
             )
             for binding_row in bindings

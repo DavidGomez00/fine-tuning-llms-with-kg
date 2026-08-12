@@ -15,5 +15,19 @@ services:
     ports:
       - "8080:80"
 
+  graph_explorer:
+    container_name: graph_explorer
+    image: public.ecr.aws/neptune/graph-explorer:latest
+    restart: unless-stopped
+    ports:
+      - "8182:80"
+      - "8443:443"
+    environment:
+      - HOST=localhost
+      - GRAPH_EXP_HTTPS_CONNECTION=false
+      - PROXY_SERVER_HTTPS_CONNECTION=false
+    depends_on:
+      - graph_database
+
 volumes:
   graph_data:
