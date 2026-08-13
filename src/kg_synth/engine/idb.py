@@ -192,6 +192,7 @@ def generate_idb(
         # Check if we can apply this rule
         for rule_id, rule in rules.items():
             predicate = rule.head.predicate
+            logger.debug("(Delete) %s", profiles)
             profile = profiles[predicate]
 
             if rule_id in closed_rule_ids or predicate in closed_preds:

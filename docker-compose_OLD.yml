@@ -1,10 +1,8 @@
 services:
-  # --- VIRTUOSO STACK ---
   graph_database:
     container_name: graph_database
     image: kemele/virtuoso:7-stable
     restart: unless-stopped
-    profiles: ["virtuoso", "all"]
     ports:
       - "8890:8890"
     volumes:
@@ -14,24 +12,29 @@ services:
     container_name: sparql_ui
     image: erikap/yasgui:latest
     restart: unless-stopped
-    profiles: ["virtuoso", "all"]
     ports:
       - "8080:80"
     environment:
       - ENABLE_ENDPOINT_SELECTOR=true
       - DEFAULT_SPARQL_ENDPOINT=http://localhost:8890/sparql
 
-  # --- GRAPHDB STACK ---
-  graphdb:
-    container_name: graphdb
-    image: ontotext/graphdb:10.7.0
+  graph_visualizer:
+    container_name: graph_visualizer
+    image: node:lts-alpine
     restart: unless-stopped
-    profiles: ["graphdb", "all"]
     ports:
-      - "7200:7200"
-    volumes:
-      - graphdb_data:/opt/graphdb/home
+      - "19006:19006"
+    working_dir: /app
+    environment:
+      - HOST=0.0.0.0
+    command: >
+      sh -c "apk add --no-cache git &&
+             rm -rf ./* .git &&
+             git clone https://github.com/MaastrichtU-IDS/into-the-graph.git . &&
+             yarn install &&
+             yarn build &&
+             yarn global add serve &&
+             serve -s web-build -l 5000"
 
 volumes:
   graph_data:
-  graphdb_data:
