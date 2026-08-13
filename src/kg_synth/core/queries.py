@@ -9,8 +9,8 @@ from requests.auth import HTTPDigestAuth
 from SPARQLWrapper import GET, JSON, SPARQLWrapper
 from yarl import URL
 
-from rules import HornRule, RuleSignature, format_term, format_triple
-from utils import setup_logging
+from kg_synth.core.rules import HornRule, RuleSignature, format_term, format_triple
+from kg_synth.utils import setup_logging
 
 logger = logging.getLogger(__name__)
 
@@ -751,8 +751,8 @@ def get_existing_triples(
 if __name__ == "__main__":
     from SPARQLWrapper import DIGEST
 
-    from config import RunConfig
-    from rules import get_term_mapping, parse_rule_set
+    from kg_synth.config import RunConfig
+    from kg_synth.core.rules import get_term_mapping, parse_rule_set
 
     french_config = Path("configurations/french_royalty.json")
     config = RunConfig.from_json(french_config)

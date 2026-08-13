@@ -4,13 +4,13 @@ from pathlib import Path
 
 from SPARQLWrapper import DIGEST, SPARQLWrapper
 
-from config import RunConfig
-from edb_generation import generate_edb
-from graph_metrics import GraphMetrics
-from idb_generation import generate_idb
-from queries import count_triples
-from rules import get_term_mapping, parse_rule_set
-from utils import setup_logging
+from kg_synth.config import RunConfig
+from kg_synth.core.queries import count_triples
+from kg_synth.core.rules import get_term_mapping, parse_rule_set
+from kg_synth.engine.edb import generate_edb
+from kg_synth.engine.idb import generate_idb
+from kg_synth.engine.metrics import GraphMetrics
+from kg_synth.utils import setup_logging
 
 logger = logging.getLogger(__name__)
 

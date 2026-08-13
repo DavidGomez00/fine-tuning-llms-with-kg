@@ -2,7 +2,7 @@ import csv
 import logging
 from pathlib import Path
 
-from rules import format_triple
+from kg_synth.core.rules import format_triple
 
 logger = logging.getLogger(__name__)
 

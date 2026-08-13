@@ -6,11 +6,11 @@ from pathlib import Path
 
 from SPARQLWrapper import DIGEST, SPARQLWrapper
 
-from config import RunConfig
-from graph_completion import complete_graph
-from queries import count_triples, initialize_graph
-from rules import get_term_mapping, parse_rule_set
-from utils import setup_logging
+from kg_synth.config import RunConfig
+from kg_synth.core.queries import count_triples, initialize_graph
+from kg_synth.core.rules import get_term_mapping, parse_rule_set
+from kg_synth.engine.completion import complete_graph
+from kg_synth.utils import setup_logging
 
 ### EDIT THIS PATH   vvv
 graph_config = Path("configurations/mario.json")
