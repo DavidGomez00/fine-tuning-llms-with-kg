@@ -3,7 +3,7 @@ from pathlib import Path
 import requests
 from SPARQLWrapper import SPARQLWrapper
 
-from utils import setup_logging
+from kg_synth.utils import setup_logging
 
 
 def download_graph_raw(
@@ -69,7 +69,7 @@ def download_graph_raw(
 if __name__ == "__main__":
     from SPARQLWrapper import DIGEST
 
-    from config import RunConfig
+    from kg_synth.config import RunConfig
 
     config_file = Path("configurations/gen_triples/french_royalty.json")
     config = RunConfig.from_json(config_file)
