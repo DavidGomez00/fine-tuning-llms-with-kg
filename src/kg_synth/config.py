@@ -71,9 +71,17 @@ class DataConfig:
 
     input_dir: Path = Path(".data/")
     output_dir: Path = Path(".experiments/new_experiment")
+
+    # Base URL of the database instance
     database_url: URL = URL("http://localhost:8890/")
-    sparql_endpoint: str = "sparql-auth"
+
+    # Path/suffix for SPARQL endpoint
+    sparql_endpoint: str = "sparql"
     crud_endpoint: str = "sparql-graph-crud-auth"
+
+    def get_full_sparql_url(self) -> str:
+        """Returns the full SPARQL endpoint for SPARQLWrapper."""
+        return str(self.database_url / self.sparql_endpoint)
 
     def __post_init__(self) -> None:
         """Validate input and create output directories."""
@@ -95,6 +103,18 @@ class DataConfig:
             raise NotADirectoryError(
                 f"Configuration Error: {field_name} at {path} is not a directory."
             )
+
+
+@dataclass(frozen=True)
+class DatabaseAuthConfig:
+    """Database authentication and batching settings."""
+
+    user: str | None = "dba"
+    password: str | None = "dba"
+
+    # Supported: "DIGEST" (Virtuoso default), "BASIC" (GraphDB default), or "NONE"
+    auth_type: Literal["DIGEST", "BASIC", "NONE"] = "DIGEST"
+    chunk_size: int = 5000
 
 
 @dataclass(frozen=True)
@@ -134,13 +154,6 @@ class GraphConfig:
 
 
 @dataclass(frozen=True)
-class VirtuosoConfig:
-    user: str = "dba"
-    password: str = "dba"
-    chunk_size: int = 5000
-
-
-@dataclass(frozen=True)
 class RulesConfig:
     """
     TODO: Docstrings
@@ -165,7 +178,7 @@ class RunConfig:
     rules: RulesConfig
     fine_tuning: FineTuningConfig | None
     cot_generation: CoTGenerationConfig | None
-    virtuoso: VirtuosoConfig = field(default_factory=VirtuosoConfig)
+    db_config: DatabaseAuthConfig = field(default_factory=DatabaseAuthConfig)
     data: DataConfig = field(default_factory=DataConfig)
     hardware: HardwareConfig = field(default_factory=HardwareConfig)
     logging: LoggingConfig = field(default_factory=LoggingConfig)
@@ -206,7 +219,7 @@ class RunConfig:
         with open(json_path, encoding="utf-8") as f:
             data: dict[str, Any] = json.load(f)
 
-        virtuoso_config = VirtuosoConfig(**get_section("virtuoso", required=True))
+        db_config = DatabaseAuthConfig(**get_section("db-config", required=True))
         graph_config = GraphConfig(**get_section("graph", required=True))
         rules_config = RulesConfig(**get_section("rules", required=True))
         data_config = DataConfig(**get_section("data", required=True))
@@ -234,7 +247,7 @@ class RunConfig:
             fine_tuning=fine_tuning,
             cot_generation=cot_config,
             logging=logging_config,
-            virtuoso=virtuoso_config,
+            db_config=db_config,
         )
 
     def __post_init__(self) -> None:

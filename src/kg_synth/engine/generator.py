@@ -7,7 +7,6 @@ metrics and logical rules to produce a complete, synthetic N-Triples dataset.
 import itertools
 import logging
 import random
-import uuid
 from collections.abc import Iterator
 from typing import Any, NamedTuple, TypedDict
 
@@ -15,10 +14,8 @@ from SPARQLWrapper import SPARQLWrapper
 
 from kg_synth.core.queries import (
     SparqlBinding,
-    build_filtered_query,
     build_rule_query,
     clear_graph_sparql,
-    execute_ask_query,
     from_binding_row,
     get_existing_triples,
     insert_triples_gsp,
@@ -283,97 +280,98 @@ def apply_rule(
     )
 
 
-def generate_triples_from_rule(
-    client: SPARQLWrapper,
-    graph_uri: str,
-    rule: HornRule,
-    use_head: bool,
-    term_mapping: dict[str, str],
-    chunk_size: int,
-    profile: PredicateProfile | None = None,
-) -> int:
-    """Generates and inserts triples to 'graph_uri'.
+# TODO: Obsolete?
+# def generate_triples_from_rule(
+#     client: SPARQLWrapper,
+#     graph_uri: str,
+#     rule: HornRule,
+#     use_head: bool,
+#     term_mapping: dict[str, str],
+#     chunk_size: int,
+#     profile: PredicateProfile | None = None,
+# ) -> int:
+#     """Generates and inserts triples to 'graph_uri'.
 
-    Args:
-        client: SPARQLWrapper client.
-        graph_uri: URI of the graph where data is queried and inserted.
-        rule: Rule represented as a Horn Rule.
-        profiles: Dict mapping each predicate to its metrics as a PredicateProfile.
-        use_head: If True will use rule's head to form the query when recursive.
-        chunk_size: Maximum number of triples to insert per SPARQL query.
-        term_mapping: Mapping from a term to its corresponding prefix.
-    Returns:
-        The number of inserted triples.
-    """
+#     Args:
+#         client: SPARQLWrapper client.
+#         graph_uri: URI of the graph where data is queried and inserted.
+#         rule: Rule represented as a Horn Rule.
+#         profiles: Dict mapping each predicate to its metrics as a PredicateProfile.
+#         use_head: If True will use rule's head to form the query when recursive.
+#         chunk_size: Maximum number of triples to insert per SPARQL query.
+#         term_mapping: Mapping from a term to its corresponding prefix.
+#     Returns:
+#         The number of inserted triples.
+#     """
 
-    predicate = rule.head.predicate
-    graph_sources: GraphSources = {
-        "target": graph_uri,
-        "others": [],
-    }
+#     predicate = rule.head.predicate
+#     graph_sources: GraphSources = {
+#         "target": graph_uri,
+#         "others": [],
+#     }
 
-    is_recursive = predicate in rule.get_body_predicates()
+#     is_recursive = predicate in rule.get_body_predicates()
 
-    if profile is not None and is_recursive:
-        # Concurrency-safe unique URI
-        searchspace_uri = f"http://SearchSpace.org/{uuid.uuid4().hex}"
-        graph_sources["others"].append(searchspace_uri)
+#     if profile is not None and is_recursive:
+#         # Concurrency-safe unique URI
+#         searchspace_uri = f"http://SearchSpace.org/{uuid.uuid4().hex}"
+#         graph_sources["others"].append(searchspace_uri)
 
-        try:
-            create_searchspace(
-                client=client,
-                profiles={predicate: profile},
-                term_mapping=term_mapping,
-                searchspace_uri=searchspace_uri,
-            )
+#         try:
+#             create_searchspace(
+#                 client=client,
+#                 profiles={predicate: profile},
+#                 term_mapping=term_mapping,
+#                 searchspace_uri=searchspace_uri,
+#             )
 
-            filtered_query, ask_query = build_filtered_query(
-                rule=rule.signature,
-                sources=graph_sources,
-                use_head=use_head,
-            )
+#             filtered_query, ask_query = build_filtered_query(
+#                 rule=rule.signature,
+#                 sources=graph_sources,
+#                 use_head=use_head,
+#             )
 
-            # logger.debug("Querying %s:\n%s", rule.rule_id, filtered_query)
+#             # logger.debug("Querying %s:\n%s", rule.rule_id, filtered_query)
 
-            if not execute_ask_query(client, ask_query):
-                logger.debug("%s does not produce new triples.", rule.rule_id)
-                return 0
+#             if not execute_ask_query(client, ask_query):
+#                 logger.debug("%s does not produce new triples.", rule.rule_id)
+#                 return 0
 
-            raw_bindings = run_select_query(client, filtered_query)
-            if not raw_bindings:
-                logger.warning("No bindings found for %s.", rule.rule_id)
-                return 0
+#             raw_bindings = run_select_query(client, filtered_query)
+#             if not raw_bindings:
+#                 logger.warning("No bindings found for %s.", rule.rule_id)
+#                 return 0
 
-        finally:
-            # Guarantee cleanup even if the query engine timeouts or filtering fails
-            clear_graph_sparql(client=client, graph_uri=searchspace_uri)
+#         finally:
+#             # Guarantee cleanup even if the query engine timeouts or filtering fails
+#             clear_graph_sparql(client=client, graph_uri=searchspace_uri)
 
-    if profile is None:
-        triple_iterator = triples_from_binds(
-            raw_bindings=raw_bindings,
-            rule=rule,
-            term_mapping=term_mapping,
-        )
-    else:
-        triple_iterator = filter_triples_from_binds(
-            raw_bindings=raw_bindings,
-            profile=profile,
-            rule=rule,
-            term_mapping=term_mapping,
-        )
+#     if profile is None:
+#         triple_iterator = triples_from_binds(
+#             raw_bindings=raw_bindings,
+#             rule=rule,
+#             term_mapping=term_mapping,
+#         )
+#     else:
+#         triple_iterator = filter_triples_from_binds(
+#             raw_bindings=raw_bindings,
+#             profile=profile,
+#             rule=rule,
+#             term_mapping=term_mapping,
+#         )
 
-    count = insert_triples_sparql(
-        graph_uri=graph_uri,
-        client=client,
-        triple_stream=triple_iterator,
-        chunk_size=chunk_size,
-    )
+#     count = insert_triples_sparql(
+#         graph_uri=graph_uri,
+#         client=client,
+#         triple_stream=triple_iterator,
+#         chunk_size=chunk_size,
+#     )
 
-    if not count:
-        logger.warning("Found bindings for %s, but still count is 0.", rule.rule_id)
-        return 0
+#     if not count:
+#         logger.warning("Found bindings for %s, but still count is 0.", rule.rule_id)
+#         return 0
 
-    return count
+#     return count
 
 
 def _is_novel_atom(index: int, binding_row: SparqlBinding) -> bool:

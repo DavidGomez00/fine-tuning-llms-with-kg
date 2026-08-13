@@ -2,13 +2,13 @@
   "data": {
     "input_dir": ".data/Mario/",
     "output_dir": ".experiments/GenTriples/Mario/",
-    "database_url": "http://localhost:8890/",
-    "sparql_endpoint": "sparql-auth",
-    "crud_endpoint": "sparql-graph-crud-auth"
+    "database_url": "http://localhost:7200/",
+    "sparql_endpoint": "repositories/MarioGraph"
   },
-  "virtuoso": {
-    "user": "dba",
-    "password": "dba",
+  "db-config": {
+    "user": "admin",
+    "password": "rootpassword",
+    "auth_type": "BASIC",
     "chunk_size": 5000
   },
   "graph": {

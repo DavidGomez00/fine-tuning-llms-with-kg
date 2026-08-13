@@ -4,13 +4,11 @@ set of rules."""
 import logging
 from pathlib import Path
 
-from SPARQLWrapper import DIGEST, SPARQLWrapper
-
 from kg_synth.config import RunConfig
 from kg_synth.core.queries import count_triples, initialize_graph
 from kg_synth.core.rules import get_term_mapping, parse_rule_set
 from kg_synth.engine.completion import complete_graph
-from kg_synth.utils import setup_logging
+from kg_synth.utils import create_sparql_client, setup_logging
 
 ### EDIT THIS PATH   vvv
 graph_config = Path("configurations/mario.json")
@@ -35,12 +33,10 @@ rules = parse_rule_set(
 )
 # TODO: Fix rule parsing
 rules = list(rules.values())
-logger.debug("Parsed %d rules.", len(rules))
 
 
-client = SPARQLWrapper(str(config.data.database_url / config.data.sparql_endpoint))
-client.setHTTPAuth(DIGEST)
-client.setCredentials(config.virtuoso.user, config.virtuoso.password)
+# SPARQL client
+client = create_sparql_client(config)
 
 # Initialize base graph
 initialize_graph(
@@ -49,6 +45,9 @@ initialize_graph(
     new_graph_uri=base_uri,
     chunk_size=1000,
 )
+
+base_count = count_triples(client, base_uri)
+logger.info("Inserted base graph to <%s> with %d triples.", base_uri, base_count)
 
 logger.info("Starting Graph Completion")
 
@@ -59,7 +58,7 @@ complete_graph(
     term_mapping=term_mapping,
     base_uri=base_uri,
     complete_uri=complete_uri,
-    chunk_size=config.virtuoso.chunk_size,
+    chunk_size=config.db_config.chunk_size,
 )
 
 logger.info(

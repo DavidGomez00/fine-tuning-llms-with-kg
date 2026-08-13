@@ -81,4 +81,4 @@ def complete_graph(
                 if state[rule.rule_id] > 0
             ]
         )
-        logger.info("[Step %d]\n%s", step, state_msg)
+        logger.info("[Step %d]: Added triples\n%s", step, state_msg)

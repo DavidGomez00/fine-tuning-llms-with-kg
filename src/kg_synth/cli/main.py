@@ -2,15 +2,13 @@ import logging
 import time
 from pathlib import Path
 
-from SPARQLWrapper import DIGEST, SPARQLWrapper
-
 from kg_synth.config import RunConfig
 from kg_synth.core.queries import count_triples
 from kg_synth.core.rules import get_term_mapping, parse_rule_set
 from kg_synth.engine.edb import generate_edb
 from kg_synth.engine.idb import generate_idb
 from kg_synth.engine.metrics import GraphMetrics
-from kg_synth.utils import setup_logging
+from kg_synth.utils import create_sparql_client, setup_logging
 
 logger = logging.getLogger(__name__)
 
@@ -29,9 +27,8 @@ def run_synthetic_graph_experiment(
     input_dir = config.data.input_dir
     rules_file = input_dir / config.rules.rules_file
 
-    client = SPARQLWrapper(str(config.data.database_url / config.data.sparql_endpoint))
-    client.setHTTPAuth(DIGEST)
-    client.setCredentials(config.virtuoso.user, config.virtuoso.password)
+    # SPARQL client
+    client = create_sparql_client(config)
 
     ## ------ Extraction of predicate profiles from original graph -------
     # Graph metrics
@@ -51,7 +48,7 @@ def run_synthetic_graph_experiment(
     )
 
     ## ------ EDB Generation  ------
-    chunk_size = config.virtuoso.chunk_size
+    chunk_size = config.db_config.chunk_size
     edb_uri = config.graph.edb_uri
     synthetic_uri = config.graph.synthetic_uri
     if source is None:
