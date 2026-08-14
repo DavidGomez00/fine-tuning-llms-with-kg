@@ -11,10 +11,10 @@ import uuid
 from collections.abc import Iterator
 from typing import Any, NamedTuple, TypedDict
 
+from rules import Atom, HornRule, format_triple
 from SPARQLWrapper import SPARQLWrapper
 
-from graph_metrics import PredicateProfile
-from queries import (
+from kg_synth.core.queries import (
     SparqlBinding,
     build_filtered_query,
     build_rule_query,
@@ -26,7 +26,7 @@ from queries import (
     insert_triples_sparql,
     run_select_query,
 )
-from rules import Atom, HornRule, format_triple
+from kg_synth.engine.metrics import PredicateProfile
 
 logger = logging.getLogger(__name__)
 

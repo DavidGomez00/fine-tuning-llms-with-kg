@@ -1,12 +1,12 @@
 import logging
 from pathlib import Path
 
+from rules import HornRule
 from SPARQLWrapper import SPARQLWrapper
 
-from graph_metrics import GraphMetrics
-from queries import count_triples, initialize_graph
-from rules import HornRule
-from triple_generation import apply_rules
+from kg_synth.core.queries import count_triples, initialize_graph
+from kg_synth.engine.generator import apply_rules
+from kg_synth.engine.metrics import GraphMetrics
 
 logger = logging.getLogger(__name__)
 
