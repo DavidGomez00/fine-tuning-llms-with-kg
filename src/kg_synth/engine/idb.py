@@ -1,11 +1,5 @@
 import logging
 
-from rules import (
-    HornRule,
-    check_uninferrable_preds,
-    get_dependencies_intensional,
-    get_predicate_mapping,
-)
 from SPARQLWrapper import SPARQLWrapper
 
 from kg_synth.core.queries import (
@@ -13,6 +7,11 @@ from kg_synth.core.queries import (
     get_frequency,
     get_support,
     initialize_graph,
+)
+from kg_synth.core.rules import (
+    HornRule,
+    check_uninferrable_preds,
+    get_predicate_mapping,
 )
 from kg_synth.engine.generator import (
     apply_rule,
@@ -146,8 +145,9 @@ def generate_idb(
         logger.error(error_msg)
         raise RuntimeError(error_msg)
 
+    # We don't need intensional dependencies if we assume the rules are complete
     # Get intensional dependencies
-    intensional_dependencies = get_dependencies_intensional(rules=rules)
+    # intensional_dependencies = get_dependencies_intensional(rules=rules)
 
     # Stratify and apply rules iteratively
     closed_rule_ids: set[str] = set()
@@ -156,6 +156,24 @@ def generate_idb(
     grounded_predicates = set(extensional_preds)
     predicate_to_rules = get_predicate_mapping(rules)
 
+    # Update closure from EDB before starting graph completion
+    update_closure(
+        client=client,
+        graph_uri=synthetic_uri,
+        profiles_to_check=profiles,
+        rules_to_check=rules,
+        closed_preds=closed_preds,
+        closed_rule_ids=closed_rule_ids,
+    )
+
+    if not (intensional_preds - closed_preds):
+        logger.info("All predicates closed.")
+        return
+
+    if not (rules.keys() - closed_rule_ids):
+        logger.info("All rules closed.")
+        return
+
     logger.info(
         "Completing Synthetic graph from EDB... Rules [%d/%d] | Predicates [%d/%d].",
         len(closed_rule_ids),
@@ -163,6 +181,7 @@ def generate_idb(
         len(closed_preds),
         len(profiles),
     )
+
     step = 0
     while True:
         step += 1
@@ -176,17 +195,22 @@ def generate_idb(
             profile = profiles[predicate]
 
             if rule_id in closed_rule_ids or predicate in closed_preds:
+                logger.debug("%s: rule or %s are closed.", rule_id, predicate)
                 continue
 
             body_predicates = rule.get_body_predicates() - {predicate}
             if not body_predicates.issubset(grounded_predicates):
+                logger.debug("%s: Rule body is not grounded.", rule_id)
                 continue
 
-            dependency_ids = intensional_dependencies.get(rule_id, [])
-            if any(r_id not in closed_rule_ids for r_id in dependency_ids):
-                continue
+            # Dependencies are not necessary if rules are complete.
+            # dependency_ids = intensional_dependencies.get(rule_id, [])
+            # if any(r_id not in closed_rule_ids for r_id in dependency_ids):
+            #     logger.debug("%s: Rule depends on other non closed rules.", rule_id)
+            #     continue
 
             # Apply the rule and generate triples from it
+            logger.debug("%s: Ready to be applied.", rule_id)
             count = apply_rule(
                 client=client,
                 graph_uri=synthetic_uri,
@@ -254,11 +278,11 @@ if __name__ == "__main__":
     import time
     from pathlib import Path
 
-    from rules import get_term_mapping, parse_rule_set
     from SPARQLWrapper import DIGEST
 
     from kg_synth.config import RunConfig
     from kg_synth.core.queries import count_triples
+    from kg_synth.core.rules import get_term_mapping, parse_rule_set
     from kg_synth.utils import setup_logging
 
     # Config setup

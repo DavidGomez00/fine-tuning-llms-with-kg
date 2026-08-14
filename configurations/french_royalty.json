@@ -15,8 +15,11 @@
     "name": "FrechRoyalty",
     "nt_file": "french_royalty.nt",
     "ontology_file": "french_royalty.ttl",
-    "synthetic_graph_uri": "http://SyntheticFrenchRoyalty.org/",
-    "base_graph_uri": "http://FrenchRoyalty.org/graph/base"
+    "namespace": "http://FrenchRoyalty.org/",
+    "base_uri": "http://FrenchRoyalty.org/graph/base",
+    "complete_uri": "http://FrenchRoyalty.org/graph/complete",
+    "edb_uri": "http://FrenchRoyalty.org/graph/EDB",
+    "synthetic_uri": "http://FrenchRoyalty.org/graph/synthetic"
   },
   "rules":{
     "rules_file": "rules_Std_1.csv",

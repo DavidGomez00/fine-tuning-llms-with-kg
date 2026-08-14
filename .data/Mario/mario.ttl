@@ -1,0 +1,26 @@
+@prefix ex: <http://example.org/mario/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+
+# --- Ontology Header ---
+ex:MarioOntology a owl:Ontology ;
+    rdfs:label "Super Mario Logic Ontology" ;
+    rdfs:comment "Defines the relationships and inferred rules of the Mario universe." .
+
+# --- Base Properties ---
+
+ex:loves a owl:ObjectProperty ;
+    rdfs:label "loves" .
+
+ex:allyOf a owl:ObjectProperty ;
+    rdfs:label "ally of" .
+
+# --- Properties mapped to Rules ---
+ex:brotherOf a owl:ObjectProperty, owl:SymmetricProperty ;
+    rdfs:label "brother of" ;
+    rdfs:subPropertyOf ex:allyOf .
+
+ex:enemyOf a owl:ObjectProperty, owl:SymmetricProperty ;
+    rdfs:label "enemy of" ;
+    owl:propertyChainAxiom ( ex:enemyOf ex:allyOf ) .

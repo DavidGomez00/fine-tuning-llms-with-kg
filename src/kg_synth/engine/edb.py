@@ -4,13 +4,6 @@ import random
 import uuid
 from collections.abc import Iterator
 
-from rules import (
-    Atom,
-    HornRule,
-    RuleSignature,
-    format_triple,
-    get_extensional_dependencies,
-)
 from SPARQLWrapper import SPARQLWrapper
 
 from kg_synth.core.queries import (
@@ -22,6 +15,13 @@ from kg_synth.core.queries import (
     initialize_graph,
     insert_triples_sparql,
     run_select_query,
+)
+from kg_synth.core.rules import (
+    Atom,
+    HornRule,
+    RuleSignature,
+    format_triple,
+    get_extensional_dependencies,
 )
 from kg_synth.engine.generator import (
     GraphSources,
@@ -478,7 +478,7 @@ def generate_edb(
     chunk_size: int,
     profiles: dict[str, PredicateProfile],
 ) -> None:
-    """Generates an EDB from a graph, ensuring a similar graph can be produced.
+    """Generates an EDB from a set of rules and predicate profiles.
 
     Args:
         client: Wrapper for SPARQL queries.
@@ -635,11 +635,11 @@ if __name__ == "__main__":
     import time
     from pathlib import Path
 
-    from rules import get_term_mapping, parse_rule_set
     from SPARQLWrapper import DIGEST
 
     from kg_synth.config import RunConfig
     from kg_synth.core.queries import count_triples
+    from kg_synth.core.rules import get_term_mapping, parse_rule_set
     from kg_synth.utils import setup_logging
 
     # Config setup

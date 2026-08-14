@@ -6,11 +6,10 @@ from typing import cast
 
 import requests
 from requests.auth import HTTPDigestAuth
-from rules import HornRule, RuleSignature, format_term, format_triple
-from SPARQLWrapper import GET, JSON, SPARQLWrapper
+from SPARQLWrapper import GET, JSON, URLENCODED, SPARQLWrapper
 from yarl import URL
 
-from kg_synth.utils import setup_logging
+from kg_synth.core.rules import HornRule, RuleSignature, format_term, format_triple
 
 logger = logging.getLogger(__name__)
 
@@ -50,7 +49,7 @@ def build_rule_query(rule: RuleSignature, sources: dict[str, str | list[str]]) -
     if t_source is None:
         raise ValueError("Target source not specified.")
     sources = [t_source] + [s for s in sources.get("others", [])]
-    source_str = "\n".join(f"FROM <{g}>" for g in sources)
+    source_str = "\n    ".join(f"FROM <{g}>" for g in sources)
 
     query = f"""
     SELECT DISTINCT ?rule_id {proj}
@@ -309,6 +308,21 @@ def insert_graph_from_nt_sparql(
     logger.debug("Inserted %d triples to <%s> from '%s'.", n, graph_uri, nt_file.name)
 
 
+def _get_update_client(client: SPARQLWrapper) -> SPARQLWrapper:
+    """Returns a SPARQLWrapper pointing to the write endpoint for updates."""
+
+    if "/repositories/" in client.endpoint and not client.endpoint.endswith(
+        "/statements"
+    ):
+        update_client = SPARQLWrapper(f"{client.endpoint.rstrip('/')}/statements")
+        update_client.http_auth = client.http_auth
+        update_client.user = getattr(client, "user", None)
+        update_client.passwd = getattr(client, "passwd", None)
+        return update_client
+
+    return client
+
+
 def clear_graph_sparql(client: SPARQLWrapper, graph_uri: str) -> None:
     """Removes all triples from a specified named graph.
 
@@ -319,16 +333,20 @@ def clear_graph_sparql(client: SPARQLWrapper, graph_uri: str) -> None:
     Raises:
         Exception: If the SPARQL CLEAR operation fails.
     """
-    client.setMethod("POST")
-
-    # CLEAR SILENT empties the graph safely even if it doesn't exist yet
+    update_client = _get_update_client(client)
+    update_client.setMethod("POST")
     query = f"CLEAR SILENT GRAPH <{graph_uri}>"
-    client.setQuery(query)
+    update_client.setQuery(query)
+
+    if hasattr(update_client, "parameters"):
+        if "query" in update_client.parameters:
+            del update_client.parameters["query"]
+        update_client.parameters["update"] = query
 
     try:
-        client.query()
+        update_client.query()
     except Exception:
-        logger.exception("Failed to clear graph <%s>: %s", graph_uri)
+        logger.exception("Failed to clear graph <%s>.", graph_uri)
         raise
 
 
@@ -498,12 +516,21 @@ def execute_ask_query(client: SPARQLWrapper, query: str) -> bool:
 
 def execute_insert_query(client: SPARQLWrapper, query: str) -> None:
     """Execute an INSERT query."""
-    client.setMethod("POST")
-    client.setQuery(query)
+    update_client = _get_update_client(client)
+
+    # Configure for SPARQL UPDATE
+    update_client.setMethod("POST")
+    update_client.setRequestMethod(URLENCODED)
+
+    update_client.setQuery(query)
+
+    if hasattr(update_client, "parameters"):
+        if "query" in update_client.parameters:
+            del update_client.parameters["query"]
+        update_client.parameters["update"] = query
 
     try:
-        client.query()
-
+        update_client.query()
     except Exception:
         logger.exception("Failed to insert chunk! Query:\n%s", query)
         raise
@@ -513,16 +540,23 @@ def copy_graph_sparql(
     client: SPARQLWrapper, source_graph_uri: str, target_graph_uri: str
 ) -> None:
     """Copy all contents from a graph to another."""
+    update_client = _get_update_client(client)
+
+    update_client.setMethod("POST")
+    update_client.setRequestMethod(URLENCODED)
 
     query = f"""
     COPY GRAPH <{source_graph_uri}> TO GRAPH <{target_graph_uri}>
     """
+    update_client.setQuery(query)
 
-    client.setQuery(query)
-    client.setMethod("POST")
+    if hasattr(update_client, "parameters"):
+        if "query" in update_client.parameters:
+            del update_client.parameters["query"]
+        update_client.parameters["update"] = query
 
     try:
-        client.query()
+        update_client.query()
         logger.debug(
             "Successfully copied <%s> to <%s>.", source_graph_uri, target_graph_uri
         )
@@ -716,7 +750,7 @@ def get_existing_triples(
     term_mapping: dict[str, str],
     chunk_size: int,
 ) -> set[str]:
-    """Return triples from 'candidate_triples' that exist in 'edb_uri'."""
+    """Return triples from 'candidate_triples' that already exist in 'edb_uri'."""
     existing_triples = set()
 
     for chunk in chunk_iter(candidate_triples, chunk_size):
@@ -737,54 +771,12 @@ def get_existing_triples(
 
         existing_triples.update(
             format_triple(
-                subject=from_binding_row("s", binding_row)[0],
-                predicate=from_binding_row("p", binding_row)[0],
-                obj=from_binding_row("o", binding_row)[0],
+                subject=from_binding_row("?s", binding_row)[0],
+                predicate=from_binding_row("?p", binding_row)[0],
+                obj=from_binding_row("?o", binding_row)[0],
                 term_mapping=term_mapping,
             )
             for binding_row in bindings
         )
 
     return existing_triples
-
-
-if __name__ == "__main__":
-    from rules import get_term_mapping, parse_rule_set
-    from SPARQLWrapper import DIGEST
-
-    from kg_synth.config import RunConfig
-
-    french_config = Path("configurations/french_royalty.json")
-    config = RunConfig.from_json(french_config)
-
-    input_dir = config.data.input_dir
-    graph_uri = config.graph.base_uri
-    ontology_file = input_dir / config.graph.ontology_file
-    rules_file = input_dir / config.rules.rules_file
-
-    setup_logging(level=config.logging.level)
-
-    client = SPARQLWrapper(str(config.data.database_url / config.data.sparql_endpoint))
-    client.setHTTPAuth(DIGEST)
-    client.setCredentials(config.virtuoso.user, config.virtuoso.password)
-
-    # initialize_graph(
-    #     client=client,
-    #     source=str(input_dir / config.graph.nt_file),
-    #     new_graph_uri=graph_uri,
-    #     chunk_size=1000,
-    # )
-
-    term_mapping = get_term_mapping(
-        ontology_file=ontology_file, default_namespace=graph_uri
-    )
-    rules = parse_rule_set(
-        rules_file=rules_file, term_mapping=term_mapping, pca_threshold=1
-    )
-
-    for rule_id, rule in rules.items():
-        logger.info("%s", rule_id)
-        logger.info(
-            "Rule support: %d",
-            get_support(client=client, rule=rule, graph_uri=graph_uri),
-        )

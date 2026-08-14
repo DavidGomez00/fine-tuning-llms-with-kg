@@ -2,10 +2,16 @@ import logging
 from pathlib import Path
 
 import pandas as pd
+from SPARQLWrapper import BASIC, DIGEST, SPARQLWrapper
+
+from kg_synth.config import RunConfig
 
 logger = logging.getLogger(__name__)
 
 
+#
+# Logging
+#
 def setup_logging(level: int | str = logging.INFO) -> None:
     """Configures the root logger to output to the console.
 
@@ -75,5 +81,23 @@ def filter_rules(
     )
 
 
-if __name__ == "__main__":
-    filter_rules(Path(".data/FrenchRoyalty/french_royalty.csv"), std_threshold=1)
+#
+# Database connection
+#
+def create_sparql_client(config: RunConfig) -> SPARQLWrapper:
+    """Instantiates a SPARQLWrapper client."""
+    endpoint_url = config.data.get_full_sparql_url()
+    client = SPARQLWrapper(endpoint_url)
+
+    auth_type = config.db_config.auth_type.upper()
+    user = config.db_config.user
+    password = config.db_config.password
+
+    if auth_type == "DIGEST" and user and password:
+        client.setHTTPAuth(DIGEST)
+        client.setCredentials(user, password)
+    elif auth_type == "BASIC" and user and password:
+        client.setHTTPAuth(BASIC)
+        client.setCredentials(user, password)
+
+    return client
