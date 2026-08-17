@@ -11,9 +11,6 @@
 .vscode/
 .vscode/*
 
-# Environment variable file
-.env
-
 # Logs
 *.log
 logs/*
