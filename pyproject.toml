@@ -2,7 +2,7 @@
 # Project Metadata
 # ==============================================================================
 [project]
-name = "Using-rules-and-knowledge-graphs"
+name = "skgg"
 version = "0.1.0"
 description = "This project implements methods and classes to deal with tasks that require rules and knowledge graphs."
 requires-python = ">=3.10"

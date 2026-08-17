@@ -1,18 +1,69 @@
-# Project Summary
-This project is a tool for Sythetic Knowledge Graph generation. The code for the tool is in the 'src' folder.
+# skgg — Synthetic Knowledge Graph Generation
 
-This tool creates a Knowledge Graph (KG) from topological metrics (number of nodes, relations, frequencies of the elements in the domain and range of each relation, etc.) and a set of rules represented in the form of Horn Rules.
+A tool for generating a **synthetic Knowledge Graph (KG)** from the
+topological metrics of a source graph (node/relation counts, domain/range
+frequencies per relation, etc.) and a set of Horn Rules — without needing
+continued access to the original graph once its metrics are extracted.
 
-The graphs are always stored in a graphical database, avoiding the usage of memmory intense libraries like RDFlib. We work with RDF format graphs and communicate with the graphical database with SPARQL queries through the SPARQLWrapper library.
+Graphs are never loaded into memory-intensive libraries like RDFlib for bulk
+work. They live in a graph database (Virtuoso or GraphDB) and are manipulated
+via SPARQL through `SPARQLWrapper`.
 
-# Building blocks
- - **config.py**: The script 'config.py' implements a general configuration dataclass that stores all relevant parameters for the execution of an experiment. The parameters are read from '.json' files from the folder "configurations".
- - **rules.py**: The script 'rules.py' implements the dataclasses that represent a rule and the functionalities to parse a set of rules from a .csv file.
- - **utils.py**: The script 'utils.py' implements some common functionalities.
- - **queries.py**: The script 'queries.py' implements the comunication functions with the graphical database and the construction of SPARQL queries.
- - **graph_metrics.py**: The script 'graph_metrics.py' implements the 'GraphMetrics' dataclass. This class stores the topological descriptors of a graph. It counts the frequency of each relation (often refered as 'predicate') and the frequency of the elements in its domain and range.
+## Requirements
 
-# Main functionality
-The main functionality of this tool is to create a synthetic copy of a set of rules and topological descriptors. 
+- Python >= 3.10
+- Docker (for the graph database)
 
-The current implementation of the tool obtains the topological descriptors from the graph itself through the 'graph_metrics.py' script. Ideally, the synthetic generator does not need to access the original graph.
+## Setup
+
+```bash
+pip install -r requirements.txt
+pip install -e .          # installs the `skgg` package from src/ in editable mode
+```
+
+Create a `.env` file (gitignored) with any required secrets, e.g. `DATABASE_URL`.
+
+## Graph database
+
+`docker-compose.yml` defines two alternative stacks, selected via Compose
+profiles — bring up one at a time:
+
+```bash
+docker compose --profile virtuoso up   # Virtuoso (8890) + YASGUI SPARQL UI (8080)
+docker compose --profile graphdb up    # GraphDB 10.7 (7200)
+docker compose --profile all up        # both
+```
+
+## Running an experiment
+
+Experiments are driven by JSON config files in `configurations/` (e.g.
+`mario.json`, `simpsons.json`, `french_royalty.json`):
+
+```python
+from pathlib import Path
+from skgg.cli.main import run_synthetic_graph_experiment
+
+run_synthetic_graph_experiment(Path("configurations/mario.json"))
+```
+
+This loads the config, computes graph metrics over SPARQL, parses the
+ontology and Horn rule set, generates the EDB (facts satisfying rule bodies),
+then grows the IDB (rule-derived facts) until closure — producing the
+synthetic graph.
+
+## Project layout
+
+```
+src/skgg/          # package source (see CLAUDE.md for the full module map)
+configurations/    # per-experiment JSON configs
+.data/<Dataset>/   # source graph data (.nt/.ttl/.csv) referenced by configs
+notebooks/         # exploratory/prototype work
+logs/              # per-run logs (gitignored)
+```
+
+## More
+
+- [`CLAUDE.md`](CLAUDE.md) — full architecture map and data flow, for
+  contributors and AI coding agents alike.
+- [`BACKLOG.md`](BACKLOG.md) — known issues and pending refactors; check
+  before assuming a code path is exercised/working.

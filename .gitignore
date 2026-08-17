@@ -4,8 +4,6 @@
 *.pyo
 *.pyd
 
-.python-version
-
 # vscode
 .vscode/
 .vscode/*
@@ -17,6 +15,8 @@
 *.log
 logs/*
 
+# Generated experiment outputs (not source data)
+.data/Synthetic/
+
 # AI assistant files
 .gemini
-CLAUDE.md
