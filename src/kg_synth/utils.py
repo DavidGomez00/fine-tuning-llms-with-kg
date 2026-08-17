@@ -1,4 +1,6 @@
+import csv
 import logging
+import re
 from pathlib import Path
 
 import pandas as pd
@@ -101,3 +103,114 @@ def create_sparql_client(config: RunConfig) -> SPARQLWrapper:
         client.setCredentials(user, password)
 
     return client
+
+
+def tsv_to_nt(tsv_file: Path, nt_file: Path, term_mapping: dict[str, str]):
+    """Parses a tsv file into a .nt file."""
+    with tsv_file.open(encoding="utf-8") as tsv_f:
+        with nt_file.open("w", encoding="utf-8") as nt_f:
+            rd = csv.reader(tsv_f, delimiter="\t")
+            for line in rd:
+                if not line:
+                    continue
+                if len(line) == 3:
+                    triple = format_triple(
+                        line[0], line[1], line[2], term_mapping
+                    ).strip()
+                    nt_f.write(f"{triple}\n")
+
+                else:
+                    logger.error("Parsed line: %s", line)
+                    raise ValueError("Error: Found != 3 elements in a non empty row.")
+
+    logger.debug(".nt file saved at %s", nt_file)
+
+
+# ---------------------------------------------------------------------------
+# Term mappings.
+# ---------------------------------------------------------------------------
+DEFAULT_PREFIXES: dict[str, str] = {
+    "type": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    "Property": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    "Class": "http://www.w3.org/2000/01/rdf-schema#",
+    "subClassOf": "http://www.w3.org/2000/01/rdf-schema#",
+    "sameAs": "http://www.w3.org/2002/07/owl#",
+    "name": "http://xmlns.com/foaf/0.1/",
+}
+
+
+def format_term(
+    term: str,
+    term_mapping: dict[str, str] | None = None,
+) -> str:
+    """Ensures a term is wrapped in one set of brackets with the correct namespace."""
+    if (term.startswith("<") and term.endswith(">")) or term.startswith("?"):
+        return term
+
+    if term.startswith("http"):
+        return f"<{term}>"
+
+    if term_mapping is not None:
+        namespace = term_mapping.get(term, term_mapping.get("default"))
+        if namespace is not None:
+            return f"<{namespace}{term}>"
+
+    message = "Default namespace not defined, aborting."
+    raise ValueError(f"Error parsing term {term}: {message}")
+
+
+def format_triple(
+    subject: str,
+    predicate: str,
+    obj: str,
+    term_mapping: dict[str, str],
+) -> str:
+    """Returns triple is in SPARQL format with the correct namespace and a final '.'."""
+    subject_str = format_term(subject, term_mapping)
+    predicate_str = format_term(predicate, term_mapping)
+    object_str = format_term(obj, term_mapping)
+
+    return f"{subject_str} {predicate_str} {object_str} ."
+
+
+def get_term_mapping(ontology_file: Path, default_namespace: str) -> dict[str, str]:
+    """Extracts term->namespace mappings from a Turtle file using line-by-line regex.
+
+    Scales with O(1) memory footprint by avoiding in-memory graph construction.
+    """
+    term_mapping: dict[str, str] = DEFAULT_PREFIXES.copy()
+    custom_mapping: dict[str, str] = {}
+    prefixes: dict[str, str] = {}
+
+    # Matches: @prefix fr: <http://FrenchRoyalty.org/> .
+    prefix_pattern = re.compile(r"@prefix\s+([^:]+):\s*<([^>]+)>\s*\.")
+
+    # Matches: fr:father a rdfs:Property (captures "fr" and "father")
+    term_pattern = re.compile(r"^([a-zA-Z0-9_-]+):([a-zA-Z0-9_-]+)(?=\s)")
+
+    with open(ontology_file, encoding="utf-8") as f:
+        for line in f:
+            line = line.lstrip()  # Keep right spaces, just clear indents
+
+            # Skip empty lines and comments
+            if not line or line.startswith("#"):
+                continue
+
+            # 1. Catch Prefix Declarations
+            if line.startswith("@prefix"):
+                match = prefix_pattern.search(line)
+                if match:
+                    prefix, uri = match.groups()
+                    prefixes[prefix] = uri
+                continue
+
+            # 2. Catch Term Definitions
+            match = term_pattern.search(line)
+            if match:
+                prefix, term = match.groups()
+                if prefix in prefixes:
+                    custom_mapping[term] = prefixes[prefix]
+    logger.debug("Created term to prefix mapping.")
+    term_mapping.update(custom_mapping)
+    term_mapping.update({"default": default_namespace})
+    return term_mapping
