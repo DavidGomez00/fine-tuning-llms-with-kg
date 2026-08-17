@@ -70,7 +70,6 @@ class DataConfig:
     """Configuration for input and output directories."""
 
     input_dir: Path = Path(".data/")
-    output_dir: Path = Path(".experiments/new_experiment")
 
     # Base URL of the database instance
     database_url: URL = URL("http://localhost:8890/")
@@ -86,11 +85,9 @@ class DataConfig:
     def __post_init__(self) -> None:
         """Validate input and create output directories."""
         self.input_dir = Path(self.input_dir)
-        self.output_dir = Path(self.output_dir)
         self.database_url = URL(self.database_url)
 
         self._validate_path(self.input_dir, "input_dir")
-        self.output_dir.mkdir(parents=True, exist_ok=True)
 
     @staticmethod
     def _validate_path(path: Path, field_name: str) -> None:

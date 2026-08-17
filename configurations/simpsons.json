@@ -1,7 +1,6 @@
 {
   "data": {
     "input_dir": ".data/Simpsons/",
-    "output_dir": ".experiments/GenTriples/Simpsons/",
     "database_url": "http://localhost:8890/",
     "sparql_endpoint": "sparql-auth",
     "crud_endpoint": "sparql-graph-crud-auth"
