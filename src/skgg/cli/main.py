@@ -2,13 +2,13 @@ import logging
 import time
 from pathlib import Path
 
-from kg_synth.config import RunConfig
-from kg_synth.core.queries import count_triples
-from kg_synth.core.rules import get_term_mapping, parse_rule_set
-from kg_synth.engine.edb import generate_edb
-from kg_synth.engine.idb import generate_idb
-from kg_synth.engine.metrics import GraphMetrics
-from kg_synth.utils import create_sparql_client, setup_logging
+from skgg.config import RunConfig
+from skgg.core.queries import count_triples
+from skgg.core.rules import get_term_mapping, parse_rule_set
+from skgg.engine.edb import generate_edb
+from skgg.engine.idb import generate_idb
+from skgg.engine.metrics import GraphMetrics
+from skgg.utils import create_sparql_client, setup_logging
 
 logger = logging.getLogger(__name__)
 

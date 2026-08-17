@@ -7,7 +7,7 @@ from dataclasses import dataclass, field
 from rdflib import Graph
 from SPARQLWrapper import SPARQLWrapper
 
-from kg_synth.core.queries import (
+from skgg.core.queries import (
     count_triples,
     get_domain,
     get_predicate_frequencies,

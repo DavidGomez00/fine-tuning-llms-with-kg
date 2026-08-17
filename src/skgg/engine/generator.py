@@ -11,7 +11,7 @@ from typing import TypedDict
 
 from SPARQLWrapper import SPARQLWrapper
 
-from kg_synth.core.queries import (
+from skgg.core.queries import (
     SparqlBinding,
     build_rule_query,
     clear_graph_sparql,
@@ -21,9 +21,9 @@ from kg_synth.core.queries import (
     insert_triples_sparql,
     run_select_query,
 )
-from kg_synth.core.rules import Atom, HornRule
-from kg_synth.engine.metrics import PredicateProfile
-from kg_synth.utils import format_triple
+from skgg.core.rules import Atom, HornRule
+from skgg.engine.metrics import PredicateProfile
+from skgg.utils import format_triple
 
 logger = logging.getLogger(__name__)
 

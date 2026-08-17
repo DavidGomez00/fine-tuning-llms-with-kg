@@ -2,21 +2,21 @@ import logging
 
 from SPARQLWrapper import SPARQLWrapper
 
-from kg_synth.core.queries import (
+from skgg.core.queries import (
     count_triples,
     get_frequency,
     get_support,
     initialize_graph,
 )
-from kg_synth.core.rules import (
+from skgg.core.rules import (
     HornRule,
     check_uninferrable_preds,
     get_predicate_mapping,
 )
-from kg_synth.engine.generator import (
+from skgg.engine.generator import (
     apply_rule,
 )
-from kg_synth.engine.metrics import GraphMetrics, PredicateProfile
+from skgg.engine.metrics import GraphMetrics, PredicateProfile
 
 logger = logging.getLogger(__name__)
 
@@ -280,10 +280,10 @@ if __name__ == "__main__":
 
     from SPARQLWrapper import DIGEST
 
-    from kg_synth.config import RunConfig
-    from kg_synth.core.queries import count_triples
-    from kg_synth.core.rules import get_term_mapping, parse_rule_set
-    from kg_synth.utils import setup_logging
+    from skgg.config import RunConfig
+    from skgg.core.queries import count_triples
+    from skgg.core.rules import get_term_mapping, parse_rule_set
+    from skgg.utils import setup_logging
 
     # Config setup
     simpson_config = Path("configurations/simpsons.json")

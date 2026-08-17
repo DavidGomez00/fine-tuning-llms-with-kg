@@ -6,7 +6,7 @@ from collections.abc import Iterator
 
 from SPARQLWrapper import SPARQLWrapper
 
-from kg_synth.core.queries import (
+from skgg.core.queries import (
     SparqlBinding,
     build_rule_query,
     clear_graph_sparql,
@@ -16,14 +16,14 @@ from kg_synth.core.queries import (
     insert_triples_sparql,
     run_select_query,
 )
-from kg_synth.core.rules import (
+from skgg.core.rules import (
     Atom,
     HornRule,
     RuleSignature,
     format_triple,
     get_extensional_dependencies,
 )
-from kg_synth.engine.generator import (
+from skgg.engine.generator import (
     GraphSources,
     create_searchspace,
     decrement_counts,
@@ -31,7 +31,7 @@ from kg_synth.engine.generator import (
     triples_from_bindings,
     update_closed_preds,
 )
-from kg_synth.engine.metrics import GraphMetrics, PredicateProfile
+from skgg.engine.metrics import GraphMetrics, PredicateProfile
 
 logger = logging.getLogger(__name__)
 
@@ -637,10 +637,10 @@ if __name__ == "__main__":
 
     from SPARQLWrapper import DIGEST
 
-    from kg_synth.config import RunConfig
-    from kg_synth.core.queries import count_triples
-    from kg_synth.core.rules import get_term_mapping, parse_rule_set
-    from kg_synth.utils import setup_logging
+    from skgg.config import RunConfig
+    from skgg.core.queries import count_triples
+    from skgg.core.rules import get_term_mapping, parse_rule_set
+    from skgg.utils import setup_logging
 
     # Config setup
     simpson_config = Path("configurations/simpsons.json")

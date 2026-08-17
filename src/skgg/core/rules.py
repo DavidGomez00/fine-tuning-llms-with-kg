@@ -14,7 +14,7 @@ from typing import Protocol
 
 import pandas as pd
 
-from kg_synth.utils import format_term
+from skgg.utils import format_term
 
 logger = logging.getLogger(__name__)
 

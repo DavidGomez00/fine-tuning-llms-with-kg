@@ -4,7 +4,7 @@ from pathlib import Path
 
 from SPARQLWrapper import BASIC, DIGEST, SPARQLWrapper
 
-from kg_synth.config import RunConfig
+from skgg.config import RunConfig
 
 logger = logging.getLogger(__name__)
 

@@ -2,10 +2,10 @@ import logging
 
 from SPARQLWrapper import SPARQLWrapper
 
-from kg_synth.core.queries import initialize_graph
-from kg_synth.core.rules import HornRule
-from kg_synth.engine.generator import apply_rule
-from kg_synth.engine.metrics import GraphMetrics
+from skgg.core.queries import initialize_graph
+from skgg.core.rules import HornRule
+from skgg.engine.generator import apply_rule
+from skgg.engine.metrics import GraphMetrics
 
 logger = logging.getLogger(__name__)
 

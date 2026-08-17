@@ -4,11 +4,11 @@ set of rules."""
 import logging
 from pathlib import Path
 
-from kg_synth.config import RunConfig
-from kg_synth.core.queries import count_triples, initialize_graph
-from kg_synth.core.rules import get_term_mapping, parse_rule_set
-from kg_synth.engine.completion import complete_graph
-from kg_synth.utils import create_sparql_client, setup_logging
+from skgg.config import RunConfig
+from skgg.core.queries import count_triples, initialize_graph
+from skgg.core.rules import get_term_mapping, parse_rule_set
+from skgg.engine.completion import complete_graph
+from skgg.utils import create_sparql_client, setup_logging
 
 ### EDIT THIS PATH   vvv
 graph_config = Path("configurations/mario.json")
