@@ -4,8 +4,10 @@
 *.pyo
 *.pyd
 
+.python-version
 
 # vscode
+.vscode/
 .vscode/*
 
 # Environment variable file
@@ -15,5 +17,6 @@
 *.log
 logs/*
 
-# Gemini files
+# AI assistant files
 .gemini
+CLAUDE.md
