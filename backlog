@@ -24,3 +24,11 @@ TODO (queries.py): Refactor script, order functions and organise boxes.
 TODO (rules.py): Refactor dataclass functions to delete obsolete code.
 TODO (rules.py): Refactor and delete obsolete functions.
 TODO (generator.py): Refactor and delete obsolete functions.
+
+
+
+Queries tiene varias funciones:
+
+chunk_iter: Función helper sólo usada dentro de queries.py -> Renombrar a _chunk_iter() y organizar en "helpers".
+build_rule_query: Es llamada desde varios scripts.
+build_filtered_query: Es llamada desde la función "generate_triples_from_rule" que tal vez esté obsoleta. De momento se comenta para ver si es eliminada más adelante.

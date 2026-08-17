@@ -10,7 +10,7 @@ from SPARQLWrapper import SPARQLWrapper
 from kg_synth.core.queries import (
     count_triples,
     get_domain,
-    get_preds_and_freqs,
+    get_predicate_frequencies,
     get_range,
     get_reflexivity,
 )
@@ -52,7 +52,7 @@ class GraphMetrics:
         )
         profiles: dict[str, PredicateProfile] = {}
 
-        predicates = get_preds_and_freqs(client, graph_uri) or {}
+        predicates = get_predicate_frequencies(client, graph_uri) or {}
 
         for predicate, frequency in predicates.items():
             if not predicate.startswith("<"):
@@ -72,18 +72,6 @@ class GraphMetrics:
         for predicate, profile in profiles.items():
             if "?f" in profile.domain.keys():
                 raise ValueError(f"Error ?f en {predicate} domain.")
-        #     logger.debug(
-        #         "Predicate %s (freq %d | reflx %d)",
-        #         predicate,
-        #         profile.frequency,
-        #         profile.reflexivity,
-        #     )
-        #     logger.debug("Domain:")
-        #     for subject, freq in profile.domain.items():
-        #         logger.debug("%s | %d", subject, freq)
-        #     logger.debug("Range:")
-        #     for obj, freq in profile.range.items():
-        #         logger.debug("%s | %d", obj, freq)
 
         return cls(profiles=profiles, triple_count=triple_count)
 

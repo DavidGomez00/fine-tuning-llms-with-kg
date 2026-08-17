@@ -15,17 +15,32 @@ logger = logging.getLogger(__name__)
 
 
 # ---------------------------------------------------------------------------
-# Utils
+# Helper functions.
 # ---------------------------------------------------------------------------
-def chunk_iter(iterable: Iterable[str], size: int) -> Iterable[tuple[str, ...]]:
+def _chunk_iter(iterable: Iterable[str], size: int) -> Iterable[tuple[str, ...]]:
     """Yields successive chunks of a given size from an iterable."""
     iterator = iter(iterable)
     while chunk := tuple(itertools.islice(iterator, size)):
         yield chunk
 
 
+def _get_update_client(client: SPARQLWrapper) -> SPARQLWrapper:
+    """Returns a SPARQLWrapper pointing to the write endpoint for updates."""
+
+    if "/repositories/" in client.endpoint and not client.endpoint.endswith(
+        "/statements"
+    ):
+        update_client = SPARQLWrapper(f"{client.endpoint.rstrip('/')}/statements")
+        update_client.http_auth = client.http_auth
+        update_client.user = getattr(client, "user", None)
+        update_client.passwd = getattr(client, "passwd", None)
+        return update_client
+
+    return client
+
+
 # ---------------------------------------------------------------------------
-# SPARQL Query generation.
+# SPARQL query generation.
 # ---------------------------------------------------------------------------
 def build_rule_query(rule: RuleSignature, sources: dict[str, str | list[str]]) -> str:
     """Creates a query for the rule signature."""
@@ -63,125 +78,128 @@ def build_rule_query(rule: RuleSignature, sources: dict[str, str | list[str]]) -
     return query
 
 
-def build_filtered_query(
-    rule: RuleSignature,
-    sources: dict[str, str | list[str]],
-    use_head: bool,
-) -> tuple[str, str]:
-    """Builds SPARQL SELECT queries to find instantiations of a rule.
+# TODO: Creo que esta función está obsoleta, de momento queda comentada para más
+# adelante ser eliminada.
+# def build_filtered_query(
+#     rule: RuleSignature,
+#     sources: dict[str, str | list[str]],
+#     use_head: bool,
+# ) -> tuple[str, str]:
+#     """Builds SPARQL SELECT queries to find instantiations of a rule.
 
-    Args:
-        rule: The rule signature containing the head and body atoms.
-        graph_uri: The primary graph URI (extensional data) to query.
-        searchspace_uri: The secondary graph URI for recursive/intensional search.
-        use_head: If True, includes the rule's head in the query body when recursive.
-        use_searchspace: If True, includes searchspace_uri in the FROM datasets.
+#     Args:
+#         rule: The rule signature containing the head and body atoms.
+#         graph_uri: The primary graph URI (extensional data) to query.
+#         searchspace_uri: The secondary graph URI for recursive/intensional search.
+#         use_head: If True, includes the rule's head in the query body when recursive.
+#         use_searchspace: If True, includes searchspace_uri in the FROM datasets.
 
-    Returns:
-        TODO
-    """
+#     Returns:
+#         TODO
+#     """
 
-    # Source Graphs
-    target = sources.get("target", "")
-    sources_block = "\n    ".join(
-        f"FROM <{g}>" for g in sorted([target] + [s for s in sources.get("others", [])])
-    )
+#     # Source Graphs
+#     target = sources.get("target", "")
+#     sources_block = "\n    ".join(
+#         f"FROM <{g}>" for g in sorted([target] + [s for s in sources.get("others", [])])
+#     )
 
-    if not target:
-        raise ValueError("Expected a value for target graph.")
+#     if not target:
+#         raise ValueError("Expected a value for target graph.")
 
-    # Patterns and variables
-    body_patterns = [f"{atom} ." for atom in sorted(rule.body)]
-    proj_variables = set(rule.get_head_variables())
+#     # Patterns and variables
+#     body_patterns = [f"{atom} ." for atom in sorted(rule.body)]
+#     proj_variables = set(rule.get_head_variables())
 
-    unique_values_str = ""
-    if len(rule.get_variables()) > 1:
-        expressions = [
-            f"{v1} != {v2}"
-            for v1, v2 in itertools.combinations(sorted(set(rule.get_variables())), 2)
-        ]
-        unique_values_str = f"FILTER ({' && '.join(expressions)})"
+#     unique_values_str = ""
+#     if len(rule.get_variables()) > 1:
+#         expressions = [
+#             f"{v1} != {v2}"
+#             for v1, v2 in itertools.combinations(sorted(set(rule.get_variables())), 2)
+#         ]
+#         unique_values_str = f"FILTER ({' && '.join(expressions)})"
 
-    h_predicate = rule.head.predicate
+#     h_predicate = rule.head.predicate
 
-    # In case of recursive rules
-    if h_predicate in rule.get_body_predicates():
-        proj_variables.update(
-            var
-            for atom in rule.body
-            if atom.predicate == h_predicate
-            for var in atom.get_variables()
-            if var is not None
-        )
+#     # In case of recursive rules
+#     if h_predicate in rule.get_body_predicates():
+#         proj_variables.update(
+#             var
+#             for atom in rule.body
+#             if atom.predicate == h_predicate
+#             for var in atom.get_variables()
+#             if var is not None
+#         )
 
-        if use_head:
-            body_patterns.append(f"{rule.head} .")
+#         if use_head:
+#             body_patterns.append(f"{rule.head} .")
 
-    # Filtered setup
-    flags = []
-    bind_statements = []
-    not_exists_statements = []
+#     # Filtered setup
+#     flags = []
+#     bind_statements = []
+#     not_exists_statements = []
 
-    for i, atom in enumerate(sorted([a for a in rule if a.predicate == h_predicate])):
-        flag_variable = f"?is_new_{i}"
-        flags.append(flag_variable)
+#     for i, atom in enumerate(sorted([a for a in rule if a.predicate == h_predicate])):
+#         flag_variable = f"?is_new_{i}"
+#         flags.append(flag_variable)
 
-        # Bind statement so Python can read the boolean flag
-        bind_str = (
-            f"BIND (\n"
-            f"        NOT EXISTS {{ GRAPH <{target}> {{ {atom} . }} }}\n"
-            f"        AS {flag_variable}\n"
-            f"      )"
-        )
-        bind_statements.append(bind_str)
+#         # Bind statement so Python can read the boolean flag
+#         bind_str = (
+#             f"BIND (\n"
+#             f"        NOT EXISTS {{ GRAPH <{target}> {{ {atom} . }} }}\n"
+#             f"        AS {flag_variable}\n"
+#             f"      )"
+#         )
+#         bind_statements.append(bind_str)
 
-        # Used to strictly compel Virtuoso to drop the rows natively
-        not_exists_statements.append(
-            f"NOT EXISTS {{ GRAPH <{target}> {{ {atom} . }} }}"
-        )
+#         # Used to strictly compel Virtuoso to drop the rows natively
+#         not_exists_statements.append(
+#             f"NOT EXISTS {{ GRAPH <{target}> {{ {atom} . }} }}"
+#         )
 
-    proj = " ".join(sorted(proj_variables) + flags)
+#     proj = " ".join(sorted(proj_variables) + flags)
 
-    # Filtered query
-    pattern_block = "\n      ".join(body_patterns)
-    filter_block = ""
-    if not_exists_statements:
-        pure_or_conditions = " || ".join(not_exists_statements)
-        filter_block = f"FILTER (\n        {pure_or_conditions}\n      )"
+#     # Filtered query
+#     pattern_block = "\n      ".join(body_patterns)
+#     filter_block = ""
+#     if not_exists_statements:
+#         pure_or_conditions = " || ".join(not_exists_statements)
+#         filter_block = f"FILTER (\n        {pure_or_conditions}\n      )"
 
-    bind_block = "\n      ".join(bind_statements)
-    filtered_query = (
-        f"    SELECT DISTINCT ?rule_id {proj}\n"
-        f"    {sources_block}\n"
-        f"    WHERE {{\n"
-        f"      {pattern_block}\n"
-        f'      BIND ("{rule.rule_id}" AS ?rule_id)\n'
-        f"      {bind_block}\n"
-        f"      {filter_block}\n"
-        f"      {unique_values_str}\n"
-        f"    }}"
-    )
+#     bind_block = "\n      ".join(bind_statements)
+#     filtered_query = (
+#         f"    SELECT DISTINCT ?rule_id {proj}\n"
+#         f"    {sources_block}\n"
+#         f"    WHERE {{\n"
+#         f"      {pattern_block}\n"
+#         f'      BIND ("{rule.rule_id}" AS ?rule_id)\n'
+#         f"      {bind_block}\n"
+#         f"      {filter_block}\n"
+#         f"      {unique_values_str}\n"
+#         f"    }}"
+#     )
 
-    # Ask query
-    ask_query = (
-        f"  ASK\n"
-        f"  {sources_block}\n"
-        f"  WHERE {{\n"
-        f"    SELECT (1 AS ?_force)\n"
-        f"    WHERE {{\n"
-        f"      {pattern_block}\n\n"
-        f"      {filter_block}\n"
-        f"      {unique_values_str}\n"
-        f"    }}\n"
-        f"  }}"
-    )
+#     # Ask query
+#     ask_query = (
+#         f"  ASK\n"
+#         f"  {sources_block}\n"
+#         f"  WHERE {{\n"
+#         f"    SELECT (1 AS ?_force)\n"
+#         f"    WHERE {{\n"
+#         f"      {pattern_block}\n\n"
+#         f"      {filter_block}\n"
+#         f"      {unique_values_str}\n"
+#         f"    }}\n"
+#         f"  }}"
+#     )
 
-    return filtered_query, ask_query
+#     return filtered_query, ask_query
 
 
 # ---------------------------------------------------------------------------
 # Insert to database.
 # ---------------------------------------------------------------------------
+# TODO: Unify the insert functions so it does work in 1 function with any source.
 def insert_triples_sparql(
     client: SPARQLWrapper,
     graph_uri: str,
@@ -202,7 +220,7 @@ def insert_triples_sparql(
     """
     total_inserted = 0
 
-    for chunk in chunk_iter(triple_stream, chunk_size):
+    for chunk in _chunk_iter(triple_stream, chunk_size):
         if unique_chunk := set(chunk):
             triples_payload = "\n".join(unique_chunk)
 
@@ -219,6 +237,7 @@ def insert_triples_sparql(
     return total_inserted
 
 
+# TODO: Create searchspace depends on this functions, but it doesn't work with graphDB.
 def insert_triples_gsp(
     client: SPARQLWrapper,
     graph_uri: str,
@@ -263,7 +282,7 @@ def insert_triples_gsp(
             total_inserted += len(batch)
 
 
-def insert_graph_from_nt_sparql(
+def insert_graph_sparql(
     client: SPARQLWrapper,
     graph_uri: str,
     chunk_size: int,
@@ -308,21 +327,6 @@ def insert_graph_from_nt_sparql(
     logger.debug("Inserted %d triples to <%s> from '%s'.", n, graph_uri, nt_file.name)
 
 
-def _get_update_client(client: SPARQLWrapper) -> SPARQLWrapper:
-    """Returns a SPARQLWrapper pointing to the write endpoint for updates."""
-
-    if "/repositories/" in client.endpoint and not client.endpoint.endswith(
-        "/statements"
-    ):
-        update_client = SPARQLWrapper(f"{client.endpoint.rstrip('/')}/statements")
-        update_client.http_auth = client.http_auth
-        update_client.user = getattr(client, "user", None)
-        update_client.passwd = getattr(client, "passwd", None)
-        return update_client
-
-    return client
-
-
 def clear_graph_sparql(client: SPARQLWrapper, graph_uri: str) -> None:
     """Removes all triples from a specified named graph.
 
@@ -350,6 +354,10 @@ def clear_graph_sparql(client: SPARQLWrapper, graph_uri: str) -> None:
         raise
 
 
+# ---------------------------------------------------------------------------
+# Download from database.
+# ---------------------------------------------------------------------------
+# TODO: Tiene esto que estar aquí??
 def download_graph_raw(
     client: SPARQLWrapper,
     graph_uri: str,
@@ -410,6 +418,9 @@ def download_graph_raw(
     logger.info(f"Successfully saved {total_triples} triples to {output_file}.")
 
 
+# ---------------------------------------------------------------------------
+# initialize graph in database.
+# ---------------------------------------------------------------------------
 def initialize_graph(
     client: SPARQLWrapper, source: str | None, new_graph_uri: str, chunk_size: int
 ) -> None:
@@ -444,7 +455,7 @@ def initialize_graph(
     clear_graph_sparql(client, new_graph_uri)
 
     if is_nt_file:
-        insert_graph_from_nt_sparql(
+        insert_graph_sparql(
             client=client,
             graph_uri=new_graph_uri,
             nt_file=source,
@@ -460,7 +471,7 @@ def initialize_graph(
 
 
 # ---------------------------------------------------------------------------
-# SPARQL query response handling.
+# Handle SPARQL query responses.
 # ---------------------------------------------------------------------------
 SparqlBinding = dict[str, dict[str, str]]
 
@@ -580,7 +591,7 @@ def from_binding_row(term: str, binding_row: SparqlBinding) -> tuple[str, str]:
 # ---------------------------------------------------------------------------
 # Query metrics.
 # ---------------------------------------------------------------------------
-def get_preds_and_freqs(client: SPARQLWrapper, graph_uri: str) -> dict[str, int]:
+def get_predicate_frequencies(client: SPARQLWrapper, graph_uri: str) -> dict[str, int]:
     """Retrieves all unique predicates in the graph and the frequency of each one."""
 
     predicate_frequencies: dict[str, int] = {}
@@ -753,7 +764,7 @@ def get_existing_triples(
     """Return triples from 'candidate_triples' that already exist in 'edb_uri'."""
     existing_triples = set()
 
-    for chunk in chunk_iter(candidate_triples, chunk_size):
+    for chunk in _chunk_iter(candidate_triples, chunk_size):
         formatted_values = (f"({triple.strip(' .')})" for triple in chunk)
         values_clause = " ".join(formatted_values)
 
