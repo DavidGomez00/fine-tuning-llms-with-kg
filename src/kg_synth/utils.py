@@ -1,9 +1,7 @@
-import csv
 import logging
 import re
 from pathlib import Path
 
-import pandas as pd
 from SPARQLWrapper import BASIC, DIGEST, SPARQLWrapper
 
 from kg_synth.config import RunConfig
@@ -11,9 +9,9 @@ from kg_synth.config import RunConfig
 logger = logging.getLogger(__name__)
 
 
-#
+# ---------------------------------------------------------------------------
 # Logging
-#
+# ---------------------------------------------------------------------------
 def setup_logging(level: int | str = logging.INFO) -> None:
     """Configures the root logger to output to the console.
 
@@ -37,57 +35,8 @@ def setup_logging(level: int | str = logging.INFO) -> None:
 
 
 # ---------------------------------------------------------------------------
-# File parsing.
-# ---------------------------------------------------------------------------
-# DEAD CODE (unreferenced, found 2026-08-17): no call sites anywhere in the repo.
-def filter_file(
-    input_file: Path,
-    target_string: str,
-    output_filename: str | None,
-) -> None:
-    """
-    Writes lines from input_file that don't contain target_string to the output file.
-    """
-    output_file = input_file
-    if output_filename is not None:
-        output_file = input_file.with_name(output_filename)
-
-    with (
-        open(input_file, encoding="utf-8") as infile,
-        open(output_file, "w", encoding="utf-8") as outfile,
-    ):
-        count_removed = 0
-        for line in infile:
-            if target_string in line:
-                count_removed += 1
-            else:
-                outfile.write(line)
-
-
-# DEAD CODE (unreferenced, found 2026-08-17): no call sites anywhere in the repo.
-def filter_rules(
-    rules_file: Path | str, pca_threshold: float = 0.0, std_threshold: float = 0.0
-) -> None:
-
-    rules_file = Path(rules_file)
-    rules_dataframe = pd.read_csv(rules_file)
-
-    if std_threshold:
-        metric = "Std"
-        threshold = std_threshold
-    else:
-        metric = "PCA"
-        threshold = pca_threshold
-
-    filtered_df = rules_dataframe[rules_dataframe[f"{metric}_Confidence"] >= threshold]
-    filtered_df.to_csv(
-        rules_file.with_name(f"rules_{metric}_{threshold}.csv"), index=False
-    )
-
-
-#
 # Database connection
-#
+# ---------------------------------------------------------------------------
 def create_sparql_client(config: RunConfig) -> SPARQLWrapper:
     """Instantiates a SPARQLWrapper client."""
     endpoint_url = config.data.get_full_sparql_url()
@@ -105,28 +54,6 @@ def create_sparql_client(config: RunConfig) -> SPARQLWrapper:
         client.setCredentials(user, password)
 
     return client
-
-
-# DEAD CODE (unreferenced, found 2026-08-17): no call sites anywhere in the repo.
-def tsv_to_nt(tsv_file: Path, nt_file: Path, term_mapping: dict[str, str]):
-    """Parses a tsv file into a .nt file."""
-    with tsv_file.open(encoding="utf-8") as tsv_f:
-        with nt_file.open("w", encoding="utf-8") as nt_f:
-            rd = csv.reader(tsv_f, delimiter="\t")
-            for line in rd:
-                if not line:
-                    continue
-                if len(line) == 3:
-                    triple = format_triple(
-                        line[0], line[1], line[2], term_mapping
-                    ).strip()
-                    nt_f.write(f"{triple}\n")
-
-                else:
-                    logger.error("Parsed line: %s", line)
-                    raise ValueError("Error: Found != 3 elements in a non empty row.")
-
-    logger.debug(".nt file saved at %s", nt_file)
 
 
 # ---------------------------------------------------------------------------

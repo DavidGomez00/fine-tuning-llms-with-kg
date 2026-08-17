@@ -407,8 +407,51 @@ def check_uninferrable_preds(
     return intensional_predicates - deducible
 
 
-# DEAD CODE (unreferenced, found 2026-08-17): only reference is a commented-out
-# call in engine/idb.py ("Dependencies are not necessary if rules are complete.").
+def get_extensional_dependencies(
+    rules: dict[str, HornRule],
+):
+    """Builds a dictionary that represents extensional predicate dependencies. A rule is
+    dependent of any other rule extensional-wise if they share an extensional predicate.
+
+    From all the rules that share an extensional predicate, the larger rules are more
+    restrictive.
+    """
+
+    intensional_preds = {rule.head.predicate for rule in rules.values()}
+
+    rule_dependency: dict[str, set[str]] = {r_id: set() for r_id in rules}
+
+    # Sort from smallest to largest body counting only extensional preds
+    sorted_ids = sorted(
+        (rule_id for rule_id in rules.keys()),
+        key=lambda r_id: len(rules[r_id].get_extensional_body(intensional_preds)),
+    )
+
+    for i, current_id in enumerate(sorted_ids):
+        current_rule = rules[current_id]
+        current_ext_preds = current_rule.get_extensional_preds(intensional_preds)
+
+        if not (current_ext_preds):
+            continue
+
+        for next_id in sorted_ids[i + 1 :]:
+            next_rule = rules[next_id]
+            next_ext_preds = next_rule.get_extensional_preds(intensional_preds)
+
+            if any(pred in next_ext_preds for pred in current_ext_preds):
+                c_length = len(current_rule.get_extensional_body(intensional_preds))
+                n_length = len(next_rule.get_extensional_body(intensional_preds))
+
+                if c_length == n_length and next_rule.support > current_rule.support:
+                    rule_dependency[next_id].add(current_id)
+                else:
+                    rule_dependency[current_id].add(next_id)
+
+    return rule_dependency
+
+
+# DEAD CODE (unreferenced, found 2026-08-17). Not to be removed yet, will be necessary
+# when rules are not complete ("Dependencies are not necessary if rules are complete.").
 def get_dependencies_intensional(rules: dict[str, HornRule]) -> dict[str, set[str]]:
     """Builds a dictionary that represents rule dependencies in a ruleset based on the
     head of the rule. A rule depends on other rules if they are more restrictive than it
@@ -463,49 +506,6 @@ def get_dependencies_intensional(rules: dict[str, HornRule]) -> dict[str, set[st
 
     logger.info("Created dependency graph for %d rules.", len(rules))
     logger.debug("Intensional dependencies: %s", rule_dependency)
-    return rule_dependency
-
-
-def get_extensional_dependencies(
-    rules: dict[str, HornRule],
-):
-    """Builds a dictionary that represents extensional predicate dependencies. A rule is
-    dependent of any other rule extensional-wise if they share an extensional predicate.
-
-    From all the rules that share an extensional predicate, the larger rules are more
-    restrictive.
-    """
-
-    intensional_preds = {rule.head.predicate for rule in rules.values()}
-
-    rule_dependency: dict[str, set[str]] = {r_id: set() for r_id in rules}
-
-    # Sort from smallest to largest body counting only extensional preds
-    sorted_ids = sorted(
-        (rule_id for rule_id in rules.keys()),
-        key=lambda r_id: len(rules[r_id].get_extensional_body(intensional_preds)),
-    )
-
-    for i, current_id in enumerate(sorted_ids):
-        current_rule = rules[current_id]
-        current_ext_preds = current_rule.get_extensional_preds(intensional_preds)
-
-        if not (current_ext_preds):
-            continue
-
-        for next_id in sorted_ids[i + 1 :]:
-            next_rule = rules[next_id]
-            next_ext_preds = next_rule.get_extensional_preds(intensional_preds)
-
-            if any(pred in next_ext_preds for pred in current_ext_preds):
-                c_length = len(current_rule.get_extensional_body(intensional_preds))
-                n_length = len(next_rule.get_extensional_body(intensional_preds))
-
-                if c_length == n_length and next_rule.support > current_rule.support:
-                    rule_dependency[next_id].add(current_id)
-                else:
-                    rule_dependency[current_id].add(next_id)
-
     return rule_dependency
 
 
