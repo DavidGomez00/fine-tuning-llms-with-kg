@@ -1,7 +1,7 @@
 """Defines data structures and logic for Horn Rule-based systems.
 
 Provides the HornRule dataclass, Pandas CSV parsing, and core logic operations
-(like forward chaining) to verify and evaluate inferrable predicates within a rule set.
+to verify and evaluate inferrable predicates within a rule set.
 """
 
 import logging
@@ -377,6 +377,7 @@ def parse_rule_set(
             - A dict of HornRules identified by rule_id.
             - A set of strings representing the predicates in the rules' head.
     """
+    # TODO: Change the return value to a simple list of rules
     rule_dataframe = pd.read_csv(rules_file)
 
     if pca_threshold is not None:
