@@ -1,3 +1,11 @@
+"""SPARQL query construction and execution against the graph database.
+
+Every read (SELECT/ASK) or write (INSERT/CLEAR/COPY) against Virtuoso or GraphDB
+goes through this module. Higher-level modules (engine/*.py) build on top of these
+functions rather than talking to `SPARQLWrapper` directly. See BACKLOG.md for known
+overlap/consolidation TODOs in this file.
+"""
+
 import itertools
 import logging
 from collections.abc import Iterable, Iterator

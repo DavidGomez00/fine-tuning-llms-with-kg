@@ -5,9 +5,10 @@
     "sparql_endpoint": "sparql-auth",
     "crud_endpoint": "sparql-graph-crud-auth"
   },
-  "virtuoso": {
+  "db_config": {
     "user": "dba",
     "password": "dba",
+    "auth_type": "DIGEST",
     "chunk_size": 1000
   },
   "graph": {

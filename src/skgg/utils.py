@@ -1,3 +1,7 @@
+"""Cross-cutting helpers: logging setup, SPARQL client construction, and mapping
+RDF terms (short names) to their fully-qualified namespace URIs.
+"""
+
 import logging
 import re
 from pathlib import Path

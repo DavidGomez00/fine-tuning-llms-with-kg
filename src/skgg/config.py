@@ -135,9 +135,23 @@ class HardwareConfig:
 
 @dataclass(frozen=True)
 class GraphConfig:
-    """Knowledge Graph settings.
+    """Knowledge Graph settings: file locations and the named-graph URIs used to
+    key each stage of the pipeline (see AGENTS.md's "Architecture" section for how
+    base/complete/EDB/synthetic relate).
 
-    TODO: Docstrings
+    Attributes:
+        name: Human-readable name for the graph/experiment.
+        ontology_file: Filename (relative to `data.input_dir`) of the ontology
+            (.ttl) used to build the term-to-namespace mapping.
+        nt_file: Filename (relative to `data.input_dir`) of the base graph in
+            N-Triples format, consumed by `cli/upload.py`.
+        namespace: Default namespace URI used to resolve unprefixed terms.
+        base_uri: Named-graph URI for the raw, uploaded base graph.
+        complete_uri: Named-graph URI for the base graph after rule-based
+            completion (`engine/completion.py`) — this is the source graph that
+            metrics are extracted from.
+        edb_uri: Named-graph URI for the generated Extensional Database.
+        synthetic_uri: Named-graph URI for the final synthetic graph (EDB + IDB).
     """
 
     name: str
@@ -152,8 +166,14 @@ class GraphConfig:
 
 @dataclass(frozen=True)
 class RulesConfig:
-    """
-    TODO: Docstrings
+    """Settings for loading and filtering the Horn rule set.
+
+    Attributes:
+        rules_file: Filename (relative to `data.input_dir`) of the rules CSV,
+            parsed by `core.rules.parse_rule_set`.
+        pca_threshold: Minimum PCA confidence a rule must have to be classified
+            "POSITIVE" (kept); rules below it are classified "NEGATIVE" and
+            excluded from generation. `None` skips filtering.
     """
 
     rules_file: str
@@ -162,7 +182,12 @@ class RulesConfig:
 
 @dataclass(frozen=True)
 class LoggingConfig:
-    """TODO: Docs"""
+    """Logging settings for an experiment run.
+
+    Attributes:
+        level: Root logger level, as an int (e.g. `logging.DEBUG`) or a level
+            name string (e.g. `"DEBUG"`). Passed to `utils.setup_logging`.
+    """
 
     level: int | str = logging.INFO
 
@@ -216,7 +241,7 @@ class RunConfig:
         with open(json_path, encoding="utf-8") as f:
             data: dict[str, Any] = json.load(f)
 
-        db_config = DatabaseAuthConfig(**get_section("db-config", required=True))
+        db_config = DatabaseAuthConfig(**get_section("db_config", required=True))
         graph_config = GraphConfig(**get_section("graph", required=True))
         rules_config = RulesConfig(**get_section("rules", required=True))
         data_config = DataConfig(**get_section("data", required=True))

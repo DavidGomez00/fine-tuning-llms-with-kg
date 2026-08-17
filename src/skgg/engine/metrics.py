@@ -1,4 +1,7 @@
-"""File for managing KG related functions."""
+"""Topological descriptors of a Knowledge Graph: per-predicate frequency, domain
+and range distributions used to drive synthetic triple generation (`engine/edb.py`,
+`engine/idb.py`) without needing continued access to the original graph.
+"""
 
 import logging
 from collections import defaultdict

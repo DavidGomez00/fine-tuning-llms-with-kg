@@ -1,22 +1,15 @@
 # Backlog
 
-Known issues and pending refactors, organized by module. See `CLAUDE.md` for
+Known issues and pending refactors, organized by module. See `AGENTS.md` for
 the current architecture map.
 
 ## `cli/`
 
-- [ ] **`download.py`** — Debe ser reescrito para funcionar con el nuevo DBMS
-      (referencia campos de config, p.ej. `config.virtuoso`, que ya no existen
-      tras el refactor). `TODO: Reescribir download.py para que funcione con
-      GraphDB.`
 - [ ] **`main.py`** — No se ejecuta correctamente. `TODO: Debug main.py`.
 - [ ] **`upload.py`** — Sin pendientes registrados.
 
 ## `core/`
 
-- [ ] **`parsing.py`** — Sólo contiene una función (`tsv_to_nt`) que necesita
-      ser revisada. Es posible que deba moverse a `utils.py` y eliminar el
-      script.
 - [ ] **`rules.py`** — Refactor dataclass functions to delete obsolete code;
       refactor and delete obsolete functions.
 - [ ] **`queries.py`** — Hay 3 funciones para escribir queries: reducir o
@@ -27,7 +20,11 @@ the current architecture map.
   - `insert_triples_gsp()` no es compatible con GraphDB, buscar una
     alternativa.
   - `insert_graph_from_nt_sparql` — revisar uso y refactorizar.
-  - `download_graph_raw()` — revisar uso y refactorizar.
+  - `download_graph_raw()` — revisar uso y refactorizar. Es la función que
+    generó el artefacto de 17MB limpiado del repo (`output_path.mkdir()`
+    seguido de `output_path / file_name` produce un directorio anidado si
+    `output_path` ya termina en el nombre de archivo); ya no tiene caller
+    desde que se eliminó `cli/download.py`, evaluar si eliminarla también.
   - `copy_graph_sparql` — reordenar, revisar uso y refactorizar.
   - Refactorizar nombres de `run_select_query`, `execute_ask_query`,
     `execute_insert_query`.
@@ -43,6 +40,14 @@ the current architecture map.
 ## `engine/`
 
 - [ ] **`generator.py`** — Refactor and delete obsolete functions.
+
+## `configurations/`
+
+- [ ] **`simpsons.json` fails to load** — verified via `RunConfig.from_json`:
+      raises `TypeError: GraphConfig.__init__() missing 1 required positional
+      argument: 'namespace'` — its `graph` section is missing the required
+      `namespace` field that `mario.json`/`french_royalty.json` both have.
+      `mario.json` and `french_royalty.json` currently load successfully.
 
 ## Tooling / process
 

@@ -1,9 +1,19 @@
+"""Builds the Intensional Database (IDB): grows the synthetic graph from the EDB by
+forward-chaining rule heads over already-grounded predicates, under the "complete
+rules" assumption (a rule set that can, in principle, deduce every intensional
+predicate — checked up front via `core.rules.check_uninferrable_preds`).
+
+`generate_idb` repeatedly applies every rule whose body predicates are already
+grounded (`engine.generator.apply_rule`), tracking which rules/predicates have
+reached their target support/frequency ("closed", via `update_closure`), until a
+step adds no new triples or everything relevant is closed.
+"""
+
 import logging
 
 from SPARQLWrapper import SPARQLWrapper
 
 from skgg.core.queries import (
-    count_triples,
     get_frequency,
     get_support,
     initialize_graph,
@@ -16,7 +26,7 @@ from skgg.core.rules import (
 from skgg.engine.generator import (
     apply_rule,
 )
-from skgg.engine.metrics import GraphMetrics, PredicateProfile
+from skgg.engine.metrics import PredicateProfile
 
 logger = logging.getLogger(__name__)
 
@@ -272,70 +282,3 @@ def generate_idb(
         if not (rules.keys() - closed_rule_ids):
             logger.info("All rules closed.")
             break
-
-
-if __name__ == "__main__":
-    import time
-    from pathlib import Path
-
-    from SPARQLWrapper import DIGEST
-
-    from skgg.config import RunConfig
-    from skgg.core.queries import count_triples
-    from skgg.core.rules import get_term_mapping, parse_rule_set
-    from skgg.utils import setup_logging
-
-    # Config setup
-    simpson_config = Path("configurations/simpsons.json")
-    french_config = Path("configurations/french_royalty.json")
-
-    ##### TO RUN ANOTHER GRAPH EDIT THIS vvvv ##
-    config = RunConfig.from_json(simpson_config)
-
-    # Logging
-    setup_logging(level=config.logging.level)
-    logger.info("Confifuration correctly initialized.")
-
-    # Graph settings
-    graph_uri = config.graph.complete_uri
-    edb_uri = config.graph.edb_uri
-    synthetic_uri = config.graph.synthetic_uri
-
-    # Input files
-    input_dir = config.data.input_dir
-    ontology_file = input_dir / config.graph.ontology_file
-    term_mapping = get_term_mapping(ontology_file, default_namespace=graph_uri)
-    rules_file = input_dir / config.rules.rules_file
-    rules = parse_rule_set(rules_file, term_mapping=term_mapping, pca_threshold=1)
-
-    # SPARQLWrapper client
-    client = SPARQLWrapper(str(config.data.database_url / config.data.sparql_endpoint))
-    client.setHTTPAuth(DIGEST)
-    client.setCredentials(config.virtuoso.user, config.virtuoso.password)
-
-    # Graph metrics
-    graph_metrics = GraphMetrics.from_uri(client, graph_uri)
-
-    # Generate IDB
-    logger.info("Starting IDB generation from <%s>...", edb_uri)
-    start_time = time.time()
-    generate_idb(
-        client=client,
-        rules=rules,
-        term_mapping=term_mapping,
-        edb_uri=edb_uri,
-        chunk_size=config.virtuoso.chunk_size,
-        synthetic_uri=synthetic_uri,
-        profiles=graph_metrics.profiles,
-    )
-    logger.info("Finished execution at %d s.", time.time() - start_time)
-    logger.info(
-        "Original graph <%s> has %d triples.",
-        graph_uri,
-        count_triples(client, graph_uri),
-    )
-    logger.info(
-        "Synthetic Graph at <%s> with %d triples.",
-        synthetic_uri,
-        count_triples(client, synthetic_uri),
-    )

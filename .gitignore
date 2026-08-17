@@ -4,6 +4,9 @@
 *.pyo
 *.pyd
 
+# Packaging build artifacts
+*.egg-info/
+
 # vscode
 .vscode/
 .vscode/*

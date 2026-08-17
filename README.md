@@ -21,8 +21,6 @@ pip install -r requirements.txt
 pip install -e .          # installs the `skgg` package from src/ in editable mode
 ```
 
-Create a `.env` file (gitignored) with any required secrets, e.g. `DATABASE_URL`.
-
 ## Graph database
 
 `docker-compose.yml` defines two alternative stacks, selected via Compose
@@ -49,21 +47,30 @@ run_synthetic_graph_experiment(Path("configurations/mario.json"))
 This loads the config, computes graph metrics over SPARQL, parses the
 ontology and Horn rule set, generates the EDB (facts satisfying rule bodies),
 then grows the IDB (rule-derived facts) until closure — producing the
-synthetic graph.
+synthetic graph. For a full walkthrough (including uploading a base graph and
+building the source graph first), see
+[`docs/getting-started.md`](docs/getting-started.md).
 
 ## Project layout
 
 ```
-src/skgg/          # package source (see CLAUDE.md for the full module map)
+src/skgg/          # package source (see docs/architecture.md for the full module map)
 configurations/    # per-experiment JSON configs
 .data/<Dataset>/   # source graph data (.nt/.ttl/.csv) referenced by configs
+docs/              # architecture, concepts glossary, getting-started guide
 notebooks/         # exploratory/prototype work
 logs/              # per-run logs (gitignored)
 ```
 
 ## More
 
-- [`CLAUDE.md`](CLAUDE.md) — full architecture map and data flow, for
-  contributors and AI coding agents alike.
+- [`docs/getting-started.md`](docs/getting-started.md) — full setup + first
+  experiment walkthrough.
+- [`docs/architecture.md`](docs/architecture.md) — components and data flow,
+  with diagrams.
+- [`docs/concepts.md`](docs/concepts.md) — glossary of domain terms (EDB/IDB,
+  Horn rules, closure, ...).
+- [`AGENTS.md`](AGENTS.md) — terse architecture reference for contributors and
+  AI coding agents alike (`CLAUDE.md` imports this same file for Claude Code).
 - [`BACKLOG.md`](BACKLOG.md) — known issues and pending refactors; check
   before assuming a code path is exercised/working.

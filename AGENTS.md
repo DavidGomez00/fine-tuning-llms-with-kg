@@ -1,0 +1,86 @@
+# AGENTS.md
+
+This file provides guidance to AI coding assistants (Claude Code, Codex,
+Cursor, Gemini CLI, etc.) when working with code in this repository.
+
+## Project Summary
+
+This project is a tool for **Synthetic Knowledge Graph (KG) generation**. It creates a synthetic Knowledge Graph from topological metrics of a source graph (number of nodes, relations, frequencies of the elements in the domain and range of each relation, etc.) and a set of Horn Rules, without needing continued access to the original graph once metrics are extracted.
+
+Graphs are never loaded into memory-intensive libraries like RDFlib for bulk work. They are always stored in a graph database (Virtuoso or GraphDB) and manipulated via SPARQL queries through `SPARQLWrapper`.
+
+## Environment Setup
+
+- Requires Python >= 3.10.
+- Dependencies are pinned in `requirements.txt` (install with `pip install -r requirements.txt`); `pyproject.toml` only carries project metadata and tool config (no dependency list or build backend).
+- Package code lives under `src/skgg/` (installed name: `skgg`) — install it in editable mode (`pip install -e .`) or run scripts with `src` on `PYTHONPATH` so `from skgg...` imports resolve.
+
+## Graph Database
+
+`docker-compose.yml` defines two alternative graph-database stacks, selected via Compose profiles — bring one up at a time:
+
+- `docker compose --profile virtuoso up` — Virtuoso (port 8890) + a YASGUI SPARQL UI (port 8080).
+- `docker compose --profile graphdb up` — GraphDB 10.7 (port 7200).
+- `--profile all` starts everything.
+
+`DatabaseAuthConfig.auth_type` must match the store in use: `DIGEST` for Virtuoso, `BASIC` for GraphDB (or `NONE`). Each experiment config's `data.database_url` / `sparql_endpoint` selects which running store and repository/endpoint to talk to (see Configuration below).
+
+## Running an experiment
+
+Experiments are driven by JSON config files in `configurations/` (e.g. `mario.json`, `simpsons.json`, `french_royalty.json`), loaded via `RunConfig.from_json(...)`.
+
+The main entry point is `run_synthetic_graph_experiment` in `src/skgg/cli/main.py`:
+
+```python
+from pathlib import Path
+from skgg.cli.main import run_synthetic_graph_experiment
+
+run_synthetic_graph_experiment(Path("configurations/mario.json"))
+```
+
+Typical experiment flow (see `cli/main.py`):
+1. Load `RunConfig` from JSON and set up logging.
+2. Compute `GraphMetrics` (predicate profiles) from the source graph (`graph.complete_uri`) over SPARQL.
+3. Parse the ontology into a term mapping and parse the Horn rule set from a CSV (`rules.rules_file`), filtered by `pca_threshold`.
+4. Generate the EDB (extensional database) — `engine/edb.py` — inserting triples that satisfy rule bodies/profiles into `graph.edb_uri`.
+5. Generate the IDB (intensional database) — `engine/idb.py` — applying rules over the EDB to produce the synthetic graph at `graph.synthetic_uri`, iterating until rules/predicates reach target support/frequency (closure).
+
+`cli/upload.py` is a separate, standalone script (run top-level, not via a function) that uploads a base graph from an `.nt` file and then runs rule-based completion (`engine/completion.py`) to build the "complete" graph used as the source for metric extraction. Edit the `graph_config` path at the top of the file before running.
+
+**Known issues (see `BACKLOG.md`):** `cli/main.py`'s `__main__` block is not confirmed working end-to-end. `core/queries.py` has several overlapping insert/query functions flagged for consolidation. Check `BACKLOG.md` for the current TODO list before assuming a code path is exercised/working.
+
+## Architecture
+
+Terse reference below; see `docs/architecture.md` for diagrams and prose, and
+`docs/concepts.md` for a glossary of the domain terms used here (EDB/IDB, Horn
+rule, closure, predicate profile, ...).
+
+```
+src/skgg/
+  config.py           # RunConfig and all sub-configs (dataclasses), loaded from configurations/*.json
+  utils.py             # logging setup, SPARQL client factory, misc file helpers
+  cli/
+    main.py            # run_synthetic_graph_experiment: the end-to-end experiment pipeline
+    upload.py           # standalone script: upload base graph + rule-based completion
+  core/
+    rules.py           # Atom / RuleSignature (Horn rule) dataclasses, rule-set CSV parsing, term mapping from ontology
+    queries.py          # All SPARQL query construction + execution against the graph DB (insert/select/ask/clear/count)
+  engine/
+    metrics.py          # GraphMetrics / PredicateProfile: topological descriptors (domain/range frequency per predicate)
+    edb.py               # Builds the Extensional DB: selects/generates triples satisfying rule bodies + profile constraints
+    idb.py                # Builds the Intensional DB: iteratively applies rules over the EDB, tracking closure of rules/predicates
+    generator.py           # Lower-level triple generation/binding logic shared by edb.py/idb.py (search space construction, novelty/validity filtering)
+    completion.py          # complete_graph: forward-chains rules over a base graph assuming rule bodies are fully grounded
+```
+
+Data flow: **ontology + rules CSV + source graph metrics → EDB (facts satisfying rule bodies) → IDB (rule-derived facts, grown until closure) → synthetic graph**, all mediated through SPARQL against the graph store, keyed by graph URIs defined per-experiment in the `graph` section of each config JSON (`base_uri`, `complete_uri`, `edb_uri`, `synthetic_uri`).
+
+Rules are parsed from CSV into `RuleSignature`/`Atom` objects (`core/rules.py`); each rule has body atoms and a head atom over predicates/variables, plus confidence metrics (PCA/Std confidence) used for filtering (`rules.pca_threshold` in config, or `utils.filter_rules` for ad hoc filtering by PCA/Std threshold).
+
+`config.py`'s `RunConfig` also defines `FineTuningConfig` and `CoTGenerationConfig` (for LoRA fine-tuning of LLMs and Chain-of-Thought dataset generation from KGs), but the corresponding pipeline code is not present yet under `src/` — check `notebooks/` (`notebooks/Disha/`, `notebooks/Mine/`) for exploratory/prototype work in that direction.
+
+## Notes
+
+- No test suite, linting/CI pipeline, or Makefile currently exists in this repo — `ruff` and `mypy` are configured in `pyproject.toml` (strict mypy, ruff rule sets E/F/I/UP/B/N) but are not wired into any automated command; run them manually (`ruff check .`, `mypy .`) if validating changes. See `BACKLOG.md` for the open question of whether/how to add a `tests/` + CI setup.
+- Per-experiment outputs (logs) are written under `logs/`. This folder is gitignored.
+- Input graph data (`.nt`, `.ttl`, rule CSVs) per dataset lives under `.data/<Dataset>/` (e.g. `.data/Mario/`, `.data/FrenchRoyalty/`) and is referenced by `data.input_dir` in each experiment config.

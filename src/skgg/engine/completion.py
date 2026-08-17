@@ -1,3 +1,11 @@
+"""Builds the "complete" graph used as the source for metric extraction.
+
+Used by `cli/upload.py` after a base graph (`.nt` file) is uploaded: forward-chains
+every rule over the base graph, assuming rule bodies are fully grounded, until no
+rule can add any more triples. The result (`graph.complete_uri`) is what
+`engine.metrics.GraphMetrics.from_uri` later profiles for EDB/IDB generation.
+"""
+
 import logging
 
 from SPARQLWrapper import SPARQLWrapper

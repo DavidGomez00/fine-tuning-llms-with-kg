@@ -1,3 +1,9 @@
+"""End-to-end experiment entry point: metrics → EDB → IDB → synthetic graph.
+
+See `run_synthetic_graph_experiment` and AGENTS.md's "Running an experiment"
+section for the full pipeline description.
+"""
+
 import logging
 import time
 from pathlib import Path

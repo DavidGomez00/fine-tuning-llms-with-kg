@@ -1,3 +1,18 @@
+"""Builds the Extensional Database (EDB): a set of ground triples over extensional
+predicates (those never inferred by a rule head) that satisfy both the source
+graph's predicate profiles and the rule bodies that will later drive IDB generation.
+
+`generate_edb` iterates three strategies per predicate, in order, until every
+extensional predicate's target frequency is reached ("closed"):
+  1. `check_direct_matches` — deterministic matches forced by profile counts.
+  2. `check_triples_from_rule` — bindings satisfying a rule's extensional body,
+     selected via CSP backtracking (`_select_valid_bindings`) so a chosen triple
+     never violates another predicate's remaining domain/range budget.
+  3. `insert_random_triples` — random assignment for whatever isn't pinned down
+     by the first two steps, still respecting the Gale-Ryser/Havel-Hakimi
+     solvability check (`generator.is_assignment_solvable`).
+"""
+
 import copy
 import logging
 import random
@@ -31,7 +46,7 @@ from skgg.engine.generator import (
     triples_from_bindings,
     update_closed_preds,
 )
-from skgg.engine.metrics import GraphMetrics, PredicateProfile
+from skgg.engine.metrics import PredicateProfile
 
 logger = logging.getLogger(__name__)
 
@@ -629,59 +644,3 @@ def generate_edb(
 
             if ran_count and _evaluate_closure():
                 break
-
-
-if __name__ == "__main__":
-    import time
-    from pathlib import Path
-
-    from SPARQLWrapper import DIGEST
-
-    from skgg.config import RunConfig
-    from skgg.core.queries import count_triples
-    from skgg.core.rules import get_term_mapping, parse_rule_set
-    from skgg.utils import setup_logging
-
-    # Config setup
-    simpson_config = Path("configurations/simpsons.json")
-    french_config = Path("configurations/french_royalty.json")
-
-    ##### TO RUN ANOTHER GRAPH EDIT THIS vvvv ##
-    config = RunConfig.from_json(simpson_config)
-
-    # Logging
-    setup_logging(level=config.logging.level)
-    logger.info("Confifuration correctly initialized.")
-
-    # Graph settings
-    graph_uri = config.graph.complete_uri
-    edb_uri = config.graph.edb_uri
-
-    # Input files
-    input_dir = config.data.input_dir
-    ontology_file = input_dir / config.graph.ontology_file
-    term_mapping = get_term_mapping(ontology_file, default_namespace=graph_uri)
-    rules_file = input_dir / config.rules.rules_file
-    rules = parse_rule_set(rules_file, term_mapping=term_mapping, pca_threshold=1)
-
-    # SPARQLWrapper client
-    client = SPARQLWrapper(str(config.data.database_url / config.data.sparql_endpoint))
-    client.setHTTPAuth(DIGEST)
-    client.setCredentials(config.virtuoso.user, config.virtuoso.password)
-
-    # Graph metrics
-    graph_metrics = GraphMetrics.from_uri(client, graph_uri)
-
-    # Generate EDB
-    logger.info("Starting EDB generation from <%s>...", graph_uri)
-    start_time = time.time()
-    generate_edb(
-        client=client,
-        rules=rules,
-        term_mapping=term_mapping,
-        edb_uri=edb_uri,
-        chunk_size=config.virtuoso.chunk_size,
-        profiles=graph_metrics.profiles,
-    )
-    logger.info("Finished execution at %d s.", time.time() - start_time)
-    logger.info("EDB at <%s> with %d triples.", edb_uri, count_triples(client, edb_uri))
