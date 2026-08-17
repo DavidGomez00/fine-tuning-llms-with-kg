@@ -407,6 +407,8 @@ def check_uninferrable_preds(
     return intensional_predicates - deducible
 
 
+# DEAD CODE (unreferenced, found 2026-08-17): only reference is a commented-out
+# call in engine/idb.py ("Dependencies are not necessary if rules are complete.").
 def get_dependencies_intensional(rules: dict[str, HornRule]) -> dict[str, set[str]]:
     """Builds a dictionary that represents rule dependencies in a ruleset based on the
     head of the rule. A rule depends on other rules if they are more restrictive than it

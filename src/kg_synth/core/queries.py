@@ -497,6 +497,9 @@ def run_select_query(client: SPARQLWrapper, query: str) -> list[SparqlBinding]:
         raise
 
 
+# DEAD CODE (unreferenced, found 2026-08-17): only call site was inside
+# generate_triples_from_rule() in engine/generator.py, which is commented out
+# and tagged "TODO: Obsolete?".
 def execute_ask_query(client: SPARQLWrapper, query: str) -> bool:
     """Executes a SPARQL ASK query and returns the boolean result.
 

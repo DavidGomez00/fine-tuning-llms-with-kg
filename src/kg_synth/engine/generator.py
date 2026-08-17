@@ -31,6 +31,8 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 # Raw Triple.
 # ---------------------------------------------------------------------------
+# DEAD CODE (unreferenced, found 2026-08-17): only used by the dead
+# _extract_raw_triple() below; nothing else in the repo constructs a RawTriple.
 class RawTriple(NamedTuple):
     """Represents an extracted, unformatted triple."""
 
@@ -380,6 +382,7 @@ def _is_novel_atom(index: int, binding_row: SparqlBinding) -> bool:
     return str(is_new_flag).lower() not in ("0", "false")
 
 
+# DEAD CODE (unreferenced, found 2026-08-17): no call sites anywhere in the repo.
 def _extract_raw_triple(atom: Atom, bindings_row: dict[str, Any]) -> RawTriple | None:
     """Extracts subject and object from bindings to form a complete RawTriple."""
     subject_val, _ = from_binding_row(atom.subject, bindings_row)
@@ -391,6 +394,9 @@ def _extract_raw_triple(atom: Atom, bindings_row: dict[str, Any]) -> RawTriple |
     return RawTriple(atom.predicate, subject_val, object_val, object_type)
 
 
+# DEAD CODE (unreferenced, found 2026-08-17): only caller was
+# generate_triples_from_rule() above, which you already commented out and
+# tagged "TODO: Obsolete?".
 def filter_triples_from_binds(
     raw_bindings: list[SparqlBinding],
     profile: PredicateProfile,
@@ -446,6 +452,9 @@ def filter_triples_from_binds(
                     break
 
 
+# DEAD CODE (unreferenced, found 2026-08-17): only caller was
+# generate_triples_from_rule() above, which you already commented out and
+# tagged "TODO: Obsolete?".
 def triples_from_binds(
     raw_bindings: list[SparqlBinding],
     rule: HornRule,

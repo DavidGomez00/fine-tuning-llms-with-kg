@@ -39,6 +39,7 @@ def setup_logging(level: int | str = logging.INFO) -> None:
 # ---------------------------------------------------------------------------
 # File parsing.
 # ---------------------------------------------------------------------------
+# DEAD CODE (unreferenced, found 2026-08-17): no call sites anywhere in the repo.
 def filter_file(
     input_file: Path,
     target_string: str,
@@ -63,6 +64,7 @@ def filter_file(
                 outfile.write(line)
 
 
+# DEAD CODE (unreferenced, found 2026-08-17): no call sites anywhere in the repo.
 def filter_rules(
     rules_file: Path | str, pca_threshold: float = 0.0, std_threshold: float = 0.0
 ) -> None:
@@ -105,6 +107,7 @@ def create_sparql_client(config: RunConfig) -> SPARQLWrapper:
     return client
 
 
+# DEAD CODE (unreferenced, found 2026-08-17): no call sites anywhere in the repo.
 def tsv_to_nt(tsv_file: Path, nt_file: Path, term_mapping: dict[str, str]):
     """Parses a tsv file into a .nt file."""
     with tsv_file.open(encoding="utf-8") as tsv_f:
