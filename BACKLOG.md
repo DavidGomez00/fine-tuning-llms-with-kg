@@ -97,19 +97,38 @@ the current architecture map.
       consumer (`rules[rule_id]`, `.values()`, `.keys()` lookups in
       `engine/idb.py`, `engine/edb.py`, `engine/generator.py`), so it's
       bigger than a same-file cleanup — do as its own change.
-- [ ] **`queries.py`** — Hay 3 funciones para escribir queries: reducir o
-      eliminar hasta sólo tener las que se usan. Además:
-  - `insert_triples_sparql` se usa en `edb.py` y en `generator.py`. Sería
-    mejor que los triples sólo se inserten desde una función; revisar si esta
-    arquitectura es apropiada.
-  - `insert_triples_gsp()` (renombrada a `insert_triples_bulk()`) — [DONE]
-    ahora soporta GraphDB además de Virtuoso:
-    detecta el backend por el endpoint (`/repositories/` ⇒ GraphDB) y hace
-    POST de N-Triples en crudo al endpoint REST de bulk-load de cada store
-    (`.../statements?context=<grafo>` en GraphDB/RDF4J,
-    `sparql-graph-crud-auth` en Virtuoso), evitando el parseo de `INSERT
-    DATA` para cientos de miles de triples.
-  - `insert_graph_from_nt_sparql` — revisar uso y refactorizar.
+- [x] **`queries.py`: 3 funciones para escribir queries** — reducir o
+      eliminar hasta sólo tener las que se usan.
+  - Audited all 3 insert-triples functions
+    (`insert_triples_sparql`/`insert_triples_bulk`/`insert_graph_sparql`):
+    all 3 are actually used somewhere in `src/`, so this wasn't a dead-code
+    deletion. `insert_triples_gsp()` was already renamed to
+    `insert_triples_bulk()` in an earlier session and now supports GraphDB
+    as well as Virtuoso (detects the backend from the endpoint,
+    `/repositories/` ⇒ GraphDB, and POSTs raw N-Triples to each store's
+    bulk-load REST endpoint — `.../statements?context=<grafo>` on
+    GraphDB/RDF4J, `sparql-graph-crud-auth` on Virtuoso — instead of
+    parsing `INSERT DATA` for hundreds of thousands of triples).
+  - Found and fixed the one real gap: `insert_graph_sparql` (formerly
+    listed here under its old name `insert_graph_from_nt_sparql`, already
+    renamed in an earlier session but never updated here) — used by
+    `cli/upload.py` to load the base graph from a `.nt` file, potentially
+    the largest/most performance-sensitive insert path in the pipeline —
+    was still going through the slow, chunked `insert_triples_sparql`
+    (SPARQL `INSERT DATA`) instead of `insert_triples_bulk`'s fast REST
+    path. Switched it over. `edb.py`/`generator.py`'s other
+    `insert_triples_sparql` call sites are left as-is: they insert
+    smaller, filtered/deduplicated runtime-generated streams with no
+    documented at-scale problem pushing them onto the bulk path.
+  - `build_filtered_query`/`generate_triples_from_rule` — no longer exist
+    anywhere in the codebase (already removed in an earlier session); the
+    old sub-bullet about them was stale.
+  - Verified via `mypy` (no new errors) and by running `cli/upload.py`
+    end-to-end against `mario.nt` (16/16 non-comment lines loaded,
+    matching exactly) followed by a full
+    `run_synthetic_graph_experiment` run.
+- [ ] **`queries.py`: remaining cleanup** — Hay más pendientes en este
+      archivo:
   - `download_graph_raw()` — revisar uso y refactorizar. Es la función que
     generó el artefacto de 17MB limpiado del repo (`output_path.mkdir()`
     seguido de `output_path / file_name` produce un directorio anidado si
@@ -123,9 +142,6 @@ the current architecture map.
   - `chunk_iter` — helper usado sólo dentro de `queries.py`; renombrar a
     `_chunk_iter()` y agrupar en una sección de "helpers".
   - `build_rule_query` — es llamada desde varios scripts.
-  - `build_filtered_query` — es llamada desde `generate_triples_from_rule`,
-    que tal vez esté obsoleta; de momento se mantiene comentada para ver si
-    se elimina más adelante.
 
 ## `engine/`
 

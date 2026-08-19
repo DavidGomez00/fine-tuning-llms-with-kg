@@ -202,17 +202,20 @@ def insert_graph_sparql(
     chunk_size: int,
     nt_file: Path | str,
 ) -> None:
-    """Overwrites a graph with contents from an .nt file or a URI.
+    """Overwrites a graph with contents from an .nt file.
+
+    Uses `insert_triples_bulk`'s bulk-load REST endpoint (rather than SPARQL
+    `INSERT DATA`) since a base graph loaded from disk can easily reach the
+    hundreds of thousands of triples that `INSERT DATA` doesn't scale to.
 
     Args:
         client: The SPARQL wrapper client used to execute queries.
         graph_uri: The URI of the named graph to overwrite.
         chunk_size: The number of triples to insert per batch.
         nt_file: The local file path to the .nt file.
-        from_uri: The remote URI pointing to an .nt file.
 
     Raises:
-        ValueError: If neither `nt_file` nor `from_uri` is provided.
+        ValueError: If `nt_file` does not point to an existing file.
     """
 
     nt_file = Path(nt_file)
@@ -237,7 +240,7 @@ def insert_graph_sparql(
 
     iterator = _triple_stream(nt_file)
 
-    n = insert_triples_sparql(client, graph_uri, iterator, chunk_size)
+    n = insert_triples_bulk(client, graph_uri, iterator, chunk_size)
     logger.debug("Inserted %d triples to <%s> from '%s'.", n, graph_uri, nt_file.name)
 
 
