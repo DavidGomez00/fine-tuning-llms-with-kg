@@ -243,32 +243,29 @@ def _parse_horn_rule(
 def parse_rule_set(
     rules_file: Path,
     term_mapping: dict[str, str],
-    pca_threshold: float | None,
+    pca_threshold: float,
 ) -> dict[str, HornRule]:
     """Parse a rules CSV into a dict of HornRules identified by rule_id.
 
     Args:
         rules_file: Path to the rules CSV file.
         term_mapping: Mapping from ontology terms to their formatted form.
-        pca_threshold: If set, classifies each rule as POSITIVE/NEGATIVE by
-            comparing its PCA confidence against this threshold (UNKNOWN if
-            the PCA confidence is missing); if None, all rules are UNKNOWN.
+        pca_threshold: Classifies each rule as POSITIVE/NEGATIVE by comparing
+            its PCA confidence against this threshold (UNKNOWN if the PCA
+            confidence is missing).
 
     Returns:
         A dict of HornRules identified by rule_id.
     """
     rule_dataframe = pd.read_csv(rules_file)
 
-    if pca_threshold is not None:
-        rule_dataframe["Classification"] = "NEGATIVE"
-        rule_dataframe.loc[
-            rule_dataframe["PCA_Confidence"] >= pca_threshold, "Classification"
-        ] = "POSITIVE"
-        rule_dataframe.loc[
-            rule_dataframe["PCA_Confidence"].isna(), "Classification"
-        ] = "UNKNOWN"
-    else:
-        rule_dataframe["Classification"] = "UNKNOWN"
+    rule_dataframe["Classification"] = "NEGATIVE"
+    rule_dataframe.loc[
+        rule_dataframe["PCA_Confidence"] >= pca_threshold, "Classification"
+    ] = "POSITIVE"
+    rule_dataframe.loc[
+        rule_dataframe["PCA_Confidence"].isna(), "Classification"
+    ] = "UNKNOWN"
 
     rules: dict[str, HornRule] = {}
 

@@ -4,10 +4,12 @@ import json
 import logging
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any, Literal, TypeVar
 
 from typing_extensions import Self
 from yarl import URL
+
+T = TypeVar("T")
 
 
 @dataclass
@@ -98,10 +100,9 @@ class RulesConfig:
             parsed by `core.rules.parse_rule_set`.
         pca_threshold: Minimum PCA confidence a rule must have to be classified
             "POSITIVE"; rules below it are classified "NEGATIVE", and rules with
-            a missing PCA confidence are classified "UNKNOWN". `None` skips
-            classification (all rules are "UNKNOWN"). Note this only labels each
-            `HornRule.classification` — nothing currently filters rules out of
-            EDB/IDB generation based on it (see BACKLOG.md).
+            a missing PCA confidence are classified "UNKNOWN". Note this only
+            labels each `HornRule.classification` — nothing currently filters
+            rules out of EDB/IDB generation based on it (see BACKLOG.md).
     """
 
     rules_file: str
@@ -134,31 +135,42 @@ class RunConfig:
     def from_json(cls, json_path: Path | str) -> Self:
         """Loads a RunConfig from a JSON file."""
 
-        def get_section(key: str, required: bool = False) -> dict[str, Any]:
-            """Fetches a section from JSON.
+        def load_section(
+            section_cls: type[T], key: str, required: bool = False
+        ) -> T:
+            """Builds a config dataclass from a JSON section.
 
             Args:
-                key: The JSON key to fetch.
+                section_cls: The dataclass to construct from the section.
+                key: The JSON key to fetch the section from.
                 required: If True, raises a KeyError if the section is missing.
 
             Raises:
                 KeyError: If a required section is missing from the JSON.
-                ValueError: If the section exists but is not a JSON object (mapping).
+                ValueError: If the section exists but is not a JSON object
+                    (mapping), or its fields don't match `section_cls`'s
+                    constructor (missing or unexpected fields).
             """
             if key not in data:
                 if required:
                     raise KeyError(
                         f"Configuration Error: Missing mandatory section {key}"
                     )
+                section = {}
+            else:
+                section = data[key]
+                if not isinstance(section, dict):
+                    raise ValueError(
+                        f"Configuration Error: Expected '{key}' to be a mapping, "
+                        f"got {type(section).__name__}"
+                    )
 
-                return {}
-
-            section = data[key]
-            if not isinstance(section, dict):
+            try:
+                return section_cls(**section)
+            except TypeError as e:
                 raise ValueError(
-                    f"Expected '{key}' to be a mapping, got {type(section).__name__}"
-                )
-            return section
+                    f"Configuration Error: Invalid '{key}' section: {e}"
+                ) from e
 
         # Read JSON contents
         json_path = Path(json_path)
@@ -166,11 +178,11 @@ class RunConfig:
         with open(json_path, encoding="utf-8") as f:
             data: dict[str, Any] = json.load(f)
 
-        db_config = DatabaseAuthConfig(**get_section("db_config", required=True))
-        graph_config = GraphConfig(**get_section("graph", required=True))
-        rules_config = RulesConfig(**get_section("rules", required=True))
-        data_config = DataConfig(**get_section("data", required=True))
-        logging_config = LoggingConfig(**get_section("logging"))
+        db_config = load_section(DatabaseAuthConfig, "db_config", required=True)
+        graph_config = load_section(GraphConfig, "graph", required=True)
+        rules_config = load_section(RulesConfig, "rules", required=True)
+        data_config = load_section(DataConfig, "data", required=True)
+        logging_config = load_section(LoggingConfig, "logging")
 
         return cls(
             data=data_config,
@@ -179,7 +191,3 @@ class RunConfig:
             logging=logging_config,
             db_config=db_config,
         )
-
-    def __post_init__(self) -> None:
-        """Validate config."""
-        pass

@@ -44,6 +44,28 @@ the current architecture map.
     `configurations/*.json` — `mario.json`/`french_royalty.json` load as
     before, `simpsons.json` still fails only on its already-tracked missing
     `namespace` field.
+- [x] **Smelly logic in `config.py`.**
+  - **Deleted** `RunConfig.__post_init__` — it was a no-op (`pass`) despite a
+    docstring claiming "Validate config."
+  - **`RulesConfig.pca_threshold` is now a required `float`, never `None`** —
+    its docstring already documented `None` as skipping classification, and
+    it fed into `core.rules.parse_rule_set(pca_threshold: float | None)`,
+    but no caller (`cli/main.py`, `cli/upload.py`) ever actually passed
+    `None`. Tightened `parse_rule_set`'s signature to plain `float` and
+    dropped its now-dead `None`-skips-classification branch to match.
+  - **Unified error surfacing in `RunConfig.from_json`** — missing/malformed
+    top-level sections used to raise clean `KeyError`/`ValueError`s via a
+    `get_section` helper, but errors *inside* a section (missing/unexpected
+    field) fell through to a raw dataclass `TypeError` with no
+    "Configuration Error" context (e.g. the `simpsons.json` case below).
+    Replaced `get_section` with `load_section`, which builds the section's
+    dataclass directly and wraps any `TypeError` from its constructor into a
+    `ValueError` prefixed the same way as the other config errors. Also
+    added the missing `"Configuration Error: "` prefix to the
+    not-a-mapping-section case, which lacked it.
+  - Verified via `mypy` (clean) and by exercising all four error paths
+    (missing section, non-mapping section, missing field, unexpected field)
+    plus an end-to-end run against `configurations/mario.json`.
 
 ## `core/`
 
@@ -112,10 +134,11 @@ the current architecture map.
 ## `configurations/`
 
 - [ ] **`simpsons.json` fails to load** — verified via `RunConfig.from_json`:
-      raises `TypeError: GraphConfig.__init__() missing 1 required positional
-      argument: 'namespace'` — its `graph` section is missing the required
-      `namespace` field that `mario.json`/`french_royalty.json` both have.
-      `mario.json` and `french_royalty.json` currently load successfully.
+      raises `ValueError: Configuration Error: Invalid 'graph' section:
+      GraphConfig.__init__() missing 1 required positional argument:
+      'namespace'` — its `graph` section is missing the required `namespace`
+      field that `mario.json`/`french_royalty.json` both have. `mario.json`
+      and `french_royalty.json` currently load successfully.
 
 ## Tooling / process
 
