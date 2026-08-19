@@ -35,7 +35,7 @@ docker compose --profile all up        # both
 ## Running an experiment
 
 Experiments are driven by JSON config files in `configurations/` (e.g.
-`mario.json`, `simpsons.json`, `french_royalty.json`):
+`mario.json`, `french_royalty.json`):
 
 ```python
 from pathlib import Path

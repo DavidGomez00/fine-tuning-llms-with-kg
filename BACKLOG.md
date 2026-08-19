@@ -295,14 +295,15 @@ the current architecture map.
 ## `configurations/`
 
 - [x] **`simpsons.json` fails to load** — verified via `RunConfig.from_json`:
-      raises `ValueError: Configuration Error: Invalid 'graph' section:
+      raised `ValueError: Configuration Error: Invalid 'graph' section:
       GraphConfig.__init__() missing 1 required positional argument:
-      'namespace'` — its `graph` section is missing the required `namespace`
-      field that `mario.json`/`french_royalty.json` both have. `mario.json`
-      and `french_royalty.json` currently load successfully.
-  - **Deleted simpsons related data and configurations** The simpsons datasets
-  were stale and the data was considered irrelevant. All files related to the
-  dataset were removed.
+      'namespace'` — its `graph` section was missing the required
+      `namespace` field that `mario.json`/`french_royalty.json` both have.
+  - Resolved by deletion rather than a fix: the Simpsons dataset
+    (`configurations/simpsons.json`, `.data/Simpsons/`) and the unrelated
+    but similarly stale `.data/Movies/` were removed as irrelevant toy
+    data. `configurations/` now only contains `mario.json` and
+    `french_royalty.json`, both of which load successfully.
 
 ## Tooling / process
 

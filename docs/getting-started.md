@@ -2,8 +2,7 @@
 
 A walkthrough of setting up the project and running one experiment end-to-end,
 using the Mario dataset (`configurations/mario.json`). `french_royalty.json`
-also loads cleanly; `simpsons.json` currently doesn't (see
-[`BACKLOG.md`](../BACKLOG.md)).
+also loads cleanly.
 
 ## 1. Install
 
@@ -73,9 +72,11 @@ is written under `logs/` (gitignored).
 
 ## Troubleshooting
 
-- **`TypeError: GraphConfig.__init__() missing 1 required positional argument:
-  'namespace'`** — the config's `graph` section is missing `namespace`. Known
-  issue for `simpsons.json`; see `BACKLOG.md`.
+- **`ValueError: Configuration Error: Invalid 'graph' section: ...missing 1
+  required positional argument: 'namespace'`** — the config's `graph`
+  section is missing `namespace`. Check it against `GraphConfig`'s fields
+  in `config.py`; both `mario.json` and `french_royalty.json` have a
+  complete `graph` section to compare against.
 - **`FileNotFoundError` from `DataConfig`** — `data.input_dir` in the config
   must point at an existing directory, resolved relative to your current
   working directory (usually the repo root).

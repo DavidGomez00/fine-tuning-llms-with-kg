@@ -27,7 +27,7 @@ Graphs are never loaded into memory-intensive libraries like RDFlib for bulk wor
 
 ## Running an experiment
 
-Experiments are driven by JSON config files in `configurations/` (e.g. `mario.json`, `simpsons.json`, `french_royalty.json`), loaded via `RunConfig.from_json(...)`.
+Experiments are driven by JSON config files in `configurations/` (e.g. `mario.json`, `french_royalty.json`), loaded via `RunConfig.from_json(...)`.
 
 The main entry point is `run_synthetic_graph_experiment` in `src/skgg/cli/main.py`:
 
