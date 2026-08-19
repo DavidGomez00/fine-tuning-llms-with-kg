@@ -19,4 +19,4 @@ logs/*
 .data/Synthetic/
 
 # AI assistant files
-.gemini
+.claude/settings.local.json
