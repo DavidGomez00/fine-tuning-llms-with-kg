@@ -10,29 +10,36 @@ the current architecture map.
 
 ## `config.py`
 
-- [ ] **Dead/unused config variables and classes.** `RunConfig` and its
-      sub-configs carry several fields/classes with zero readers anywhere in
-      `src/`. For each, decide whether to wire it into the pipeline it was
-      built for or delete it until that work starts:
-  - `HardwareConfig` (`n_gpus`, `device`, `precision`, `max_memory_mb`) —
-    entirely unused; `RunConfig.hardware` is never read outside its own
-    `default_factory` construction. Its only live effect today is forcing
-    the `torch` import in `config.py` (and the `torch` dependency) at
-    config-load time.
-  - `DataConfig.crud_endpoint` — defined but never read anywhere.
-  - `FineTuningConfig` / `CoTGenerationConfig` — already noted in
-    `AGENTS.md` as configuration for pipeline code that "is not present yet
-    under `src/`"; confirmed zero reads of `run_config.fine_tuning`/
-    `run_config.cot_generation` anywhere in `src/`.
-  - **`classification`/`pca_threshold` filtering inconsistency** —
-    `RulesConfig.pca_threshold`'s docstring claims rules classified
-    `"NEGATIVE"` are "excluded from generation," and `AGENTS.md` references
-    a `utils.filter_rules` function for ad hoc PCA/Std-confidence
-    filtering — but no such function exists in `utils.py`, and nothing
-    downstream actually checks `rule.classification` before feeding rules
-    into `generate_edb`/`generate_idb`. Needs investigation: should
-    filtering happen in `parse_rule_set`, a new `utils.filter_rules`, or
-    elsewhere?
+- [x] **Dead/unused config variables and classes.** `RunConfig` and its
+      sub-configs carried several fields/classes with zero readers anywhere
+      in `src/`.
+  - **Deleted** `HardwareConfig` (`n_gpus`, `device`, `precision`,
+    `max_memory_mb`) entirely — it was never read outside its own
+    `default_factory` construction, and its only live effect was forcing
+    the `torch` import in `config.py`. Removed the `RunConfig.hardware`
+    field, its `from_json` section handling, and the `import torch`.
+  - **Deleted** `DataConfig.crud_endpoint` — defined but never read
+    anywhere. Also removed the matching (equally unused) `crud_endpoint`
+    key from `configurations/french_royalty.json` and
+    `configurations/simpsons.json`'s `data` sections — since `DataConfig`
+    is built via `DataConfig(**get_section("data", ...))`, that stray key
+    would otherwise now raise a `TypeError` on load.
+  - **Kept** `FineTuningConfig` / `CoTGenerationConfig` as-is — already
+    documented in `AGENTS.md` as configuration for pipeline code that "is
+    not present yet under `src/`"; deliberate forward-looking scaffolding,
+    not stray dead code.
+  - **`classification`/`pca_threshold` filtering inconsistency** — resolved
+    as docs-only: `RulesConfig.pca_threshold`'s docstring and `AGENTS.md`
+    both claimed/implied `"NEGATIVE"`-classified rules are excluded from
+    generation, but nothing downstream actually checks
+    `rule.classification` before feeding rules into
+    `generate_edb`/`generate_idb`, and no `utils.filter_rules` function
+    exists. Corrected both docs to describe the actual (classify-only,
+    no filtering) behavior instead of implementing the missing filter.
+  - Verified via `mypy` (clean) and `RunConfig.from_json` against all three
+    `configurations/*.json` — `mario.json`/`french_royalty.json` load as
+    before, `simpsons.json` still fails only on its already-tracked missing
+    `namespace` field.
 
 ## `core/`
 

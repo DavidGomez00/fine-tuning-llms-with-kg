@@ -75,7 +75,7 @@ src/skgg/
 
 Data flow: **ontology + rules CSV + source graph metrics → EDB (facts satisfying rule bodies) → IDB (rule-derived facts, grown until closure) → synthetic graph**, all mediated through SPARQL against the graph store, keyed by graph URIs defined per-experiment in the `graph` section of each config JSON (`base_uri`, `complete_uri`, `edb_uri`, `synthetic_uri`).
 
-Rules are parsed from CSV into `RuleSignature`/`Atom` objects (`core/rules.py`); each rule has body atoms and a head atom over predicates/variables, plus confidence metrics (PCA/Std confidence) used for filtering (`rules.pca_threshold` in config, or `utils.filter_rules` for ad hoc filtering by PCA/Std threshold).
+Rules are parsed from CSV into `RuleSignature`/`Atom` objects (`core/rules.py`); each rule has body atoms and a head atom over predicates/variables, plus confidence metrics (PCA/Std confidence). `rules.pca_threshold` in config classifies each rule's `HornRule.classification` as POSITIVE/NEGATIVE/UNKNOWN by comparing PCA confidence against the threshold, but nothing currently filters rules out of EDB/IDB generation based on that classification — see `BACKLOG.md`.
 
 `config.py`'s `RunConfig` also defines `FineTuningConfig` and `CoTGenerationConfig` (for LoRA fine-tuning of LLMs and Chain-of-Thought dataset generation from KGs), but the corresponding pipeline code is not present yet under `src/` — check `notebooks/` (`notebooks/Disha/`, `notebooks/Mine/`) for exploratory/prototype work in that direction.
 

@@ -2,8 +2,7 @@
   "data": {
     "input_dir": ".data/Simpsons/",
     "database_url": "http://localhost:8890/",
-    "sparql_endpoint": "sparql-auth",
-    "crud_endpoint": "sparql-graph-crud-auth"
+    "sparql_endpoint": "sparql-auth"
   },
   "db_config": {
     "user": "dba",

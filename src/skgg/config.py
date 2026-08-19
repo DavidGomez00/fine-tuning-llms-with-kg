@@ -6,7 +6,6 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Literal
 
-import torch
 from typing_extensions import Self
 from yarl import URL
 
@@ -76,7 +75,6 @@ class DataConfig:
 
     # Path/suffix for SPARQL endpoint
     sparql_endpoint: str = "sparql"
-    crud_endpoint: str = "sparql-graph-crud-auth"
 
     def get_full_sparql_url(self) -> str:
         """Returns the full SPARQL endpoint for SPARQLWrapper."""
@@ -115,25 +113,6 @@ class DatabaseAuthConfig:
 
 
 @dataclass(frozen=True)
-class HardwareConfig:
-    """Hardware settings.
-
-    Attributes:
-        n_gpus: Number of CUDA ready available GPUs.
-        device: Which device to perform computations on.
-        precision: Precision used by PyTorch tensors.
-        max_memory_mb: Maximum memory allocation in megabytes.
-    """
-
-    n_gpus: int = field(default_factory=lambda: torch.cuda.device_count())
-    device: Literal["gpu", "cpu"] = field(
-        default_factory=lambda: "gpu" if torch.cuda.is_available() else "cpu"
-    )
-    precision: str = "float16"
-    max_memory_mb: int = 40960
-
-
-@dataclass(frozen=True)
 class GraphConfig:
     """Knowledge Graph settings: file locations and the named-graph URIs used to
     key each stage of the pipeline (see AGENTS.md's "Architecture" section for how
@@ -166,14 +145,17 @@ class GraphConfig:
 
 @dataclass(frozen=True)
 class RulesConfig:
-    """Settings for loading and filtering the Horn rule set.
+    """Settings for loading and classifying the Horn rule set.
 
     Attributes:
         rules_file: Filename (relative to `data.input_dir`) of the rules CSV,
             parsed by `core.rules.parse_rule_set`.
         pca_threshold: Minimum PCA confidence a rule must have to be classified
-            "POSITIVE" (kept); rules below it are classified "NEGATIVE" and
-            excluded from generation. `None` skips filtering.
+            "POSITIVE"; rules below it are classified "NEGATIVE", and rules with
+            a missing PCA confidence are classified "UNKNOWN". `None` skips
+            classification (all rules are "UNKNOWN"). Note this only labels each
+            `HornRule.classification` — nothing currently filters rules out of
+            EDB/IDB generation based on it (see BACKLOG.md).
     """
 
     rules_file: str
@@ -202,7 +184,6 @@ class RunConfig:
     cot_generation: CoTGenerationConfig | None
     db_config: DatabaseAuthConfig = field(default_factory=DatabaseAuthConfig)
     data: DataConfig = field(default_factory=DataConfig)
-    hardware: HardwareConfig = field(default_factory=HardwareConfig)
     logging: LoggingConfig = field(default_factory=LoggingConfig)
 
     @classmethod
@@ -245,7 +226,6 @@ class RunConfig:
         graph_config = GraphConfig(**get_section("graph", required=True))
         rules_config = RulesConfig(**get_section("rules", required=True))
         data_config = DataConfig(**get_section("data", required=True))
-        hardware_config = HardwareConfig(**get_section("hardware"))
         logging_config = LoggingConfig(**get_section("logging"))
 
         # --- Optional attributes ---
@@ -265,7 +245,6 @@ class RunConfig:
             data=data_config,
             graph=graph_config,
             rules=rules_config,
-            hardware=hardware_config,
             fine_tuning=fine_tuning,
             cot_generation=cot_config,
             logging=logging_config,
