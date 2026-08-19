@@ -146,15 +146,46 @@ the current architecture map.
       inside the deleted function). Verified via `mypy` and end-to-end runs
       of `cli/upload.py` and `run_synthetic_graph_experiment`. Re-add a
       download/export feature from scratch if/when it's actually needed.
+- [x] **`queries.py`: `copy_graph_sparql`** — reordenar, revisar uso y
+      refactorizar.
+  - **Uso**: confirmed used — its only caller is `initialize_graph` (for
+    the "source is a graph URI, not a `.nt` file" branch), and the pipeline
+    exercises it every run (e.g. copying `graph/base` → `graph/complete`).
+  - **Refactor**: `clear_graph_sparql`, `execute_insert_query`, and
+    `copy_graph_sparql` each duplicated the same ~15-line
+    "configure the update client, work around `SPARQLWrapper`'s
+    query/update param quirk, execute, log-and-raise on failure"
+    boilerplate — and `clear_graph_sparql` was even missing the
+    `setRequestMethod(URLENCODED)` call the other two had (harmless in
+    practice, since that's already `SPARQLWrapper`'s own default, but
+    still an inconsistency). Extracted the shared logic into a new
+    `_execute_update_query()` helper (grouped with `_get_update_client` in
+    the "Helper functions" section); all three now just build their query
+    string and delegate to it. Also fixed `clear_graph_sparql`'s stale
+    docstring (documented a nonexistent `database_endpoint` arg instead of
+    `client`).
+  - **Reorder**: moved `copy_graph_sparql`'s definition to sit right after
+    `clear_graph_sparql` — both are graph-level SPARQL UPDATE operations
+    feeding `initialize_graph`, previously separated by the unrelated
+    "Handle SPARQL query responses" section.
+  - As a side effect, de-duplicating the boilerplate also collapsed 2 of
+    the file's pre-existing `mypy` errors (duplicate copies of the same
+    type mismatch) down to 1 occurrence.
+  - Verified via `mypy` and end-to-end runs of `cli/upload.py` (including
+    its "Successfully copied ..." debug log) and
+    `run_synthetic_graph_experiment`.
+- [x] **`queries.py`: `chunk_iter`** — already resolved in an earlier
+      session: it's `_chunk_iter()` and already grouped in the "Helper
+      functions" section alongside `_get_update_client`/
+      `_execute_update_query`. Stale sub-bullet, no action needed.
 - [ ] **`queries.py`: remaining cleanup** — Hay más pendientes en este
       archivo:
-  - `copy_graph_sparql` — reordenar, revisar uso y refactorizar.
   - Refactorizar nombres de `run_select_query`, `execute_ask_query`,
-    `execute_insert_query`.
+    `execute_insert_query`. Nota: `execute_ask_query` no existe en el
+    archivo actual — puede que ya haya sido eliminada o nunca haya
+    existido bajo ese nombre; revisar antes de refactorizar.
   - Refactorizar el script en general: ordenar funciones y organizar en
     secciones.
-  - `chunk_iter` — helper usado sólo dentro de `queries.py`; renombrar a
-    `_chunk_iter()` y agrupar en una sección de "helpers".
   - `build_rule_query` — es llamada desde varios scripts.
 
 ## `engine/`

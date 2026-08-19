@@ -48,6 +48,33 @@ def _get_update_client(client: SPARQLWrapper) -> SPARQLWrapper:
     return client
 
 
+def _execute_update_query(client: SPARQLWrapper, query: str) -> None:
+    """Executes a SPARQL UPDATE query (INSERT/CLEAR/COPY) against the update endpoint.
+
+    Args:
+        client: An instantiated and configured SPARQLWrapper client.
+        query: The SPARQL UPDATE query to execute.
+
+    Raises:
+        Exception: If the store rejects the update.
+    """
+    update_client = _get_update_client(client)
+    update_client.setMethod("POST")
+    update_client.setRequestMethod(URLENCODED)
+    update_client.setQuery(query)
+
+    if hasattr(update_client, "parameters"):
+        if "query" in update_client.parameters:
+            del update_client.parameters["query"]
+        update_client.parameters["update"] = query
+
+    try:
+        update_client.query()
+    except Exception:
+        logger.exception("SPARQL UPDATE failed:\n%s", query)
+        raise
+
+
 # ---------------------------------------------------------------------------
 # SPARQL query generation.
 # ---------------------------------------------------------------------------
@@ -248,27 +275,33 @@ def clear_graph_sparql(client: SPARQLWrapper, graph_uri: str) -> None:
     """Removes all triples from a specified named graph.
 
     Args:
-        database_endpoint: The URL of the SPARQL database endpoint.
+        client: The SPARQL wrapper client used to execute queries.
         graph_uri: The URI of the named graph to clear.
 
     Raises:
         Exception: If the SPARQL CLEAR operation fails.
     """
-    update_client = _get_update_client(client)
-    update_client.setMethod("POST")
-    query = f"CLEAR SILENT GRAPH <{graph_uri}>"
-    update_client.setQuery(query)
+    _execute_update_query(client, f"CLEAR SILENT GRAPH <{graph_uri}>")
 
-    if hasattr(update_client, "parameters"):
-        if "query" in update_client.parameters:
-            del update_client.parameters["query"]
-        update_client.parameters["update"] = query
 
-    try:
-        update_client.query()
-    except Exception:
-        logger.exception("Failed to clear graph <%s>.", graph_uri)
-        raise
+def copy_graph_sparql(
+    client: SPARQLWrapper, source_graph_uri: str, target_graph_uri: str
+) -> None:
+    """Copy all contents from a graph to another.
+
+    Args:
+        client: The SPARQL wrapper client used to execute queries.
+        source_graph_uri: The URI of the named graph to copy from.
+        target_graph_uri: The URI of the named graph to copy to.
+
+    Raises:
+        Exception: If the SPARQL COPY operation fails.
+    """
+    query = f"COPY GRAPH <{source_graph_uri}> TO GRAPH <{target_graph_uri}>"
+    _execute_update_query(client, query)
+    logger.debug(
+        "Successfully copied <%s> to <%s>.", source_graph_uri, target_graph_uri
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -352,55 +385,7 @@ def run_select_query(client: SPARQLWrapper, query: str) -> list[SparqlBinding]:
 
 def execute_insert_query(client: SPARQLWrapper, query: str) -> None:
     """Execute an INSERT query."""
-    update_client = _get_update_client(client)
-
-    # Configure for SPARQL UPDATE
-    update_client.setMethod("POST")
-    update_client.setRequestMethod(URLENCODED)
-
-    update_client.setQuery(query)
-
-    if hasattr(update_client, "parameters"):
-        if "query" in update_client.parameters:
-            del update_client.parameters["query"]
-        update_client.parameters["update"] = query
-
-    try:
-        update_client.query()
-    except Exception:
-        logger.exception("Failed to insert chunk! Query:\n%s", query)
-        raise
-
-
-def copy_graph_sparql(
-    client: SPARQLWrapper, source_graph_uri: str, target_graph_uri: str
-) -> None:
-    """Copy all contents from a graph to another."""
-    update_client = _get_update_client(client)
-
-    update_client.setMethod("POST")
-    update_client.setRequestMethod(URLENCODED)
-
-    query = f"""
-    COPY GRAPH <{source_graph_uri}> TO GRAPH <{target_graph_uri}>
-    """
-    update_client.setQuery(query)
-
-    if hasattr(update_client, "parameters"):
-        if "query" in update_client.parameters:
-            del update_client.parameters["query"]
-        update_client.parameters["update"] = query
-
-    try:
-        update_client.query()
-        logger.debug(
-            "Successfully copied <%s> to <%s>.", source_graph_uri, target_graph_uri
-        )
-    except Exception:
-        logger.exception(
-            "Failed to copy <%s> to <%s>.", source_graph_uri, target_graph_uri
-        )
-        raise
+    _execute_update_query(client, query)
 
 
 def from_binding_row(term: str, binding_row: SparqlBinding) -> tuple[str, str]:
