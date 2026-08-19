@@ -7,7 +7,6 @@ to verify and evaluate inferrable predicates within a rule set.
 import logging
 import re
 from collections import defaultdict
-from collections.abc import Iterator
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Protocol
@@ -22,9 +21,6 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 # Dataclasses
 # ---------------------------------------------------------------------------
-CAMEL_CASE_PATTERN = re.compile(r"(?<=[a-z])([A-Z])")
-
-
 @dataclass(frozen=True, slots=True)
 class Atom:
     """Represents a triple composed of subject predicate object.
@@ -52,31 +48,6 @@ class Atom:
             return NotImplemented
         return str(self) < str(other)
 
-    def __contains__(self, item: str) -> bool:
-        """Returns True if the term is in the atom, False otherwise."""
-        return item in (self.subject, self.predicate, self.obj)
-
-    def get_variables(self) -> tuple[str | None, str | None]:
-        """Returns the variables in this atom, ordered as [subject_var, object_var]"""
-        s_var = self.subject if self.subject.startswith("?") else None
-        o_var = self.obj if self.obj.startswith("?") else None
-        return (s_var, o_var)
-
-    def to_natural_language(self) -> tuple[str, str, str]:
-        """Extracts the name of a resource from a URI string."""
-
-        def clean(term: str) -> str:
-            """Resolve URIs, variables and formatting."""
-            if term.startswith("?"):
-                return term.removeprefix("?")
-
-            term = re.split(r"[#\/:]", term)[-1]
-            term = CAMEL_CASE_PATTERN.sub(r" \1", term)
-            term = term.replace("_", " ").strip().lower()
-            return term
-
-        return (clean(self.subject), clean(self.predicate), clean(self.obj))
-
 
 @dataclass(frozen=True, slots=True)
 class RuleSignature:
@@ -85,36 +56,6 @@ class RuleSignature:
     rule_id: str
     body: frozenset[Atom]
     head: Atom
-
-    def __str__(self) -> str:
-        """Returns the formal representation of the rule as 'atom AND ... -> head'."""
-        body_desc = " AND ".join(f"{atom}" for atom in sorted(self.body))
-        return f"{body_desc} -> {self.head}"
-
-    def __iter__(self) -> Iterator[Atom]:
-        """Iterates over all atoms in the rule (body and head).
-
-        Yields:
-            Atom: Each atom composing the rule's body, followed by the head atom.
-        """
-        yield from sorted(self.body)
-        yield self.head
-
-    def to_natural_language(self) -> str:
-        """Returns a natural language description of the rule."""
-        sorted_body = sorted(self.body)
-
-        body_desc = " AND ".join(
-            " ".join(atom.to_natural_language()) for atom in sorted_body
-        )
-        head_desc = " ".join(self.head.to_natural_language())
-
-        body_formal = " AND ".join(f"{atom}" for atom in sorted_body)
-
-        return (
-            f"If {body_desc}, then {head_desc}.\n\n"
-            f"Formal Rule:\n\tHead: {self.head}\n\tBody: {body_formal}"
-        )
 
     def get_variables(self) -> set[str]:
         """Return unique variables starting with '?' in this rule."""
@@ -134,12 +75,6 @@ class RuleSignature:
             if term.startswith("?")
         }
 
-    def get_head_variables(self) -> list[str]:
-        """Return the head variables in a list [subject, object] or [subject]"""
-        return [
-            term for term in (self.head.subject, self.head.obj) if term.startswith("?")
-        ]
-
     def get_predicates(self) -> set[str]:
         """Return the set of unique predicates in the rule."""
         return {atom.predicate for atom in (self.body | {self.head})}
@@ -148,10 +83,10 @@ class RuleSignature:
         """Return the set of unique predicates in the body atoms."""
         return {atom.predicate for atom in self.body}
 
-    def get_extensional_body(self, intesional_preds: set[str]) -> frozenset[Atom]:
+    def get_extensional_body(self, intensional_preds: set[str]) -> frozenset[Atom]:
         """Returns the rule's body excluding atoms with intensional predicates."""
         return frozenset(
-            {atom for atom in self.body if atom.predicate not in intesional_preds}
+            {atom for atom in self.body if atom.predicate not in intensional_preds}
         )
 
     def get_extensional_preds(self, intensional_preds: set[str]) -> set[str]:
@@ -196,15 +131,6 @@ class HornRule:
         """Exposes the signature's id for convenience."""
         return self.signature.rule_id
 
-    def __str__(self) -> str:
-        """Returns a formatted string representation of the rule and its stats."""
-        return (
-            f"| Id: {self.rule_id} | Signature: {self.signature} | "
-            f"PCA conf.: {self.pca_confidence} | "
-            f"supp.: {self.support} | "
-            f"hc: {self.head_coverage} |"
-        )
-
     def get_body_predicates(self) -> set[str]:
         """Return the set of unique predicates in the body atoms."""
         return self.signature.get_body_predicates()
@@ -212,10 +138,6 @@ class HornRule:
     def get_extensional_body(self, intensional_preds: set[str]) -> frozenset[Atom]:
         """Returns rule's body excluding atoms that contain intensional predicates."""
         return self.signature.get_extensional_body(intensional_preds)
-
-    def get_head_variables(self) -> list[str]:
-        """Returns a list of the head variables."""
-        return self.signature.get_head_variables()
 
     def get_predicates(self) -> set[str]:
         """Returns a set containing all predicates present in the rule"""
@@ -236,7 +158,7 @@ class HornRule:
 ATOM_PATTERN = re.compile(r"(\?\w+)\s+(\S+)\s+(\S+)")
 
 
-class RuleRow(Protocol):
+class _RuleRow(Protocol):
     """Definines the expected structure of a rule DataFrame row."""
 
     Head: str
@@ -248,7 +170,7 @@ class RuleRow(Protocol):
     Classification: str
 
 
-def parse_body(body_str: str, term_mapping: dict[str, str]) -> frozenset[Atom]:
+def _parse_body(body_str: str, term_mapping: dict[str, str]) -> frozenset[Atom]:
     """Parses a body string containing one or more atoms into a frozen set of atoms."""
     if not body_str:
         logger.warning("Parsing empty body. Is this supposed to happen?")
@@ -264,7 +186,7 @@ def parse_body(body_str: str, term_mapping: dict[str, str]) -> frozenset[Atom]:
     )
 
 
-def parse_head(head_str: str, term_mapping: dict[str, str]) -> Atom:
+def _parse_head(head_str: str, term_mapping: dict[str, str]) -> Atom:
     """Parses a head string into an Atom."""
     if not head_str:
         raise ValueError("Head string format is not valid: Empty string.")
@@ -280,8 +202,8 @@ def parse_head(head_str: str, term_mapping: dict[str, str]) -> Atom:
     )
 
 
-def parse_horn_rule(
-    row: RuleRow,
+def _parse_horn_rule(
+    row: _RuleRow,
     rule_id: str,
     term_mapping: dict[str, str],
 ) -> HornRule:
@@ -302,8 +224,8 @@ def parse_horn_rule(
     rule = HornRule(
         signature=RuleSignature(
             rule_id=rule_id,
-            head=parse_head(str(row.Head), term_mapping),
-            body=parse_body(str(row.Body), term_mapping),
+            head=_parse_head(str(row.Head), term_mapping),
+            body=_parse_body(str(row.Body), term_mapping),
         ),
         support=_parse_metric(row.Positive_Examples),
         head_coverage=_parse_metric(row.Head_Coverage),
@@ -323,17 +245,18 @@ def parse_rule_set(
     term_mapping: dict[str, str],
     pca_threshold: float | None,
 ) -> dict[str, HornRule]:
-    """Parse a DataFrame into a dict of HornRules identified by rule_id.
+    """Parse a rules CSV into a dict of HornRules identified by rule_id.
 
     Args:
-        rules_df: DataFrame containing information for each rule in each row.
+        rules_file: Path to the rules CSV file.
+        term_mapping: Mapping from ontology terms to their formatted form.
+        pca_threshold: If set, classifies each rule as POSITIVE/NEGATIVE by
+            comparing its PCA confidence against this threshold (UNKNOWN if
+            the PCA confidence is missing); if None, all rules are UNKNOWN.
 
     Returns:
-        A tuple containing
-            - A dict of HornRules identified by rule_id.
-            - A set of strings representing the predicates in the rules' head.
+        A dict of HornRules identified by rule_id.
     """
-    # TODO: Change the return value to a simple list of rules
     rule_dataframe = pd.read_csv(rules_file)
 
     if pca_threshold is not None:
@@ -351,7 +274,7 @@ def parse_rule_set(
 
     for row_id, row in enumerate(rule_dataframe.itertuples(index=False), start=1):
         rule_id = f"rule_{row_id}"
-        rule = parse_horn_rule(
+        rule = _parse_horn_rule(
             row=row,
             rule_id=rule_id,
             term_mapping=term_mapping,

@@ -10,8 +10,43 @@ the current architecture map.
 
 ## `core/`
 
-- [ ] **`rules.py`** — Refactor dataclass functions to delete obsolete code;
+- [x] **`rules.py`** — Refactor dataclass functions to delete obsolete code;
       refactor and delete obsolete functions.
+  - Deleted dead methods with zero callers anywhere in `src/`:
+    `Atom.__contains__`, `Atom.get_variables`, `Atom.to_natural_language`
+    (and `CAMEL_CASE_PATTERN`), `RuleSignature.__iter__`,
+    `RuleSignature.to_natural_language`, `RuleSignature.__str__`,
+    `RuleSignature.get_head_variables`/`HornRule.get_head_variables`,
+    `HornRule.__str__`.
+  - `get_dependencies_intensional` kept as-is (flagged dead-for-now by the
+    author, needed once incomplete-rule support is built).
+  - Renamed internal-only parsing helpers to signal they're private:
+    `parse_body`→`_parse_body`, `parse_head`→`_parse_head`,
+    `parse_horn_rule`→`_parse_horn_rule`, `RuleRow`→`_RuleRow`.
+  - Fixed the `intesional_preds`→`intensional_preds` misspelling in
+    `RuleSignature.get_extensional_body`, and rewrote `parse_rule_set`'s
+    stale docstring (referenced a nonexistent `rules_df` param and a tuple
+    return value).
+  - Verified via `mypy` (no new errors) and an end-to-end run of
+    `run_synthetic_graph_experiment` against `configurations/mario.json`.
+  - Follow-ups spun out below: `parse_rule_set` return type, and the
+    `classification`/`pca_threshold` filtering inconsistency.
+- [ ] **`rules.py`: `parse_rule_set` return type** — `parse_rule_set`
+      returns `dict[str, HornRule]` and still carries a stale
+      `# TODO: Change the return value to a simple list of rules` comment.
+      Changing it to `list[HornRule]` requires updating every dict-keyed
+      consumer (`rules[rule_id]`, `.values()`, `.keys()` lookups in
+      `engine/idb.py`, `engine/edb.py`, `engine/generator.py`), so it's
+      bigger than a same-file cleanup — do as its own change.
+- [ ] **`classification`/`pca_threshold` filtering inconsistency** —
+      `config.py`'s `RulesConfig.pca_threshold` docstring claims rules
+      classified `"NEGATIVE"` are "excluded from generation," and
+      `AGENTS.md` references a `utils.filter_rules` function for ad hoc
+      PCA/Std-confidence filtering — but no such function exists in
+      `utils.py`, and nothing downstream actually checks
+      `rule.classification` before feeding rules into
+      `generate_edb`/`generate_idb`. Needs investigation: should filtering
+      happen in `parse_rule_set`, a new `utils.filter_rules`, or elsewhere?
 - [ ] **`queries.py`** — Hay 3 funciones para escribir queries: reducir o
       eliminar hasta sólo tener las que se usan. Además:
   - `insert_triples_sparql` se usa en `edb.py` y en `generator.py`. Sería
