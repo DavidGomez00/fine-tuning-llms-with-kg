@@ -238,7 +238,37 @@ the current architecture map.
 
 ## `engine/`
 
-- [ ] **`generator.py`** — Refactor and delete obsolete functions.
+- [x] **`generator.py`** — Refactor and delete obsolete functions.
+  - **No dead functions found** — same pattern as `rules.py`/`queries.py`:
+    every function (`decrement_counts`, `update_closed_preds`,
+    `is_assignment_solvable`, `create_searchspace`, `GraphSources`,
+    `triples_from_bindings`, `apply_rule`) is actually called from
+    `edb.py`, `idb.py`, or `completion.py`.
+  - **Found and fixed a real correctness bug** while auditing:
+    `apply_rule`'s inner `filter_triples` checked
+    `profile.range.get(subject, 0)` instead of
+    `profile.range.get(obj, 0)`. `range` is object-keyed everywhere else
+    in the codebase (`get_range()`, `is_assignment_solvable`,
+    `edb.py`'s domain/range usage all pair `domain`↔`subject` /
+    `range`↔`obj`), so this line effectively always evaluated to "reject
+    the triple" whenever a profile was passed — which `idb.py`'s IDB
+    generation loop always does. Before the fix, every run in this
+    session's history ended in "Reached stale state" without full
+    predicate closure and produced ~10-20 synthetic triples for
+    `mario.json`; after the fix, runs consistently reach "All predicates
+    closed" and produce ~28-30 triples. Fixed by keying on `obj` instead
+    of `subject`.
+  - Cleaned up dead commented-out debug-log lines in `filter_triples`,
+    and fixed several stale docstrings: `create_searchspace` documented
+    nonexistent params (`database_endpoint`/`predicate`/`profile`) and a
+    wrong return type (said it returns a URI; it returns `None`);
+    `triples_from_bindings` said it returns "a set" but it's a generator;
+    `decrement_counts`/`update_closed_preds` called themselves "private"
+    despite being public, cross-module functions (plus a "helpter" typo
+    in the latter).
+  - Verified via `mypy` (identical error set to baseline — zero new
+    issues) and multiple end-to-end runs of `cli/upload.py` and
+    `run_synthetic_graph_experiment` against `mario.json`.
 
 ## `configurations/`
 

@@ -32,7 +32,7 @@ logger = logging.getLogger(__name__)
 # Profile update.
 # ---------------------------------------------------------------------------
 def decrement_counts(counts: dict[str, int], term: str) -> None:
-    """Module-level private helper for managing frequency state."""
+    """Decrements a term's remaining frequency budget, dropping it once exhausted."""
     if term in counts:
         counts[term] -= 1
         if counts[term] == 0:
@@ -47,8 +47,11 @@ def update_closed_preds(
     edb_profiles: dict[str, PredicateProfile],
     closed_preds: set[str],
 ) -> bool:
-    """Module-level private helpter to update the state of the predicates. Returns True
-    if new predicates are closed."""
+    """Updates the state of the predicates.
+
+    Returns:
+        True if new predicates are closed.
+    """
     new = False
     for predicate, profile in edb_profiles.items():
         if profile.frequency <= 0 and predicate not in closed_preds:
@@ -102,20 +105,21 @@ def create_searchspace(
 ) -> None:
     """Generates and inserts a searchspace into the DB using one or more predicates.
 
-    Creates all possible triples for the given predicate using the cartesian
-    product of the domain and range entities, and inserts them into a specific
-    named graph using batching to ensure scalability. Uses `insert_triples_bulk`'s
-    bulk-load REST endpoint (rather than SPARQL `INSERT DATA`) so hundreds of
-    thousands of candidate triples can be materialized in seconds; the search
-    space graph is deleted again once candidates have been selected from it.
+    For each predicate, creates all possible triples using the cartesian product of
+    its domain and range entities, and inserts them into `searchspace_uri` using
+    batching to ensure scalability. Uses `insert_triples_bulk`'s bulk-load REST
+    endpoint (rather than SPARQL `INSERT DATA`) so hundreds of thousands of candidate
+    triples can be materialized in seconds. The caller is responsible for deleting
+    `searchspace_uri` again once candidates have been selected from it (see
+    `apply_rule`).
 
     Args:
-        database_endpoint: The URL of the SPARQL database endpoint.
-        predicate: The URI of the predicate to link subjects and objects.
-        profile: A profile object containing `domain` and `range` Counters.
-
-    Returns:
-        The URI of the generated search space named graph.
+        client: An instantiated and configured SPARQLWrapper client.
+        profiles: Maps each predicate to the profile whose domain/range entities
+            are used to generate its candidate triples.
+        term_mapping: Mapping from a term to its corresponding prefix.
+        searchspace_uri: URI of the named graph the candidate triples are inserted
+            into.
 
     Raises:
         Exception: If a SPARQL insertion batch fails.
@@ -155,7 +159,7 @@ def triples_from_bindings(
         term_mapping: Mapping of terms to their string representations.
 
     Returns:
-        A set of all possible formatted triple strings.
+        An iterator of formatted triple strings, one per (atom, binding row) pair.
     """
     return (
         format_triple(
@@ -243,21 +247,16 @@ def apply_rule(
             term_mapping=term_mapping,
         ):
             if triple in existing_triples:
-                # logger.debug("%s already exists in the graph.", triple)
                 continue
 
             if use_profile:
-                subject, predicate, obj = triple.strip(" .").split(sep=" ")
-                # logger.debug(
-                #    "Subject: %s | Predicate: %s | Object: %s", subject, predicate, obj
-                # )
+                subject, _predicate, obj = triple.strip(" .").split(sep=" ")
                 if (
                     profile.frequency <= 0
                     or profile.domain.get(subject, 0) <= 0
-                    or profile.range.get(subject, 0) <= 0
+                    or profile.range.get(obj, 0) <= 0
                     or not is_assignment_solvable(profile, subject, obj)
                 ):
-                    # logger.debug("%s violates profile constraints.", triple)
                     continue
 
             yield triple
