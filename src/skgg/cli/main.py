@@ -44,7 +44,7 @@ def run_synthetic_graph_experiment(
     ## ------ Previous evaluation of rules ------
     term_mapping = get_term_mapping(
         ontology_file=input_dir / config.graph.ontology_file,
-        default_namespace=config.graph.complete_uri,
+        default_namespace=config.graph.namespace,
     )
 
     rules = parse_rule_set(

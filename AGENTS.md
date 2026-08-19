@@ -47,7 +47,7 @@ Typical experiment flow (see `cli/main.py`):
 
 `cli/upload.py` is a separate, standalone script (run top-level, not via a function) that uploads a base graph from an `.nt` file and then runs rule-based completion (`engine/completion.py`) to build the "complete" graph used as the source for metric extraction. Edit the `graph_config` path at the top of the file before running.
 
-**Known issues (see `BACKLOG.md`):** `cli/main.py`'s `__main__` block is not confirmed working end-to-end. `core/queries.py` has several overlapping insert/query functions flagged for consolidation. Check `BACKLOG.md` for the current TODO list before assuming a code path is exercised/working.
+`cli/main.py`'s `__main__` block runs `run_synthetic_graph_experiment` end-to-end and is confirmed working (verified via `python -m skgg.cli.main` against `mario.json`; see `BACKLOG.md`). Check `BACKLOG.md` for the current TODO list before assuming any other code path is exercised/working.
 
 ## Architecture
 

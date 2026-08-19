@@ -5,7 +5,29 @@ the current architecture map.
 
 ## `cli/`
 
-- [ ] **`main.py`** — No se ejecuta correctamente. `TODO: Debug main.py`.
+- [x] **`main.py`** — No se ejecuta correctamente. `TODO: Debug main.py`.
+  - **Found and fixed the actual bug**: `run_synthetic_graph_experiment`
+    called `get_term_mapping(..., default_namespace=config.graph.complete_uri)`
+    — should be `config.graph.namespace`, matching `cli/upload.py`'s
+    already-correct usage. `default_namespace` becomes the fallback
+    namespace for any unprefixed ontology term; with the bug, any term
+    falling through to that fallback got wrongly resolved against the
+    named-graph URI instead of the entity namespace, silently producing
+    garbage URIs rather than an error. Impact on `mario.json` specifically
+    was masked — its rules CSV and EDB/IDB entity terms are already
+    fully-qualified `<...>` URIs, which `format_term` returns unmodified
+    without ever touching the "default" fallback — but the fix is
+    unambiguously correct (matches the parameter's documented intent and
+    `cli/upload.py`'s sibling implementation) and matters for any dataset
+    whose ontology/rules use bare, unprefixed terms.
+  - **Confirmed working end-to-end**: ran the actual entrypoint
+    (`python -m skgg.cli.main`, not just calling the function directly)
+    against `mario.json`. Completes cleanly, reaches "All predicates
+    closed" (producing 30 synthetic triples from the 26-triple source),
+    and the synthetic graph's triples inspected via SPARQL are
+    structurally sane — clean, correctly-resolved entity/predicate names,
+    no malformed/garbage URIs. `AGENTS.md`'s "Known issues" note updated
+    to match.
 - [ ] **`upload.py`** — Sin pendientes registrados.
 
 ## `config.py`
