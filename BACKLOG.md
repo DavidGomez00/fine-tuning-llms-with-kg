@@ -131,13 +131,23 @@ the current architecture map.
     end-to-end against `mario.nt` (16/16 non-comment lines loaded,
     matching exactly) followed by a full
     `run_synthetic_graph_experiment` run.
+- [x] **`queries.py`: `download_graph_raw()` removed** — dropped the
+      "produce a file with a graph in it" feature entirely for now. It had
+      zero callers anywhere in `src/`/`notebooks/` (its only caller,
+      `cli/download.py`, was already removed in an earlier session) and was
+      the function responsible for the 17MB artifact previously cleaned out
+      of the repo (`output_path.mkdir()` followed by `output_path /
+      file_name` produces a nested directory when `output_path` already
+      ends with the file name). Deleted the whole "Download from database"
+      section, including its stale `# TODO: Tiene esto que estar aquí??`.
+      `requests`/`URL`/`Path` imports are all still used elsewhere in the
+      file, so no import cleanup was needed. As a side effect, this also
+      removed one of the file's pre-existing `mypy` errors (a type mismatch
+      inside the deleted function). Verified via `mypy` and end-to-end runs
+      of `cli/upload.py` and `run_synthetic_graph_experiment`. Re-add a
+      download/export feature from scratch if/when it's actually needed.
 - [ ] **`queries.py`: remaining cleanup** — Hay más pendientes en este
       archivo:
-  - `download_graph_raw()` — revisar uso y refactorizar. Es la función que
-    generó el artefacto de 17MB limpiado del repo (`output_path.mkdir()`
-    seguido de `output_path / file_name` produce un directorio anidado si
-    `output_path` ya termina en el nombre de archivo); ya no tiene caller
-    desde que se eliminó `cli/download.py`, evaluar si eliminarla también.
   - `copy_graph_sparql` — reordenar, revisar uso y refactorizar.
   - Refactorizar nombres de `run_select_query`, `execute_ask_query`,
     `execute_insert_query`.
