@@ -10,11 +10,11 @@ from pathlib import Path
 
 from skgg.config import RunConfig
 from skgg.core.queries import count_triples
-from skgg.core.rules import get_term_mapping, parse_rule_set
+from skgg.core.rules import parse_rule_set
 from skgg.engine.edb import generate_edb
 from skgg.engine.idb import generate_idb
 from skgg.engine.metrics import GraphMetrics
-from skgg.utils import create_sparql_client, setup_logging
+from skgg.utils import create_sparql_client, get_term_mapping, setup_logging
 
 logger = logging.getLogger(__name__)
 

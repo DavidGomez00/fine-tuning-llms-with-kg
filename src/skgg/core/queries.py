@@ -17,7 +17,8 @@ from requests.auth import HTTPDigestAuth
 from SPARQLWrapper import GET, JSON, URLENCODED, SPARQLWrapper
 from yarl import URL
 
-from skgg.core.rules import HornRule, RuleSignature, format_term, format_triple
+from skgg.core.rules import HornRule, RuleSignature
+from skgg.utils import format_term, format_triple
 
 logger = logging.getLogger(__name__)
 

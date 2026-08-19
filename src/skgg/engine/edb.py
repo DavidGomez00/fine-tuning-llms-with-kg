@@ -35,7 +35,6 @@ from skgg.core.rules import (
     Atom,
     HornRule,
     RuleSignature,
-    format_triple,
     get_extensional_dependencies,
 )
 from skgg.engine.generator import (
@@ -47,6 +46,7 @@ from skgg.engine.generator import (
     update_closed_preds,
 )
 from skgg.engine.metrics import PredicateProfile
+from skgg.utils import format_triple
 
 logger = logging.getLogger(__name__)
 
