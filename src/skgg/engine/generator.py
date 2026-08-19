@@ -17,7 +17,7 @@ from skgg.core.queries import (
     clear_graph_sparql,
     from_binding_row,
     get_existing_triples,
-    insert_triples_gsp,
+    insert_triples_bulk,
     insert_triples_sparql,
     run_select_query,
 )
@@ -104,7 +104,10 @@ def create_searchspace(
 
     Creates all possible triples for the given predicate using the cartesian
     product of the domain and range entities, and inserts them into a specific
-    named graph using batching to ensure scalability.
+    named graph using batching to ensure scalability. Uses `insert_triples_bulk`'s
+    bulk-load REST endpoint (rather than SPARQL `INSERT DATA`) so hundreds of
+    thousands of candidate triples can be materialized in seconds; the search
+    space graph is deleted again once candidates have been selected from it.
 
     Args:
         database_endpoint: The URL of the SPARQL database endpoint.
@@ -126,7 +129,7 @@ def create_searchspace(
                 profile.domain.keys(), profile.range.keys()
             )
         )
-        insert_triples_gsp(
+        insert_triples_bulk(
             graph_uri=searchspace_uri,
             triples=triple_generator,
             client=client,

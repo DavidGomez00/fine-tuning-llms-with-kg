@@ -17,8 +17,13 @@ the current architecture map.
   - `insert_triples_sparql` se usa en `edb.py` y en `generator.py`. Sería
     mejor que los triples sólo se inserten desde una función; revisar si esta
     arquitectura es apropiada.
-  - `insert_triples_gsp()` no es compatible con GraphDB, buscar una
-    alternativa.
+  - `insert_triples_gsp()` (renombrada a `insert_triples_bulk()`) — [DONE]
+    ahora soporta GraphDB además de Virtuoso:
+    detecta el backend por el endpoint (`/repositories/` ⇒ GraphDB) y hace
+    POST de N-Triples en crudo al endpoint REST de bulk-load de cada store
+    (`.../statements?context=<grafo>` en GraphDB/RDF4J,
+    `sparql-graph-crud-auth` en Virtuoso), evitando el parseo de `INSERT
+    DATA` para cientos de miles de triples.
   - `insert_graph_from_nt_sparql` — revisar uso y refactorizar.
   - `download_graph_raw()` — revisar uso y refactorizar. Es la función que
     generó el artefacto de 17MB limpiado del repo (`output_path.mkdir()`

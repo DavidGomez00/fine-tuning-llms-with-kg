@@ -127,49 +127,72 @@ def insert_triples_sparql(
     return total_inserted
 
 
-# TODO: Create searchspace depends on this functions, but it doesn't work with graphDB.
-def insert_triples_gsp(
+def insert_triples_bulk(
     client: SPARQLWrapper,
     graph_uri: str,
     triples: Iterator[str],
     chunk_size: int = 10000,
-) -> None:
-    """Inserts triples into Virtuoso using the Graph Store HTTP Protocol.
+) -> int:
+    """Bulk-inserts N-Triples into a named graph via the store's native bulk-load
+    endpoint, bypassing SPARQL Update parsing entirely.
 
-    Sends raw N-Triples data directly to the REST API, preventing SQL translation buffer
-    overflows and drastically speeding up ingestion.
+    `INSERT DATA` queries force the store to parse a full SPARQL Update grammar for
+    every triple, which does not scale to the hundreds of thousands of triples used to
+    initialize a rule's search space (see `engine/generator.py`'s `create_searchspace`).
+    Posting raw N-Triples payloads straight to the store's Graph Store / bulk-statements
+    REST endpoint is dramatically faster and is the scalable path for that use case.
+    Dispatches to the right protocol based on the client's endpoint:
+
+    - GraphDB (RDF4J): streams batches to the repository's `/statements` endpoint (the
+      RDF4J "add statements" REST API) with `context=<graph_uri>` so each batch lands
+      directly in the target named graph.
+    - Virtuoso: streams batches to `sparql-graph-crud-auth` (the SPARQL 1.1 Graph Store
+      HTTP Protocol endpoint).
 
     Args:
+        client: An instantiated and configured SPARQLWrapper client.
         graph_uri: Target named graph URI.
         triples: Iterator yielding N-Triple formatted strings.
         chunk_size: Number of triples to send per HTTP POST request.
-        auth: A (username, password) tuple for basic authentication.
+
+    Returns:
+        The number of triples sent to the store.
 
     Raises:
-        requests.HTTPError: If the Virtuoso server rejects the payload.
+        requests.HTTPError: If the store rejects a batch.
     """
-    params = {"graph-uri": graph_uri}
+    is_graphdb = "/repositories/" in client.endpoint
+
+    if is_graphdb:
+        url = _get_update_client(client).endpoint
+        params = {"context": f"<{graph_uri}>"}
+    else:
+        url = str(URL(client.endpoint).with_name("sparql-graph-crud-auth"))
+        params = {"graph-uri": graph_uri}
+
     headers = {"Content-Type": "application/n-triples"}
+
+    user, passwd = getattr(client, "user", None), getattr(client, "passwd", None)
+    auth: HTTPDigestAuth | tuple[str, str] | None = None
+    if user and passwd:
+        auth = (
+            HTTPDigestAuth(user, passwd)
+            if getattr(client, "http_auth", None) == "DIGEST"
+            else (user, passwd)
+        )
 
     total_inserted = 0
 
     with requests.Session() as session:
-        session.auth = HTTPDigestAuth(*(client.user, client.passwd))
+        session.auth = auth
 
-        while True:
-            batch = list(itertools.islice(triples, chunk_size))
-            if not batch:
-                break
-
+        for batch in _chunk_iter(triples, chunk_size):
             payload = "\n".join(batch) + "\n"
-            response = session.post(
-                url=URL(client.endpoint).with_name("sparql-graph-crud-auth"),
-                params=params,
-                headers=headers,
-                data=payload,
-            )
+            response = session.post(url, params=params, headers=headers, data=payload)
             response.raise_for_status()
             total_inserted += len(batch)
+
+    return total_inserted
 
 
 def insert_graph_sparql(
