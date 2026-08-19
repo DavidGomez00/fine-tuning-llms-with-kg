@@ -77,7 +77,7 @@ Data flow: **ontology + rules CSV + source graph metrics → EDB (facts satisfyi
 
 Rules are parsed from CSV into `RuleSignature`/`Atom` objects (`core/rules.py`); each rule has body atoms and a head atom over predicates/variables, plus confidence metrics (PCA/Std confidence). `rules.pca_threshold` in config classifies each rule's `HornRule.classification` as POSITIVE/NEGATIVE/UNKNOWN by comparing PCA confidence against the threshold, but nothing currently filters rules out of EDB/IDB generation based on that classification — see `BACKLOG.md`.
 
-`config.py`'s `RunConfig` also defines `FineTuningConfig` and `CoTGenerationConfig` (for LoRA fine-tuning of LLMs and Chain-of-Thought dataset generation from KGs), but the corresponding pipeline code is not present yet under `src/` — check `notebooks/` (`notebooks/Disha/`, `notebooks/Mine/`) for exploratory/prototype work in that direction.
+LoRA fine-tuning of LLMs and Chain-of-Thought dataset generation from KGs are not implemented under `src/` yet — check `notebooks/` (`notebooks/Disha/`, `notebooks/Mine/`) for exploratory/prototype work in that direction. `config.py` previously carried placeholder `FineTuningConfig`/`CoTGenerationConfig` dataclasses for this; they were removed as dead code (nothing read them) and should be reintroduced once that pipeline is actually built.
 
 ## Notes
 

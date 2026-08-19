@@ -24,10 +24,14 @@ the current architecture map.
     `configurations/simpsons.json`'s `data` sections — since `DataConfig`
     is built via `DataConfig(**get_section("data", ...))`, that stray key
     would otherwise now raise a `TypeError` on load.
-  - **Kept** `FineTuningConfig` / `CoTGenerationConfig` as-is — already
-    documented in `AGENTS.md` as configuration for pipeline code that "is
-    not present yet under `src/`"; deliberate forward-looking scaffolding,
-    not stray dead code.
+  - **Deleted** `FineTuningConfig` / `CoTGenerationConfig` — initially kept
+    as documented forward-looking scaffolding, but reconsidered as out of
+    scope for now and removed along with `RunConfig.fine_tuning`/
+    `cot_generation` and their `from_json` handling (no config JSON
+    referenced either section). `AGENTS.md` updated to note the
+    fine-tuning/CoT pipeline isn't implemented under `src/` without
+    pointing at now-nonexistent config classes; reintroduce them once that
+    pipeline is actually built.
   - **`classification`/`pca_threshold` filtering inconsistency** — resolved
     as docs-only: `RulesConfig.pca_threshold`'s docstring and `AGENTS.md`
     both claimed/implied `"NEGATIVE"`-classified rules are excluded from

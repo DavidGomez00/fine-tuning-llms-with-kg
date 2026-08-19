@@ -11,60 +11,6 @@ from yarl import URL
 
 
 @dataclass
-class FineTuningConfig:
-    """Configuration for the training loop and hyperparameters."""
-
-    # Fine-tuning experiment behavior
-    skip_base_eval: bool = False
-    skip_baseline: bool = False
-
-    # Generated outputs
-    results_json_file: str = "results.json"
-    summary_csv_file: str = "summary.csv"
-    summary_plot_file: str = "experiment_plot.png"
-    summary_table_file: str = "experiment_table.png"
-
-    # Dataset generation for fine-tuning
-    generate_datasets: bool = False
-    train_with_rules_samples: int = 10
-    train_without_rules_samples: int = 10
-    test_samples: int = 5
-
-    # Base model configuration
-    model_name: str = "meta-llama/Llama-3.2-1B-Instruct"
-    model_alias: str = "LLaMA-3.2-1B"
-    context_window: int = 512
-
-    # Training loop parameters
-    per_device_batch_size: int = 1
-    num_train_epochs: float = 1.0
-    max_steps: int = 500
-    learning_rate: float = 2e-3
-    warmup_steps: int = 10
-    optim: str = "paged_adamw_8bit"
-    gradient_accumulation_steps: int = 4
-    logging_steps: int = 50
-    save_steps: int = 100
-
-    # LoRA Config
-    lora_r: int = 16
-    lora_alpha: int = 64
-    lora_dropout: float = 0.1
-    lora_bias: Literal["none", "lora_only", "all"] = "none"
-    lora_task_type: str = "CAUSAL_LM"
-
-
-@dataclass
-class CoTGenerationConfig:
-    """Configuration settings for generating CoT from KGs for training."""
-
-    # Behavior for generating CoTs
-    max_rules: int = 100
-    max_groundings: int = 100
-    rule_summary_file: str = "rules_summary.txt"
-
-
-@dataclass
 class DataConfig:
     """Configuration for input and output directories."""
 
@@ -180,8 +126,6 @@ class RunConfig:
 
     graph: GraphConfig
     rules: RulesConfig
-    fine_tuning: FineTuningConfig | None
-    cot_generation: CoTGenerationConfig | None
     db_config: DatabaseAuthConfig = field(default_factory=DatabaseAuthConfig)
     data: DataConfig = field(default_factory=DataConfig)
     logging: LoggingConfig = field(default_factory=LoggingConfig)
@@ -228,25 +172,10 @@ class RunConfig:
         data_config = DataConfig(**get_section("data", required=True))
         logging_config = LoggingConfig(**get_section("logging"))
 
-        # --- Optional attributes ---
-        if "cot_generation" in data:
-            cot_config = CoTGenerationConfig(**data["cot_generation"])
-        else:
-            # TODO: print
-            cot_config = None
-
-        if "fine_tuning" in data:
-            fine_tuning = FineTuningConfig(**data["fine_tuning"])
-        else:
-            # TODO: print
-            fine_tuning = None
-
         return cls(
             data=data_config,
             graph=graph_config,
             rules=rules_config,
-            fine_tuning=fine_tuning,
-            cot_generation=cot_config,
             logging=logging_config,
             db_config=db_config,
         )
