@@ -158,7 +158,6 @@ def build_rule_query(rule: RuleSignature, sources: dict[str, str | list[str]]) -
 # ---------------------------------------------------------------------------
 # Write to database.
 # ---------------------------------------------------------------------------
-# TODO: Unify the insert functions so it does work in 1 function with any source.
 def insert_triples_sparql(
     client: SPARQLWrapper,
     graph_uri: str,
