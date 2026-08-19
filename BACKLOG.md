@@ -206,11 +206,35 @@ the current architecture map.
   - Verified via `mypy` (identical error set/line numbers to baseline —
     zero new issues) and end-to-end runs of `cli/upload.py` and
     `run_synthetic_graph_experiment`.
-- [ ] **`queries.py`: remaining cleanup** — Hay más pendientes en este
-      archivo:
-  - Refactorizar el script en general: ordenar funciones y organizar en
-    secciones.
-  - `build_rule_query` — es llamada desde varios scripts.
+- [x] **`queries.py`: refactorizar el script en general** — ordenar
+      funciones y organizar en secciones. Rewrote the file into 6 coherent
+      sections instead of the previous scattered/mislabeled ones:
+      `Helper functions` (private), `Query execution` (the public
+      `execute_select_query`/`execute_insert_query` primitives, moved up
+      from ~230 lines further down — `insert_triples_sparql` calls
+      `execute_insert_query`, so this also fixes a forward-reference
+      ordering issue), `SPARQL query generation` (`build_rule_query`),
+      `Write to database` (`insert_triples_sparql`/`insert_triples_bulk`/
+      `insert_graph`/`clear_graph`/`copy_graph`/`initialize_graph` — merges
+      the old "Insert to database" and "initialize graph in database."
+      sections, which mislabeled `clear_graph`/`copy_graph` as inserts and
+      gave `initialize_graph` its own redundant section), `Query metrics`,
+      and `Helpers for IDB/EDB generation` (fixed a `"ofr"` → `"for"`
+      typo). Also moved the `SparqlBinding` type alias up next to `logger`
+      since it's used throughout the file, not just by the "response
+      handling" functions it used to sit next to. Pure reordering — no
+      logic changes; verified the function set is byte-identical
+      (`diff`'d sorted `def` names before/after) and behavior is unchanged
+      via `mypy` (identical error set, just shifted line numbers) and
+      end-to-end runs of `cli/upload.py` and `run_synthetic_graph_experiment`.
+  - `build_rule_query` — called from several scripts (`engine/edb.py`,
+    `engine/generator.py`); this was always just a "don't delete it, it's
+    alive" note, not an actionable TODO.
+  - This closes out the `queries.py` module entirely — every sub-item
+    tracked under it (function consolidation, `download_graph_raw`
+    removal, `copy_graph_sparql`/`clear_graph_sparql` refactor+rename,
+    `run_select_query`/`execute_insert_query`/`count_triples` renames,
+    and this reorganization pass) is now resolved.
 
 ## `engine/`
 

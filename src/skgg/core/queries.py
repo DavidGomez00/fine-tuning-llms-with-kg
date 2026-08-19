@@ -22,6 +22,8 @@ from skgg.utils import format_term, format_triple
 
 logger = logging.getLogger(__name__)
 
+SparqlBinding = dict[str, dict[str, str]]
+
 
 # ---------------------------------------------------------------------------
 # Helper functions.
@@ -76,6 +78,45 @@ def _execute_update_query(client: SPARQLWrapper, query: str) -> None:
 
 
 # ---------------------------------------------------------------------------
+# Query execution.
+# ---------------------------------------------------------------------------
+def execute_select_query(client: SPARQLWrapper, query: str) -> list[SparqlBinding]:
+    """Executes a SELECT query and returns the bindings."""
+    # TODO (optim): Maybe we want this as an iterator
+    client.setMethod(GET)
+    client.setReturnFormat(JSON)
+    client.setQuery(query)
+
+    try:
+        response = client.queryAndConvert()
+
+        if isinstance(response, dict) and "results" in response:
+            raw_bindings = response["results"].get("bindings", [])
+            return cast(list[SparqlBinding], raw_bindings)
+
+        raise ValueError("Failed to retrieve bindings from query results.")
+
+    except Exception:
+        logger.error("SPARQL execution failed for query:\n%s", query)
+        raise
+
+
+def execute_insert_query(client: SPARQLWrapper, query: str) -> None:
+    """Execute an INSERT query."""
+    _execute_update_query(client, query)
+
+
+def from_binding_row(term: str, binding_row: SparqlBinding) -> tuple[str, str]:
+    """Safely extracts a term from a single binding row."""
+    if term.startswith("?"):
+        var_name = term.lstrip("?")
+        val = format_term(binding_row.get(var_name, {}).get("value", var_name))
+        v_type = binding_row.get(var_name, {}).get("type", "uri")
+        return val, v_type
+    return term, "uri"
+
+
+# ---------------------------------------------------------------------------
 # SPARQL query generation.
 # ---------------------------------------------------------------------------
 def build_rule_query(rule: RuleSignature, sources: dict[str, str | list[str]]) -> str:
@@ -115,7 +156,7 @@ def build_rule_query(rule: RuleSignature, sources: dict[str, str | list[str]]) -
 
 
 # ---------------------------------------------------------------------------
-# Insert to database.
+# Write to database.
 # ---------------------------------------------------------------------------
 # TODO: Unify the insert functions so it does work in 1 function with any source.
 def insert_triples_sparql(
@@ -304,9 +345,6 @@ def copy_graph(
     )
 
 
-# ---------------------------------------------------------------------------
-# initialize graph in database.
-# ---------------------------------------------------------------------------
 def initialize_graph(
     client: SPARQLWrapper, source: str | None, new_graph_uri: str, chunk_size: int
 ) -> None:
@@ -357,48 +395,6 @@ def initialize_graph(
 
 
 # ---------------------------------------------------------------------------
-# Handle SPARQL query responses.
-# ---------------------------------------------------------------------------
-SparqlBinding = dict[str, dict[str, str]]
-
-
-def execute_select_query(client: SPARQLWrapper, query: str) -> list[SparqlBinding]:
-    """Executes a SELECT query and returns the bindings."""
-    # TODO (optim): Maybe we want this as an iterator
-    client.setMethod(GET)
-    client.setReturnFormat(JSON)
-    client.setQuery(query)
-
-    try:
-        response = client.queryAndConvert()
-
-        if isinstance(response, dict) and "results" in response:
-            raw_bindings = response["results"].get("bindings", [])
-            return cast(list[SparqlBinding], raw_bindings)
-
-        raise ValueError("Failed to retrieve bindings from query results.")
-
-    except Exception:
-        logger.error("SPARQL execution failed for query:\n%s", query)
-        raise
-
-
-def execute_insert_query(client: SPARQLWrapper, query: str) -> None:
-    """Execute an INSERT query."""
-    _execute_update_query(client, query)
-
-
-def from_binding_row(term: str, binding_row: SparqlBinding) -> tuple[str, str]:
-    """Safely extracts a term from a single binding row."""
-    if term.startswith("?"):
-        var_name = term.lstrip("?")
-        val = format_term(binding_row.get(var_name, {}).get("value", var_name))
-        v_type = binding_row.get(var_name, {}).get("type", "uri")
-        return val, v_type
-    return term, "uri"
-
-
-# ---------------------------------------------------------------------------
 # Query metrics.
 # ---------------------------------------------------------------------------
 def get_predicate_frequencies(client: SPARQLWrapper, graph_uri: str) -> dict[str, int]:
@@ -407,10 +403,10 @@ def get_predicate_frequencies(client: SPARQLWrapper, graph_uri: str) -> dict[str
     predicate_frequencies: dict[str, int] = {}
     query = f"""
         SELECT ?predicate (COUNT(*) AS ?frequency)
-        WHERE {{ 
+        WHERE {{
           GRAPH <{graph_uri}> {{
             ?s ?predicate ?o .
-          }} 
+          }}
         }}
         GROUP BY ?predicate
         """
@@ -433,12 +429,12 @@ def get_domain(client: SPARQLWrapper, graph_uri: str, predicate: str) -> dict[st
     domain: dict[str, int] = {}
 
     query = f"""
-    SELECT ?subject (COUNT(*) AS ?count) 
+    SELECT ?subject (COUNT(*) AS ?count)
     WHERE {{
       GRAPH <{graph_uri}> {{
-        ?subject {predicate} ?o 
+        ?subject {predicate} ?o
       }}
-    }} 
+    }}
     GROUP BY ?subject
     """
 
@@ -460,12 +456,12 @@ def get_range(client: SPARQLWrapper, graph_uri: str, predicate: str) -> dict[str
     p_range: dict[str, int] = {}
 
     query = f"""
-    SELECT ?obj (COUNT(*) AS ?count) 
+    SELECT ?obj (COUNT(*) AS ?count)
     WHERE {{
       GRAPH <{graph_uri}> {{
-        ?s {predicate} ?obj 
+        ?s {predicate} ?obj
       }}
-    }} 
+    }}
     GROUP BY ?obj
     """
 
@@ -487,8 +483,8 @@ def get_reflexivity(client: SPARQLWrapper, graph_uri: str, predicate: str) -> in
     SELECT (COUNT(*) AS ?c)
     WHERE {{
       GRAPH <{graph_uri}> {{
-        ?s {predicate} ?s 
-      }} 
+        ?s {predicate} ?s
+      }}
     }}"""
 
     if results := execute_select_query(client, query):
@@ -511,7 +507,7 @@ def get_support(client: SPARQLWrapper, rule: HornRule, graph_uri: str) -> int:
       WHERE {{
         GRAPH <{graph_uri}> {{
         {patterns}
-      }}  
+      }}
       }}
     }}"""
 
@@ -562,7 +558,7 @@ def get_triple_count(client: SPARQLWrapper, graph_uri: str) -> int:
 
 
 # ---------------------------------------------------------------------------
-# Helpers ofr IDB/EDB generation.
+# Helpers for IDB/EDB generation.
 # ---------------------------------------------------------------------------
 def get_existing_triples(
     client: SPARQLWrapper,
