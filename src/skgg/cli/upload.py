@@ -5,7 +5,7 @@ import logging
 from pathlib import Path
 
 from skgg.config import RunConfig
-from skgg.core.queries import count_triples, initialize_graph
+from skgg.core.queries import get_triple_count, initialize_graph
 from skgg.core.rules import parse_rule_set
 from skgg.engine.completion import complete_graph
 from skgg.utils import create_sparql_client, get_term_mapping, setup_logging
@@ -46,7 +46,7 @@ initialize_graph(
     chunk_size=1000,
 )
 
-base_count = count_triples(client, base_uri)
+base_count = get_triple_count(client, base_uri)
 logger.info("Inserted base graph to <%s> with %d triples.", base_uri, base_count)
 
 logger.info("Starting Graph Completion")
@@ -64,5 +64,5 @@ complete_graph(
 logger.info(
     "Complete graph in <%s> has %d triples.",
     complete_uri,
-    count_triples(client, complete_uri),
+    get_triple_count(client, complete_uri),
 )

@@ -24,12 +24,12 @@ from SPARQLWrapper import SPARQLWrapper
 from skgg.core.queries import (
     SparqlBinding,
     build_rule_query,
-    clear_graph_sparql,
+    clear_graph,
+    execute_select_query,
     from_binding_row,
     get_existing_triples,
     initialize_graph,
     insert_triples_sparql,
-    run_select_query,
 )
 from skgg.core.rules import (
     Atom,
@@ -364,11 +364,11 @@ def check_triples_from_rule(
         sources = GraphSources(target=searchspace_uri, others=[])
         query = build_rule_query(rule=new_rule.signature, sources=sources)
         # logger.debug("Query: %s", query)
-        bindings = run_select_query(client, query)
+        bindings = execute_select_query(client, query)
 
     finally:
         # Guarantee cleanup even if the query engine timeouts or filtering fails
-        clear_graph_sparql(client=client, graph_uri=searchspace_uri)
+        clear_graph(client=client, graph_uri=searchspace_uri)
 
     # Filter the retrieved bindings
     triple_stream = _filter_bindings(

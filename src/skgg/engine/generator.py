@@ -14,12 +14,12 @@ from SPARQLWrapper import SPARQLWrapper
 from skgg.core.queries import (
     SparqlBinding,
     build_rule_query,
-    clear_graph_sparql,
+    clear_graph,
+    execute_select_query,
     from_binding_row,
     get_existing_triples,
     insert_triples_bulk,
     insert_triples_sparql,
-    run_select_query,
 )
 from skgg.core.rules import Atom, HornRule
 from skgg.engine.metrics import PredicateProfile
@@ -215,12 +215,12 @@ def apply_rule(
 
         # Query the graph
         query = build_rule_query(rule=rule.signature, sources=graph_sources)
-        if not (raw_bindings := run_select_query(client, query)):
+        if not (raw_bindings := execute_select_query(client, query)):
             return 0
 
     # Clear the searchspace
     finally:
-        clear_graph_sparql(client, searchspace_uri)
+        clear_graph(client, searchspace_uri)
 
     # Get the candidate triples that already exist in the graph
     existing_triples = get_existing_triples(

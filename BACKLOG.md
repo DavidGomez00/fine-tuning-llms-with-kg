@@ -178,12 +178,36 @@ the current architecture map.
       session: it's `_chunk_iter()` and already grouped in the "Helper
       functions" section alongside `_get_update_client`/
       `_execute_update_query`. Stale sub-bullet, no action needed.
+- [x] **`queries.py`: renombrar `run_select_query`/`execute_ask_query`/
+      `execute_insert_query`** — `execute_ask_query` turned out to not
+      exist in the file at all (confirmed via grep; likely never existed
+      under that name, or was removed before this file's history was
+      tracked here). Converged the "run a raw/pre-built query string
+      against the store" layer on one verb, **"execute"** — matching
+      `execute_insert_query` and the `_execute_update_query()` helper added
+      in the previous pass, so only `run_select_query` needed to move
+      (cheaper than moving the other two):
+  - `run_select_query` → `execute_select_query`.
+  - Also renamed for consistency, per user decision:
+    - `clear_graph_sparql`/`copy_graph_sparql` → `clear_graph`/`copy_graph`
+      — dropped the redundant `_sparql` suffix (the module talks SPARQL by
+      default per its own docstring, so the suffix added no signal here).
+      Left `insert_triples_sparql`/`insert_triples_bulk` alone: that pair's
+      suffixes are load-bearing, disambiguating two real implementations
+      of the same operation (SPARQL `INSERT DATA` vs. REST bulk-load).
+    - `count_triples` → `get_triple_count` — the only metric-query function
+      not prefixed `get_*` (siblings: `get_domain`, `get_range`,
+      `get_reflexivity`, `get_support`, `get_frequency`,
+      `get_predicate_frequencies`, `get_existing_triples`).
+  - Updated every external caller: `engine/generator.py`, `engine/edb.py`
+    (`execute_select_query`, `clear_graph`), `engine/metrics.py`,
+    `cli/main.py`, `cli/upload.py` (`get_triple_count`) — plus re-sorted
+    the import blocks touched, alphabetically (`ruff`'s `I` rules).
+  - Verified via `mypy` (identical error set/line numbers to baseline —
+    zero new issues) and end-to-end runs of `cli/upload.py` and
+    `run_synthetic_graph_experiment`.
 - [ ] **`queries.py`: remaining cleanup** — Hay más pendientes en este
       archivo:
-  - Refactorizar nombres de `run_select_query`, `execute_ask_query`,
-    `execute_insert_query`. Nota: `execute_ask_query` no existe en el
-    archivo actual — puede que ya haya sido eliminada o nunca haya
-    existido bajo ese nombre; revisar antes de refactorizar.
   - Refactorizar el script en general: ordenar funciones y organizar en
     secciones.
   - `build_rule_query` — es llamada desde varios scripts.

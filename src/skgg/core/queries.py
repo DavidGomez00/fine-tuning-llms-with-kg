@@ -249,7 +249,7 @@ def insert_graph(
     if not nt_file.is_file():
         raise ValueError("Invalid input file: %s", nt_file)
 
-    clear_graph_sparql(client, graph_uri)
+    clear_graph(client, graph_uri)
 
     def _parse_line(text: str) -> str:
         """Parses a line from a .nt file to a valid triple."""
@@ -271,7 +271,7 @@ def insert_graph(
     logger.debug("Inserted %d triples to <%s> from '%s'.", n, graph_uri, nt_file.name)
 
 
-def clear_graph_sparql(client: SPARQLWrapper, graph_uri: str) -> None:
+def clear_graph(client: SPARQLWrapper, graph_uri: str) -> None:
     """Removes all triples from a specified named graph.
 
     Args:
@@ -284,7 +284,7 @@ def clear_graph_sparql(client: SPARQLWrapper, graph_uri: str) -> None:
     _execute_update_query(client, f"CLEAR SILENT GRAPH <{graph_uri}>")
 
 
-def copy_graph_sparql(
+def copy_graph(
     client: SPARQLWrapper, source_graph_uri: str, target_graph_uri: str
 ) -> None:
     """Copy all contents from a graph to another.
@@ -323,7 +323,7 @@ def initialize_graph(
     """
 
     if source is None:
-        clear_graph_sparql(client, new_graph_uri)
+        clear_graph(client, new_graph_uri)
         logger.debug("Initializated empty graph at <%s>.", new_graph_uri)
         return
 
@@ -338,7 +338,7 @@ def initialize_graph(
     if is_uri and clean_source == clean_target:
         return
 
-    clear_graph_sparql(client, new_graph_uri)
+    clear_graph(client, new_graph_uri)
 
     if is_nt_file:
         insert_graph(
@@ -349,7 +349,7 @@ def initialize_graph(
         )
 
     else:
-        copy_graph_sparql(
+        copy_graph(
             client=client,
             source_graph_uri=clean_source,
             target_graph_uri=new_graph_uri,
@@ -362,7 +362,7 @@ def initialize_graph(
 SparqlBinding = dict[str, dict[str, str]]
 
 
-def run_select_query(client: SPARQLWrapper, query: str) -> list[SparqlBinding]:
+def execute_select_query(client: SPARQLWrapper, query: str) -> list[SparqlBinding]:
     """Executes a SELECT query and returns the bindings."""
     # TODO (optim): Maybe we want this as an iterator
     client.setMethod(GET)
@@ -415,7 +415,7 @@ def get_predicate_frequencies(client: SPARQLWrapper, graph_uri: str) -> dict[str
         GROUP BY ?predicate
         """
 
-    results = run_select_query(client, query)
+    results = execute_select_query(client, query)
     if not results:
         return predicate_frequencies
 
@@ -442,7 +442,7 @@ def get_domain(client: SPARQLWrapper, graph_uri: str, predicate: str) -> dict[st
     GROUP BY ?subject
     """
 
-    if results := run_select_query(client, query):
+    if results := execute_select_query(client, query):
         for row in results:
             subject = f"<{row['subject']['value']}>"
             frequency = int(row["count"]["value"])
@@ -469,7 +469,7 @@ def get_range(client: SPARQLWrapper, graph_uri: str, predicate: str) -> dict[str
     GROUP BY ?obj
     """
 
-    if results := run_select_query(client, query):
+    if results := execute_select_query(client, query):
         for row in results:
             obj = f"<{row['obj']['value']}>"
             frequency = int(row["count"]["value"])
@@ -491,7 +491,7 @@ def get_reflexivity(client: SPARQLWrapper, graph_uri: str, predicate: str) -> in
       }} 
     }}"""
 
-    if results := run_select_query(client, query):
+    if results := execute_select_query(client, query):
         return int(results[0]["c"]["value"])
     return 0
 
@@ -515,7 +515,7 @@ def get_support(client: SPARQLWrapper, rule: HornRule, graph_uri: str) -> int:
       }}
     }}"""
 
-    if results := run_select_query(client, query):
+    if results := execute_select_query(client, query):
         return int(results[0]["supp"]["value"])
 
     logger.warning("Retrieved None for %s support in %s.", rule.rule_id, graph_uri)
@@ -533,14 +533,14 @@ def get_frequency(client: SPARQLWrapper, predicate: str, graph_uri: str) -> int:
       }}
     }}"""
 
-    if results := run_select_query(client, query):
+    if results := execute_select_query(client, query):
         return int(results[0]["frequency"]["value"])
 
     logger.warning("Retrieved None for %s frequency in %s.", predicate, graph_uri)
     return 0
 
 
-def count_triples(client: SPARQLWrapper, graph_uri: str) -> int:
+def get_triple_count(client: SPARQLWrapper, graph_uri: str) -> int:
     """Returns the total triples in a graph."""
 
     query = f"""
@@ -551,7 +551,7 @@ def count_triples(client: SPARQLWrapper, graph_uri: str) -> int:
       }}
     }}"""
 
-    if results := run_select_query(client, query):
+    if results := execute_select_query(client, query):
         total_triples = int(results[0]["total"]["value"])
         if total_triples == 0:
             logger.warning("Retrieved 0 triples from %s.", graph_uri)
@@ -588,7 +588,7 @@ def get_existing_triples(
             }}
         """
 
-        bindings = run_select_query(client, query)
+        bindings = execute_select_query(client, query)
 
         existing_triples.update(
             format_triple(

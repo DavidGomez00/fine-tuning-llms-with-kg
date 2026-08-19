@@ -9,7 +9,7 @@ import time
 from pathlib import Path
 
 from skgg.config import RunConfig
-from skgg.core.queries import count_triples
+from skgg.core.queries import get_triple_count
 from skgg.core.rules import parse_rule_set
 from skgg.engine.edb import generate_edb
 from skgg.engine.idb import generate_idb
@@ -78,7 +78,7 @@ def run_synthetic_graph_experiment(
         "Finished EDB generation after %f s at <%s> with %d triples",
         edb_time,
         edb_uri,
-        count_triples(client, edb_uri),
+        get_triple_count(client, edb_uri),
     )
 
     generate_idb(
@@ -91,8 +91,8 @@ def run_synthetic_graph_experiment(
         profiles=profiles,
     )
 
-    original_count = count_triples(client, source)
-    count = count_triples(client, synthetic_uri)
+    original_count = get_triple_count(client, source)
+    count = get_triple_count(client, synthetic_uri)
 
     logger.info("Original graph has %d triples.", original_count)
     logger.info("Synthetic graph at <%s> has %d triples.", synthetic_uri, count)

@@ -11,11 +11,11 @@ from rdflib import Graph
 from SPARQLWrapper import SPARQLWrapper
 
 from skgg.core.queries import (
-    count_triples,
     get_domain,
     get_predicate_frequencies,
     get_range,
     get_reflexivity,
+    get_triple_count,
 )
 
 logger = logging.getLogger(__name__)
@@ -49,7 +49,7 @@ class GraphMetrics:
         data transfers and database ResultSetMaxRows limits.
         """
 
-        triple_count = count_triples(client, graph_uri)
+        triple_count = get_triple_count(client, graph_uri)
         logger.debug(
             "Retrieving metrics from <%s> (%d triples).", graph_uri, triple_count
         )
