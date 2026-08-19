@@ -8,6 +8,32 @@ the current architecture map.
 - [ ] **`main.py`** — No se ejecuta correctamente. `TODO: Debug main.py`.
 - [ ] **`upload.py`** — Sin pendientes registrados.
 
+## `config.py`
+
+- [ ] **Dead/unused config variables and classes.** `RunConfig` and its
+      sub-configs carry several fields/classes with zero readers anywhere in
+      `src/`. For each, decide whether to wire it into the pipeline it was
+      built for or delete it until that work starts:
+  - `HardwareConfig` (`n_gpus`, `device`, `precision`, `max_memory_mb`) —
+    entirely unused; `RunConfig.hardware` is never read outside its own
+    `default_factory` construction. Its only live effect today is forcing
+    the `torch` import in `config.py` (and the `torch` dependency) at
+    config-load time.
+  - `DataConfig.crud_endpoint` — defined but never read anywhere.
+  - `FineTuningConfig` / `CoTGenerationConfig` — already noted in
+    `AGENTS.md` as configuration for pipeline code that "is not present yet
+    under `src/`"; confirmed zero reads of `run_config.fine_tuning`/
+    `run_config.cot_generation` anywhere in `src/`.
+  - **`classification`/`pca_threshold` filtering inconsistency** —
+    `RulesConfig.pca_threshold`'s docstring claims rules classified
+    `"NEGATIVE"` are "excluded from generation," and `AGENTS.md` references
+    a `utils.filter_rules` function for ad hoc PCA/Std-confidence
+    filtering — but no such function exists in `utils.py`, and nothing
+    downstream actually checks `rule.classification` before feeding rules
+    into `generate_edb`/`generate_idb`. Needs investigation: should
+    filtering happen in `parse_rule_set`, a new `utils.filter_rules`, or
+    elsewhere?
+
 ## `core/`
 
 - [x] **`rules.py`** — Refactor dataclass functions to delete obsolete code;
@@ -31,22 +57,13 @@ the current architecture map.
     `run_synthetic_graph_experiment` against `configurations/mario.json`.
   - Follow-ups spun out below: `parse_rule_set` return type, and the
     `classification`/`pca_threshold` filtering inconsistency.
-- [ ] **`rules.py`: `parse_rule_set` return type** — `parse_rule_set`
-      returns `dict[str, HornRule]` and still carries a stale
+- [ ] **`rules.py`: `parse_rule_set` return type** *(low priority)* —
+      `parse_rule_set` returns `dict[str, HornRule]` and still carries a stale
       `# TODO: Change the return value to a simple list of rules` comment.
       Changing it to `list[HornRule]` requires updating every dict-keyed
       consumer (`rules[rule_id]`, `.values()`, `.keys()` lookups in
       `engine/idb.py`, `engine/edb.py`, `engine/generator.py`), so it's
       bigger than a same-file cleanup — do as its own change.
-- [ ] **`classification`/`pca_threshold` filtering inconsistency** —
-      `config.py`'s `RulesConfig.pca_threshold` docstring claims rules
-      classified `"NEGATIVE"` are "excluded from generation," and
-      `AGENTS.md` references a `utils.filter_rules` function for ad hoc
-      PCA/Std-confidence filtering — but no such function exists in
-      `utils.py`, and nothing downstream actually checks
-      `rule.classification` before feeding rules into
-      `generate_edb`/`generate_idb`. Needs investigation: should filtering
-      happen in `parse_rule_set`, a new `utils.filter_rules`, or elsewhere?
 - [ ] **`queries.py`** — Hay 3 funciones para escribir queries: reducir o
       eliminar hasta sólo tener las que se usan. Además:
   - `insert_triples_sparql` se usa en `edb.py` y en `generator.py`. Sería
