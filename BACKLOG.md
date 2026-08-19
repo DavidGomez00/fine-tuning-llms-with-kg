@@ -100,15 +100,16 @@ the current architecture map.
 - [x] **`queries.py`: 3 funciones para escribir queries** — reducir o
       eliminar hasta sólo tener las que se usan.
   - Audited all 3 insert-triples functions
-    (`insert_triples_sparql`/`insert_triples_bulk`/`insert_graph_sparql`):
-    all 3 are actually used somewhere in `src/`, so this wasn't a dead-code
-    deletion. `insert_triples_gsp()` was already renamed to
-    `insert_triples_bulk()` in an earlier session and now supports GraphDB
-    as well as Virtuoso (detects the backend from the endpoint,
-    `/repositories/` ⇒ GraphDB, and POSTs raw N-Triples to each store's
-    bulk-load REST endpoint — `.../statements?context=<grafo>` on
-    GraphDB/RDF4J, `sparql-graph-crud-auth` on Virtuoso — instead of
-    parsing `INSERT DATA` for hundreds of thousands of triples).
+    (`insert_triples_sparql`/`insert_triples_bulk`/`insert_graph_sparql`,
+    the last since renamed to `insert_graph` — see below): all 3 are
+    actually used somewhere in `src/`, so this wasn't a dead-code deletion.
+    `insert_triples_gsp()` was already renamed to `insert_triples_bulk()`
+    in an earlier session and now supports GraphDB as well as Virtuoso
+    (detects the backend from the endpoint, `/repositories/` ⇒ GraphDB, and
+    POSTs raw N-Triples to each store's bulk-load REST endpoint —
+    `.../statements?context=<grafo>` on GraphDB/RDF4J,
+    `sparql-graph-crud-auth` on Virtuoso — instead of parsing `INSERT DATA`
+    for hundreds of thousands of triples).
   - Found and fixed the one real gap: `insert_graph_sparql` (formerly
     listed here under its old name `insert_graph_from_nt_sparql`, already
     renamed in an earlier session but never updated here) — used by
@@ -120,6 +121,9 @@ the current architecture map.
     `insert_triples_sparql` call sites are left as-is: they insert
     smaller, filtered/deduplicated runtime-generated streams with no
     documented at-scale problem pushing them onto the bulk path.
+  - Since it no longer builds/executes SPARQL itself, renamed
+    `insert_graph_sparql` → `insert_graph` (only caller: `initialize_graph`
+    within `queries.py` itself).
   - `build_filtered_query`/`generate_triples_from_rule` — no longer exist
     anywhere in the codebase (already removed in an earlier session); the
     old sub-bullet about them was stale.

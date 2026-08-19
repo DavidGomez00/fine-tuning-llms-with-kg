@@ -196,7 +196,7 @@ def insert_triples_bulk(
     return total_inserted
 
 
-def insert_graph_sparql(
+def insert_graph(
     client: SPARQLWrapper,
     graph_uri: str,
     chunk_size: int,
@@ -372,7 +372,7 @@ def initialize_graph(
     clear_graph_sparql(client, new_graph_uri)
 
     if is_nt_file:
-        insert_graph_sparql(
+        insert_graph(
             client=client,
             graph_uri=new_graph_uri,
             nt_file=source,
