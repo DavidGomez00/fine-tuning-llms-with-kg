@@ -304,12 +304,3 @@ the current architecture map.
     but similarly stale `.data/Movies/` were removed as irrelevant toy
     data. `configurations/` now only contains `mario.json` and
     `french_royalty.json`, both of which load successfully.
-
-## Tooling / process
-
-- [ ] **To be researched: tests + CI.** No `tests/` directory or CI pipeline
-      exists yet. `ruff` and `mypy` are already configured in `pyproject.toml`
-      but nothing runs them automatically. Decide whether to add a `tests/`
-      scaffold (pytest, mocking `SPARQLWrapper` for unit tests that don't need
-      a live DB) and a GitHub Actions workflow to run `ruff check .`,
-      `mypy .`, and the test suite on every push/PR.
