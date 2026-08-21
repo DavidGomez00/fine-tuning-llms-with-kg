@@ -28,7 +28,6 @@ the current architecture map.
     structurally sane — clean, correctly-resolved entity/predicate names,
     no malformed/garbage URIs. `AGENTS.md`'s "Known issues" note updated
     to match.
-- [ ] **`upload.py`** — Sin pendientes registrados.
 
 ## `config.py`
 
