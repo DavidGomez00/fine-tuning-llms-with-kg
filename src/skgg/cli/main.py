@@ -197,6 +197,7 @@ def run_synthetic_graph_experiment(
         get_triple_count(client, edb_uri),
     )
 
+    ## ------ Graph Completion  ------
     generate_idb(
         client=client,
         rules=rules,

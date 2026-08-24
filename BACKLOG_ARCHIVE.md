@@ -31,6 +31,65 @@ architecture map.
     structurally sane — clean, correctly-resolved entity/predicate names,
     no malformed/garbage URIs. `AGENTS.md`'s "Known issues" note updated
     to match.
+- [x] **`main.py`** — Add a summary of the metrics comparing the original
+      metrics with the generated graph.
+  - Added a `summary()` function, called at the end of
+    `run_synthetic_graph_experiment` right after `generate_idb`. For both
+    the original (`graph.complete_uri`) and synthetic (`graph.synthetic_uri`)
+    graphs it logs: total triple count, every predicate's domain/range
+    distributions and frequency (`GraphMetrics.from_uri`), and every rule's
+    support (`get_support`) — via the new `_format_graph_block` helper. It
+    then logs a synthetic-minus-original delta block
+    (`_format_delta_block`): triple-count delta, per-predicate
+    frequency/domain-size/range-size deltas, and per-rule support deltas.
+  - All logging-only (`logger.info`), no new graph-URIs or DB writes.
+- [x] **`main.py`**: The generation of triples is incorrect. IDB must take
+      into account intensional dependencies, even under the "complete rules"
+      assumption.
+  - **The bug**: `engine/idb.py`'s generation loop applied every rule whose
+    body predicates were grounded, in no particular order, whenever multiple
+    rules shared a head predicate (including recursive rules, e.g.
+    `p(x,y) :- p(x,z), p(z,y)`). A more general/looser rule could fire before
+    a more specific/restrictive same-head rule and consume search-space
+    triples the stricter rule specifically needed, or a recursive rule could
+    fire before its predicate had enough non-recursively-derived base facts
+    to recurse over — producing wrong/limited synthetic triples even though
+    `check_uninferrable_preds` confirmed the rule set was structurally
+    complete.
+  - **The fix**: revived the previously-dead `get_dependencies_intensional`
+    (explicitly commented as "not necessary for complete rules") in
+    `core/rules.py` and rewrote it as `get_intensional_dependencies`. For
+    each group of rules sharing a head predicate, it splits into recursive
+    (head predicate also in body) vs. non-recursive rules, orders both by
+    body size, and derives a dependency in the restrictive-first direction:
+    a rule depends on (must wait for) every other same-head rule whose body
+    is a strict superset of its own — i.e. more restrictive, so it closes
+    first. Ties on equal-size bodies are broken by support (lower-support/
+    rarer rule goes first). Recursive rules additionally depend on *every*
+    non-recursive rule for the same head, plus the same superset-based
+    dependency among themselves. `engine/idb.py`'s `generate_idb` now calls
+    `get_intensional_dependencies` and skips a rule in its main loop until
+    every rule ID in its dependency set is in `closed_rule_ids` (previously
+    dead/commented-out code).
+  - **Known caveat, now documented** (`docs/concepts.md`,
+    `docs/architecture.md`): this only reorders *when* a
+    structurally-derivable rule is allowed to run — `check_uninferrable_preds`'s
+    upfront guarantee is unaffected, since it never consults the dependency
+    graph. But runtime closure is now coupled to the ordering: if a
+    dependency rule itself never closes (its search space runs dry before
+    its `support` target is met), everything gated on it stays skipped
+    indefinitely, and the loop can reach "stale state"
+    (`if not added_triples: break`) with a structurally-derivable predicate
+    still short of its target frequency — a failure mode that didn't exist
+    before this change.
+  - Verified via `mypy` (no new errors from the `rules.py`/`idb.py` changes)
+    and end-to-end against `mario.json` (GraphDB already up, `complete_uri`
+    pre-populated from an earlier `cli/upload.py` run): the dependency
+    gating is visibly exercised in the logs — `rule_5`/`rule_6` (both
+    depend on `rule_4`) are skipped ("Rule depends on non closed rules
+    {'rule_4'}") in step 1 while `rule_4` is still open, then fire in step 2
+    once `rule_4` closes — and the run still reaches "All predicates
+    closed": full closure, no stale-state stall for this dataset.
 
 ## `config.py`
 

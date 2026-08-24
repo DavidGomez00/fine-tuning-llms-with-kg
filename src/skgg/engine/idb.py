@@ -21,6 +21,7 @@ from skgg.core.queries import (
 from skgg.core.rules import (
     HornRule,
     check_uninferrable_preds,
+    get_intensional_dependencies,
     get_predicate_mapping,
 )
 from skgg.engine.generator import (
@@ -155,9 +156,9 @@ def generate_idb(
         logger.error(error_msg)
         raise RuntimeError(error_msg)
 
-    # We don't need intensional dependencies if we assume the rules are complete
     # Get intensional dependencies
-    # intensional_dependencies = get_dependencies_intensional(rules=rules)
+    intensional_dependencies = get_intensional_dependencies(rules=rules)
+    logger.debug("Intensional dependencies: \n%s", intensional_dependencies)
 
     # Stratify and apply rules iteratively
     closed_rule_ids: set[str] = set()
@@ -213,11 +214,11 @@ def generate_idb(
                 logger.debug("%s: Rule body is not grounded.", rule_id)
                 continue
 
-            # Dependencies are not necessary if rules are complete.
-            # dependency_ids = intensional_dependencies.get(rule_id, [])
-            # if any(r_id not in closed_rule_ids for r_id in dependency_ids):
-            #     logger.debug("%s: Rule depends on other non closed rules.", rule_id)
-            #     continue
+            dependency_ids = intensional_dependencies[rule_id]
+            _rules = dependency_ids - closed_rule_ids
+            if len(_rules):
+                logger.debug("%s: Rule depends on non closed rules %s", rule_id, _rules)
+                continue
 
             # Apply the rule and generate triples from it
             logger.debug("%s: Ready to be applied.", rule_id)

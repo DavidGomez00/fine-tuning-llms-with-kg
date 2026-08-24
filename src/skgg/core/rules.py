@@ -151,6 +151,10 @@ class HornRule:
         """Returns body predicates excluding the ones in 'intensional_preds'."""
         return self.signature.get_extensional_preds(intensional_preds)
 
+    def __len__(self) -> int:
+        """Returns the number of atoms in the rule's body."""
+        return len(self.body)
+
 
 # ---------------------------------------------------------------------------
 # Rule parsing.
@@ -263,9 +267,9 @@ def parse_rule_set(
     rule_dataframe.loc[
         rule_dataframe["PCA_Confidence"] >= pca_threshold, "Classification"
     ] = "POSITIVE"
-    rule_dataframe.loc[
-        rule_dataframe["PCA_Confidence"].isna(), "Classification"
-    ] = "UNKNOWN"
+    rule_dataframe.loc[rule_dataframe["PCA_Confidence"].isna(), "Classification"] = (
+        "UNKNOWN"
+    )
 
     rules: dict[str, HornRule] = {}
 
@@ -329,7 +333,7 @@ def check_uninferrable_preds(
 
 def get_extensional_dependencies(
     rules: dict[str, HornRule],
-):
+) -> dict[str, set[str]]:
     """Builds a dictionary that represents extensional predicate dependencies. A rule is
     dependent of any other rule extensional-wise if they share an extensional predicate.
 
@@ -370,13 +374,10 @@ def get_extensional_dependencies(
     return rule_dependency
 
 
-# DEAD CODE (unreferenced, found 2026-08-17). Not to be removed yet, will be necessary
-# when rules are not complete ("Dependencies are not necessary if rules are complete.").
-def get_dependencies_intensional(rules: dict[str, HornRule]) -> dict[str, set[str]]:
+def get_intensional_dependencies(rules: dict[str, HornRule]) -> dict[str, set[str]]:
     """Builds a dictionary that represents rule dependencies in a ruleset based on the
     head of the rule. A rule depends on other rules if they are more restrictive than it
     and produce the same head.
-    TODO: This is not relevant for complete rules, but incomplete rules need priorities.
     """
 
     if any(rule.support is None for rule in rules.values()):
@@ -384,48 +385,98 @@ def get_dependencies_intensional(rules: dict[str, HornRule]) -> dict[str, set[st
 
     intensional_preds = {rule.head.predicate for rule in rules.values()}
 
-    # Group rules by head predicate
-    by_head: dict[str, list[str]] = defaultdict(list)
-    for rule_id, rule in rules.items():
+    # Group rules by the predicate in their heads
+    by_head: dict[str, list[HornRule]] = defaultdict(list)
+    for rule in rules.values():
         if rule.head.predicate in intensional_preds:
-            by_head[rule.head.predicate].append(rule_id)
+            by_head[rule.head.predicate].append(rule)
     by_head = dict(by_head)  # Secure the dict type
 
-    # Determine dependencies
-    rule_dependency: dict[str, set[str]] = {r_id: set() for r_id in rules}
+    # Initialize dependency dict
+    rule_dependency: dict[str, set[str]] = {r_id: set() for r_id in rules.keys()}
 
-    for _, rule_ids in by_head.items():
-        # Sort the rules that generate the same predicate by body length
-        sorted_ids = sorted(
-            rule_ids, key=lambda r_id: len(rules[r_id].get_body_predicates())
-        )
+    # Process each group independently
+    for rule_group in by_head.values():
+        # Select recursive rules (e.g., p -> p)
+        recursive_rules: list[HornRule] = []
+        non_recursive_rules: list[HornRule] = []
+        for rule in rule_group:
+            if rule.head.predicate in rule.get_body_predicates():
+                recursive_rules.append(rule)
+            else:
+                non_recursive_rules.append(rule)
 
-        # Scan the rules from shortest to largest
-        for i, current_id in enumerate(sorted_ids):
-            current_rule = rules[current_id]
-            current_body = current_rule.get_body_predicates()
+        # Set dependencies for recursive rules first. A recursive rule depends on every
+        # other rule from this group that is not recursive and on the rules it subsumes.
+        sorted_recursive_rules = sorted(recursive_rules, key=len)
+        sorted_non_recursive_rules = sorted(non_recursive_rules, key=len)
+        for i, current_rule in enumerate(sorted_recursive_rules):
+            current_id = current_rule.rule_id
             current_support = current_rule.support
 
-            for next_id in sorted_ids[i + 1 :]:
-                next_rule = rules[next_id]
-                next_body = next_rule.get_body_predicates()
+            for next_rule in sorted_recursive_rules[i + 1 :]:
+                next_id = next_rule.rule_id
                 next_support = next_rule.support
 
-                # The rule only depends on others if they share the complete body of the
-                # current rule
-                if current_body.issubset(next_body):
-                    # If they happen to have the same body, the lesser support is more
-                    # restrictive
-                    if (
-                        len(next_body) == len(current_body)
-                        and current_support < next_support
-                    ):
-                        rule_dependency[next_id].add(current_id)
-                    else:
-                        rule_dependency[current_id].add(next_id)
+                # Current rule subsumes next rule if all the current predicates are in
+                # the next rule's body.
+                if any(
+                    pred not in next_rule.get_body_predicates()
+                    for pred in current_rule.get_body_predicates()
+                ):
+                    continue
+                # If the continue did not trigger (current_rule subsumes next_rule),
+                # most likely next_rule is larger than current_rule. Just in case they
+                # are the same size (basically same rule but with variables changed in
+                # order) we compare the support.
+                if len(next_rule) < len(current_rule):
+                    raise RuntimeError(
+                        "Next rule is smaller than current rule. Cannot be!"
+                    )
+                elif (
+                    len(next_rule) == len(current_rule)
+                    and next_support > current_support
+                ):
+                    rule_dependency[next_id].add(current_id)
+                else:
+                    rule_dependency[current_id].add(next_id)
+
+            # Finally, recursive rules depend on all non recursive rules
+            for rule in sorted_non_recursive_rules:
+                rule_dependency[current_id].add(rule.rule_id)
+
+        # Set dependencies for non-recursive rules. A non-recursive rule only depends on
+        # the rules it subsumes.
+        for i, current_rule in enumerate(sorted_non_recursive_rules):
+            current_id = current_rule.rule_id
+            current_support = current_rule.support
+
+            for next_rule in sorted_non_recursive_rules[i + 1 :]:
+                next_id = next_rule.rule_id
+                next_support = next_rule.support
+                # If current_rule contains any predicate that is not in next_rule,
+                # current_rule cannot subsume next_rule.
+                if any(
+                    pred not in next_rule.get_body_predicates()
+                    for pred in current_rule.get_body_predicates()
+                ):
+                    continue
+
+                # Just in case they are the same rule but with variables changed, we
+                # compare the support.
+                if len(next_rule) < len(current_rule):
+                    raise RuntimeError(
+                        "Next rule is smaller than current rule. Cannot be!"
+                    )
+                elif (
+                    len(next_rule) == len(current_rule)
+                    and next_support > current_support
+                ):
+                    rule_dependency[next_id].add(current_id)
+                else:
+                    rule_dependency[current_id].add(next_id)
 
     logger.info("Created dependency graph for %d rules.", len(rules))
-    logger.debug("Intensional dependencies: %s", rule_dependency)
     return rule_dependency
 
 

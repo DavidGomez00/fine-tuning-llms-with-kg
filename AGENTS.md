@@ -43,7 +43,7 @@ Typical experiment flow (see `cli/main.py`):
 2. Compute `GraphMetrics` (predicate profiles) from the source graph (`graph.complete_uri`) over SPARQL.
 3. Parse the ontology into a term mapping and parse the Horn rule set from a CSV (`rules.rules_file`), filtered by `pca_threshold`.
 4. Generate the EDB (extensional database) — `engine/edb.py` — inserting triples that satisfy rule bodies/profiles into `graph.edb_uri`.
-5. Generate the IDB (intensional database) — `engine/idb.py` — applying rules over the EDB to produce the synthetic graph at `graph.synthetic_uri`, iterating until rules/predicates reach target support/frequency (closure).
+5. Generate the IDB (intensional database) — `engine/idb.py` — applying rules over the EDB to produce the synthetic graph at `graph.synthetic_uri`, iterating until rules/predicates reach target support/frequency (closure). Within a same-head-predicate group, rules are applied in intensional-dependency order (`core/rules.py`'s `get_intensional_dependencies`): more restrictive rules close before more general ones, and recursive rules wait for all non-recursive rules producing the same head — see `docs/concepts.md`.
 
 `cli/upload.py` is a separate, standalone script (run top-level, not via a function) that uploads a base graph from an `.nt` file and then runs rule-based completion (`engine/completion.py`) to build the "complete" graph used as the source for metric extraction. Edit the `graph_config` path at the top of the file before running.
 

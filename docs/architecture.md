@@ -56,6 +56,23 @@ Blue nodes are named graphs in the database (keyed by the URIs in each config's
 5. **IDB generation** (`engine/idb.py`) forward-chains the rules again, this
    time starting from the EDB instead of a real graph, growing `synthetic_uri`
    until every rule/predicate reaches its target support/frequency (closure).
+   Within each step, a rule only fires once every rule it *depends on* is
+   closed: `core/rules.py`'s `get_intensional_dependencies` makes a rule
+   depend on every other rule that shares its head predicate and is *more
+   restrictive* (a bigger/more specific body — a strict superset of the
+   dependent rule's body predicates; for recursive rules — head predicate
+   also in the body — every non-recursive rule for that head counts as a
+   dependency too). More restrictive rules are generated first, so a looser
+   rule can't consume search-space triples a stricter same-head rule still
+   needs. This still holds under the "complete rules" assumption
+   (`check_uninferrable_preds`'s upfront check, that every intensional
+   predicate has *some* path back to extensional predicates, is unaffected —
+   it never consults the dependency graph) — but it does mean *runtime*
+   closure is now coupled to it: if a dependency rule itself never closes
+   (its search space runs dry before its `support` target is met), every
+   rule gated on it stays skipped indefinitely, and generation can reach a
+   stale state with a structurally-derivable predicate still short of its
+   target frequency.
 
 ## Components
 
@@ -106,7 +123,10 @@ flowchart TD
 - **`core/rules.py`** — `Atom`/`RuleSignature`/`HornRule` dataclasses, CSV
   parsing into a rule set, and rule-set-level checks (e.g.
   `check_uninferrable_preds` verifies every intensional predicate is actually
-  derivable from the extensional ones before IDB generation starts).
+  derivable from the extensional ones before IDB generation starts, and
+  `get_intensional_dependencies` builds the per-rule "must close first"
+  dependency set consumed by `engine/idb.py`'s generation loop — see "Data
+  flow" step 5).
 - **`core/queries.py`** — every SPARQL query construction/execution function.
   Nothing outside this module talks to `SPARQLWrapper` directly for reads/writes.
 - **`engine/metrics.py`** — `GraphMetrics`/`PredicateProfile`: the topological

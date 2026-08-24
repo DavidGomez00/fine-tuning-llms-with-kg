@@ -100,6 +100,40 @@ Both EDB and IDB generation loop until everything relevant is closed (or a step
 makes no more progress), tracked via `closed_preds` / `closed_rule_ids` in
 `engine/edb.py` and `engine/idb.py`.
 
+## Intensional rule dependencies
+
+Multiple rules can share the same head predicate. Without an order between
+them, a more general (looser) rule could consume search-space triples that a
+more specific (restrictive) rule for the same head still needs, or a
+recursive rule (one whose head predicate also appears in its own body) could
+fire before its predicate has enough non-recursively-derived facts to
+recurse over.
+
+`core/rules.get_intensional_dependencies` computes, per rule, the set of
+other rule IDs it depends on and must wait for:
+
+- Within a same-head group, a rule depends on every other rule whose body is
+  a strict superset of its own — i.e. more restrictive, so it's produced
+  first. Ties on equal-size bodies (the same rule up to variable renaming)
+  are broken by support: the lower-support/rarer rule goes first.
+- Recursive rules additionally depend on *every* non-recursive rule for the
+  same head, plus the same superset-based dependency among themselves.
+
+`engine/idb.py`'s generation loop (`generate_idb`) only applies a rule once
+every rule ID in its dependency set is in `closed_rule_ids` — so more
+restrictive (and, for recursive rules, all non-recursive) same-head rules
+always close first.
+
+**Caveat**: this only reorders *when* a structurally-derivable rule is
+allowed to run — it doesn't change `check_uninferrable_preds`'s upfront
+guarantee that every intensional predicate has some path back to extensional
+ones. But it does mean a rule can now be gated on another rule's closure
+indefinitely: if a dependency never closes (its own search space is
+exhausted before its `support` target is met), everything depending on it
+stays skipped, and the generation loop can reach a stale state with a
+predicate still short of its target — a way of failing to reach full closure
+that didn't exist before this ordering was introduced.
+
 ## Term mapping / namespace
 
 RDF terms are written as short names in rules/config (`ex:hasAge`) but need a
