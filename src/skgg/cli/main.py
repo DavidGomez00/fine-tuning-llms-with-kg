@@ -8,15 +8,131 @@ import logging
 import time
 from pathlib import Path
 
+from SPARQLWrapper import SPARQLWrapper
+
 from skgg.config import RunConfig
-from skgg.core.queries import get_triple_count
-from skgg.core.rules import parse_rule_set
+from skgg.core.queries import get_support, get_triple_count
+from skgg.core.rules import HornRule, parse_rule_set
 from skgg.engine.edb import generate_edb
 from skgg.engine.idb import generate_idb
-from skgg.engine.metrics import GraphMetrics
+from skgg.engine.metrics import GraphMetrics, PredicateProfile
 from skgg.utils import create_sparql_client, get_term_mapping, setup_logging
 
 logger = logging.getLogger(__name__)
+
+
+def _format_distribution(dist: dict[str, int], indent: str) -> str:
+    """Formats a value->count distribution (a predicate's domain or range) as
+    one 'value: count' entry per line, sorted by value, so it stays readable
+    instead of dumping the raw dict repr onto one line."""
+    if not dist:
+        return f"{indent}(empty)"
+    return "\n".join(
+        f"{indent}{value}: {count}" for value, count in sorted(dist.items())
+    )
+
+
+def _format_graph_block(
+    uri: str,
+    triple_count: int,
+    metrics: GraphMetrics,
+    rules: dict[str, HornRule],
+    supports: dict[str, int],
+) -> str:
+    """Formats one graph's stats: total triples, per-predicate domain/range/
+    frequency, and per-rule support."""
+    lines = [f"=== <{uri}> ===", f"\tTotal triples: {triple_count}", "\tPredicates:"]
+    for pred in sorted(metrics.profiles):
+        profile = metrics.profiles[pred]
+        lines.append(f"\t\t{pred}:")
+        lines.append("\t\t\tDomain:")
+        lines.append(_format_distribution(profile.domain, "\t\t\t\t"))
+        lines.append("\t\t\tRange:")
+        lines.append(_format_distribution(profile.range, "\t\t\t\t"))
+        lines.append(f"\t\t\tFrequency: {profile.frequency}")
+    lines.append("\tRules:")
+    for rule_id in sorted(rules):
+        lines.append(f"\t\t{rule_id}:")
+        lines.append(f"\t\t\tSupport: {supports[rule_id]}")
+    return "\n".join(lines)
+
+
+def _format_delta_block(
+    og_triple_count: int,
+    syn_triple_count: int,
+    og_metrics: GraphMetrics,
+    syn_metrics: GraphMetrics,
+    rules: dict[str, HornRule],
+    og_supports: dict[str, int],
+    syn_supports: dict[str, int],
+) -> str:
+    """Formats synthetic-minus-original deltas for triples, per-predicate
+    frequency/domain/range size, and per-rule support."""
+    empty_profile = PredicateProfile()
+    triple_delta = syn_triple_count - og_triple_count
+    lines = [f"Triple count delta: {triple_delta}", "Predicates:"]
+    all_preds = sorted(set(og_metrics.profiles) | set(syn_metrics.profiles))
+    for pred in all_preds:
+        og_profile = og_metrics.profiles.get(pred, empty_profile)
+        syn_profile = syn_metrics.profiles.get(pred, empty_profile)
+        freq_delta = syn_profile.frequency - og_profile.frequency
+        domain_delta = len(syn_profile.domain) - len(og_profile.domain)
+        range_delta = len(syn_profile.range) - len(og_profile.range)
+        lines.append(f"    {pred}:")
+        lines.append(f"        Frequency delta: {freq_delta}")
+        lines.append(f"        Domain size delta: {domain_delta}")
+        lines.append(f"        Range size delta: {range_delta}")
+    lines.append("Rules:")
+    for rule_id in sorted(rules):
+        support_delta = syn_supports[rule_id] - og_supports[rule_id]
+        lines.append(f"    {rule_id}: Support delta: {support_delta}")
+    return "\n".join(lines)
+
+
+def summary(
+    client: SPARQLWrapper,
+    original_uri: str,
+    synthetic_uri: str,
+    rules: dict[str, HornRule],
+) -> None:
+    """Creates a summary in the logs that compare the original metrics with the created
+    graph metrics."""
+    # OG triples
+    og_triple_count = get_triple_count(client, original_uri)
+    syn_triple_count = get_triple_count(client, synthetic_uri)
+
+    # Profiles and frequencies
+    og_metrics = GraphMetrics.from_uri(client, original_uri)
+    syn_metrics = GraphMetrics.from_uri(client, synthetic_uri)
+
+    # Rule support
+    og_supports = {
+        rid: get_support(client, rule, original_uri) for rid, rule in rules.items()
+    }
+    syn_supports = {
+        rid: get_support(client, rule, synthetic_uri) for rid, rule in rules.items()
+    }
+
+    og_block = _format_graph_block(
+        original_uri, og_triple_count, og_metrics, rules, og_supports
+    )
+    syn_block = _format_graph_block(
+        synthetic_uri, syn_triple_count, syn_metrics, rules, syn_supports
+    )
+    logger.info("Original graph summary:\n%s", og_block)
+    logger.info("Synthetic graph summary:\n%s", syn_block)
+    logger.info(
+        "Comparison (synthetic - original):\n%s",
+        _format_delta_block(
+            og_triple_count,
+            syn_triple_count,
+            og_metrics,
+            syn_metrics,
+            rules,
+            og_supports,
+            syn_supports,
+        ),
+    )
 
 
 def run_synthetic_graph_experiment(
@@ -91,11 +207,8 @@ def run_synthetic_graph_experiment(
         profiles=profiles,
     )
 
-    original_count = get_triple_count(client, source)
-    count = get_triple_count(client, synthetic_uri)
+    summary(client, config.graph.complete_uri, synthetic_uri, rules)
 
-    logger.info("Original graph has %d triples.", original_count)
-    logger.info("Synthetic graph at <%s> has %d triples.", synthetic_uri, count)
     logger.info("Execution finished after %d s.", time.time() - start_time)
 
 

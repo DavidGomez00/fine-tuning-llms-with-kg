@@ -13,3 +13,7 @@ the current architecture map. Resolved items are archived in
       consumer (`rules[rule_id]`, `.values()`, `.keys()` lookups in
       `engine/idb.py`, `engine/edb.py`, `engine/generator.py`), so it's
       bigger than a same-file cleanup — do as its own change.
+
+## 'cli/'
+- [ ] **main.py**: Add a summary of the metrics comparing the original metrics with the generated graph.
+      
