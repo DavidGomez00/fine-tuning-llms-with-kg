@@ -144,9 +144,4 @@ flowchart TD
 
 ## Known rough edges
 
-See [`BACKLOG.md`](../BACKLOG.md) for the full, current list. The one worth
-knowing up front:
-
-- `cli/main.py`'s `__main__` block is not confirmed working end-to-end, and
-  `core/queries.py` has several overlapping insert/query functions flagged
-  for consolidation — don't assume all of them are still used.
+See [`BACKLOG.md`](../BACKLOG.md) for the full, current list.

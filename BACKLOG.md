@@ -13,3 +13,7 @@ the current architecture map. Resolved items are archived in
       consumer (`rules[rule_id]`, `.values()`, `.keys()` lookups in
       `engine/idb.py`, `engine/edb.py`, `engine/generator.py`), so it's
       bigger than a same-file cleanup — do as its own change.
+
+## 'docs/'
+- [ ] **concepts.md** *(low priority)*: Check all definitions are as intended (support, head coverage, etc).
+- [ ] **getting_started.md** *(low priority)*: Define clearly all the neccessary inputs for the execution of the repo.
