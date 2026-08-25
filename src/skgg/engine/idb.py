@@ -158,7 +158,6 @@ def generate_idb(
 
     # Get intensional dependencies
     intensional_dependencies = get_intensional_dependencies(rules=rules)
-    logger.debug("Intensional dependencies: \n%s", intensional_dependencies)
 
     # Stratify and apply rules iteratively
     closed_rule_ids: set[str] = set()
@@ -193,6 +192,7 @@ def generate_idb(
         len(profiles),
     )
 
+    # Start iterating over the rules to generate the rest of the triples
     step = 0
     while True:
         step += 1
@@ -200,20 +200,27 @@ def generate_idb(
         applied_rules: dict[str, HornRule] = {}
         added_triples = 0
 
-        # Check if we can apply this rule
         for rule_id, rule in rules.items():
             predicate = rule.head.predicate
             profile = profiles[predicate]
 
-            if rule_id in closed_rule_ids or predicate in closed_preds:
-                logger.debug("%s: rule or %s are closed.", rule_id, predicate)
+            # Check if rule is closed
+            if rule_id in closed_rule_ids:
+                logger.debug("%s: rule is closed.", rule_id)
                 continue
 
+            # Check if head predicate is closde
+            if predicate in closed_preds:
+                logger.debug("%s: %s is closed.", rule_id, predicate)
+                continue
+
+            # Check if rule is grounded
             body_predicates = rule.get_body_predicates() - {predicate}
             if not body_predicates.issubset(grounded_predicates):
                 logger.debug("%s: Rule body is not grounded.", rule_id)
                 continue
 
+            # Check if rule has pending dependencies
             dependency_ids = intensional_dependencies[rule_id]
             _rules = dependency_ids - closed_rule_ids
             if len(_rules):

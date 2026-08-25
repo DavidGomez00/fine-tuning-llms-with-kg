@@ -14,6 +14,10 @@ the current architecture map. Resolved items are archived in
       `engine/idb.py`, `engine/edb.py`, `engine/generator.py`), so it's
       bigger than a same-file cleanup — do as its own change.
 
+## 'engine/'
+- [ ] **`metrics.py`**: There has to be a way to pass the metrics without reading an actual graph. Pass the metrics through a JSON or smth.
+  - [ ] **`main.py`**: We should read the original metrics from the JSON or data input, not through SPARQL queries.
+
 ## 'docs/'
 - [ ] **concepts.md** *(low priority)*: Check all definitions are as intended (support, head coverage, etc).
 - [ ] **getting_started.md** *(low priority)*: Define clearly all the neccessary inputs for the execution of the repo.
