@@ -497,7 +497,7 @@ def get_support(client: SPARQLWrapper, rule: HornRule, graph_uri: str) -> int:
     patterns = "\n        ".join(
         [f"{atom} ." for atom in rule.body] + [f"{rule.head} ."]
     )
-    proj = " ".join(rule.get_variables())
+    proj = " ".join(sorted(rule.get_head_variables()))
 
     query = f"""
     SELECT (COUNT(*) AS ?supp)

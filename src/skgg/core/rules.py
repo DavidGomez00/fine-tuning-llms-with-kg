@@ -66,6 +66,14 @@ class RuleSignature:
             if term.startswith("?")
         }
 
+    def get_head_variables(self) -> set[str]:
+        """Return unique variables starting with '?' in the rule's head."""
+        return {
+            term
+            for term in (self.head.subject, self.head.obj)
+            if term.startswith("?")
+        }
+
     def get_body_variables(self) -> set[str]:
         """Return unique variables starting with '?' in the rule's body."""
         return {
@@ -146,6 +154,10 @@ class HornRule:
     def get_variables(self) -> set[str]:
         """Returns a set with all the variables present in the rule."""
         return self.signature.get_variables()
+
+    def get_head_variables(self) -> set[str]:
+        """Returns a set with the variables present in the rule's head."""
+        return self.signature.get_head_variables()
 
     def get_extensional_preds(self, intensional_preds: set[str]) -> set[str]:
         """Returns body predicates excluding the ones in 'intensional_preds'."""

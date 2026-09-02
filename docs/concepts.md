@@ -56,8 +56,11 @@ parsed by `core.rules.parse_rule_set`.
 Rule quality metrics carried alongside each rule (from the CSV, used to filter
 which rules are trusted enough to drive generation):
 
-- **Support** — count of distinct bindings that satisfy both body and head in
-  the source graph. How much evidence the rule has.
+- **Support** — count of distinct bindings of the *head atom's* variables for
+  which the head fact holds in the source graph and the body holds for at
+  least one binding of its own extra variables (if any). Those extra
+  body-only variables aren't projected over, so each one only needs a single
+  witness — matching AMIE3's definition. How much evidence the rule has.
 - **Head coverage** — support divided by the total number of head-predicate
   triples in the graph. What fraction of the target relation this rule
   explains.
