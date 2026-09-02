@@ -14,7 +14,6 @@ from SPARQLWrapper import SPARQLWrapper
 from skgg.core.queries import (
     SparqlBinding,
     build_rule_query,
-    clear_graph,
     execute_select_query,
     from_binding_row,
     get_existing_triples,
@@ -196,35 +195,16 @@ def apply_rule(
         Number of novel triples inserted to the graph.
     """
 
-    # Retrieve bindings. If using profile, generates a searchspace.
-    try:
-        graph_sources: GraphSources = {
-            "target": graph_uri,
-            "others": [],
-        }
-        searchspace_uri = "http://Searchspace.org/"
+    # Retrieve bindings.
+    graph_sources: GraphSources = {
+        "target": graph_uri,
+        "others": [],
+    }
 
-        use_profile = profile is not None
-
-        if use_profile and rule.head.predicate in rule.get_body_predicates():
-            # Create a searchspace
-            create_searchspace(
-                client=client,
-                profiles={rule.head.predicate: profile},
-                term_mapping=term_mapping,
-                searchspace_uri=searchspace_uri,
-            )
-            # Add the searchspace as a source
-            graph_sources.update({"others": [searchspace_uri]})
-
-        # Query the graph
-        query = build_rule_query(rule=rule.signature, sources=graph_sources)
-        if not (raw_bindings := execute_select_query(client, query)):
-            return 0
-
-    # Clear the searchspace
-    finally:
-        clear_graph(client, searchspace_uri)
+    # Query the graph
+    query = build_rule_query(rule=rule.signature, sources=graph_sources)
+    if not (raw_bindings := execute_select_query(client, query)):
+        return 0
 
     # Get the candidate triples that already exist in the graph
     existing_triples = get_existing_triples(
@@ -249,7 +229,7 @@ def apply_rule(
             if triple in existing_triples:
                 continue
 
-            if use_profile:
+            if profile is not None:
                 subject, _predicate, obj = triple.strip(" .").split(sep=" ")
                 if (
                     profile.frequency <= 0

@@ -206,29 +206,33 @@ def generate_idb(
 
             # Check if rule is closed
             if rule_id in closed_rule_ids:
-                logger.debug("%s: rule is closed.", rule_id)
+                logger.debug("[Step %d] %s: rule is closed.", step, rule_id)
                 continue
 
             # Check if head predicate is closde
             if predicate in closed_preds:
-                logger.debug("%s: %s is closed.", rule_id, predicate)
+                logger.debug("[Step %d] %s: %s is closed.", step, rule_id, predicate)
                 continue
 
             # Check if rule is grounded
             body_predicates = rule.get_body_predicates() - {predicate}
             if not body_predicates.issubset(grounded_predicates):
-                logger.debug("%s: Rule body is not grounded.", rule_id)
+                logger.debug("[Step %d] %s: Body not grounded.", step, rule_id)
                 continue
 
             # Check if rule has pending dependencies
             dependency_ids = intensional_dependencies[rule_id]
             _rules = dependency_ids - closed_rule_ids
             if len(_rules):
-                logger.debug("%s: Rule depends on non closed rules %s", rule_id, _rules)
+                logger.debug(
+                    "[Step %d] %s: Depends on non closed rules %s",
+                    step,
+                    rule_id,
+                    _rules,
+                )
                 continue
 
             # Apply the rule and generate triples from it
-            logger.debug("%s: Ready to be applied.", rule_id)
             count = apply_rule(
                 client=client,
                 graph_uri=synthetic_uri,
@@ -238,7 +242,7 @@ def generate_idb(
                 profile=profile,
             )
             logger.debug(
-                "[Step %d]: %s added %d triples for %s.",
+                "[Step %d] %s: Added %d triples for %s.",
                 step,
                 rule_id,
                 count,
@@ -251,9 +255,9 @@ def generate_idb(
             # Keep track of the rules appliead
             applied_rules[rule_id] = rule
 
-        logger.info("[Step %d]: Added %d triples.", step, added_triples)
+        logger.info("[Step %d] Added %d triples.", step, added_triples)
         if not added_triples:
-            logger.info("[Step %d]: Reached stale state.", step)
+            logger.info("[Step %d] Reached stale state.", step)
             break
 
         # Determine which rules should be checked for closure
@@ -264,6 +268,7 @@ def generate_idb(
             if id not in closed_rule_ids
         }
         rules_to_check = {r_id: rules[r_id] for r_id in pending_rule_ids}
+        logger.debug("[Step %d] Rules to check: %s.", step, rules_to_check.keys())
 
         # Update the closure for the rules and predicates
         if update_closure(
@@ -275,7 +280,7 @@ def generate_idb(
             closed_rule_ids=closed_rule_ids,
         ):
             logger.info(
-                "[Step %d]: Closed - Rules [%d/%d] | Predicates [%d/%d].",
+                "[Step %d] Closed - Rules [%d/%d] | Predicates [%d/%d].",
                 step,
                 len(closed_rule_ids),
                 len(rules),

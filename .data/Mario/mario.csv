@@ -1,5 +1,4 @@
 Body,Head,Head_Coverage,Std_Confidence,PCA_Confidence,Positive_Examples,Body_size,PCA_Body_size,Functional_variable
-?b <http://SuperMario.org/brotherOf> ?a, ?a <http://SuperMario.org/brotherOf> ?b, 0, 1.0, 1.0, 2, 2, 2, ?a
 ?a <http://SuperMario.org/brotherOf> ?b, ?a <http://SuperMario.org/allyOf> ?b, 0, 1.0, 1.0, 2, 2, 2, ?a
 ?a <http://SuperMario.org/servantOf> ?b, ?a <http://SuperMario.org/allyOf> ?b, 0, 1.0, 1.0, 5, 5, 5, ?a
 ?a <http://SuperMario.org/loves> ?c ?b <http://SuperMario.org/loves> ?c, ?a <http://SuperMario.org/enemyOf> ?b, 0, 1.0, 1.0, 2, 2, 2, ?a
