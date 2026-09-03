@@ -53,6 +53,7 @@ Blue nodes are named graphs in the database (keyed by the URIs in each config's
 4. **EDB generation** (`engine/edb.py`) synthesizes ground triples for
    *extensional* predicates (ones no rule head ever produces) that satisfy both
    the profiles and the rule bodies that reference them, producing `edb_uri`.
+   See [`edb-generation.md`](edb-generation.md) for the full algorithm.
 5. **IDB generation** (`engine/idb.py`) forward-chains the rules again, this
    time starting from the EDB instead of a real graph, growing `synthetic_uri`
    until every rule/predicate reaches its target support/frequency (closure).
