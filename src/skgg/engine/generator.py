@@ -7,7 +7,6 @@ metrics and logical rules to produce a complete, synthetic N-Triples dataset.
 import itertools
 import logging
 from collections.abc import Iterator
-from typing import TypedDict
 
 from SPARQLWrapper import SPARQLWrapper
 
@@ -142,11 +141,6 @@ def create_searchspace(
 # ---------------------------------------------------------------------------
 # Apply rules.
 # ---------------------------------------------------------------------------
-class GraphSources(TypedDict):
-    target: str
-    others: list[str]
-
-
 def triples_from_bindings(
     bindings: list[SparqlBinding], atoms: list[Atom], term_mapping: dict[str, str]
 ) -> Iterator[str]:
@@ -196,13 +190,7 @@ def apply_rule(
     """
 
     # Retrieve bindings.
-    graph_sources: GraphSources = {
-        "target": graph_uri,
-        "others": [],
-    }
-
-    # Query the graph
-    query = build_rule_query(rule=rule.signature, sources=graph_sources)
+    query = build_rule_query(rule=rule.signature, graph_uri=graph_uri)
     if not (raw_bindings := execute_select_query(client, query)):
         return 0
 

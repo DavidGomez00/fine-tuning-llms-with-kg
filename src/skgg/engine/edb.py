@@ -38,7 +38,6 @@ from skgg.core.rules import (
     get_extensional_dependencies,
 )
 from skgg.engine.generator import (
-    GraphSources,
     create_searchspace,
     decrement_counts,
     is_assignment_solvable,
@@ -361,8 +360,7 @@ def check_triples_from_rule(
             searchspace_uri=searchspace_uri,
         )
 
-        sources = GraphSources(target=searchspace_uri, others=[])
-        query = build_rule_query(rule=new_rule.signature, sources=sources)
+        query = build_rule_query(rule=new_rule.signature, graph_uri=searchspace_uri)
         # logger.debug("Query: %s", query)
         bindings = execute_select_query(client, query)
 

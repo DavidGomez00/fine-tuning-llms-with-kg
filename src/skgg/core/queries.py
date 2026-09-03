@@ -119,7 +119,7 @@ def from_binding_row(term: str, binding_row: SparqlBinding) -> tuple[str, str]:
 # ---------------------------------------------------------------------------
 # SPARQL query generation.
 # ---------------------------------------------------------------------------
-def build_rule_query(rule: RuleSignature, sources: dict[str, str | list[str]]) -> str:
+def build_rule_query(rule: RuleSignature, graph_uri: str) -> str:
     """Creates a query for the rule signature."""
 
     # Get the variables from the atomns with extensional predicates
@@ -136,12 +136,7 @@ def build_rule_query(rule: RuleSignature, sources: dict[str, str | list[str]]) -
         ]
         unique_values_str = f"FILTER ({' && '.join(expressions)})"
 
-    # Define the Graph sources for the query
-    t_source = sources.get("target", None)
-    if t_source is None:
-        raise ValueError("Target source not specified.")
-    sources = [t_source] + [s for s in sources.get("others", [])]
-    source_str = "\n    ".join(f"FROM <{g}>" for g in sources)
+    source_str = f"FROM <{graph_uri}>"
 
     query = f"""
     SELECT DISTINCT ?rule_id {proj}
