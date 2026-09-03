@@ -1,4 +1,4 @@
-# skgg — Synthetic Knowledge Graph Generation
+# SKGG — Synthetic Knowledge Graph Generation
 
 A tool for generating a **synthetic Knowledge Graph (KG)** from the
 topological metrics of a source graph (node/relation counts, domain/range
