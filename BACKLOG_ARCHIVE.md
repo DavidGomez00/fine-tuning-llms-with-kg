@@ -311,6 +311,10 @@ architecture map.
     removal, `copy_graph_sparql`/`clear_graph_sparql` refactor+rename,
     `run_select_query`/`execute_insert_query`/`count_triples` renames,
     and this reorganization pass) is now resolved.
+- [x] **`generator.py`**: Deleted the creation of searchspace in the generation
+  of triples by applying rules. It was specified that the frequency of the 
+  predicates is an upper bound, not strict. This leaves many rules with the
+  support not met either, but this may be the correct way.
 
 ## `engine/`
 

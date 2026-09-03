@@ -1,0 +1,30 @@
+{
+  "data": {
+    "input_dir": ".data/LungCancer/",
+    "database_url": "http://localhost:7200/",
+    "sparql_endpoint": "repositories/LungCancer"
+  },
+  "db_config": {
+    "user": "admin",
+    "password": "rootpassword",
+    "auth_type": "BASIC",
+    "chunk_size": 5000
+  },
+  "graph": {
+    "name": "LungCancer",
+    "nt_file": "LC.nt",
+    "ontology_file": "",
+    "namespace": "http://LungCancer.org/",
+    "base_uri": "http://LungCancer.org/graph/base",
+    "complete_uri": "http://LungCancer.org/graph/complete",
+    "edb_uri": "http://LungCancer.org/graph/EDB",
+    "synthetic_uri": "http://LungCancer.org/graph/synthetic"
+  },
+  "rules":{
+    "rules_file": "LungCancer-rules.csv",
+    "pca_threshold": 0.9
+  },
+  "logging":{
+    "level":"DEBUG"
+  }
+}
