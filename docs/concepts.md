@@ -106,11 +106,11 @@ makes no more progress), tracked via `closed_preds` / `closed_rule_ids` in
 ## Intensional rule dependencies
 
 Multiple rules can share the same head predicate. Without an order between
-them, a more general (looser) rule could consume search-space triples that a
-more specific (restrictive) rule for the same head still needs, or a
-recursive rule (one whose head predicate also appears in its own body) could
-fire before its predicate has enough non-recursively-derived facts to
-recurse over.
+them, a more general (looser) rule could consume bindings/budget (the
+head predicate's remaining `frequency`/`support`) that a more specific
+(restrictive) rule for the same head still needs, or a recursive rule (one
+whose head predicate also appears in its own body) could fire before its
+predicate has enough non-recursively-derived facts to recurse over.
 
 `core/rules.get_intensional_dependencies` computes, per rule, the set of
 other rule IDs it depends on and must wait for:
@@ -131,11 +131,11 @@ always close first.
 allowed to run — it doesn't change `check_uninferrable_preds`'s upfront
 guarantee that every intensional predicate has some path back to extensional
 ones. But it does mean a rule can now be gated on another rule's closure
-indefinitely: if a dependency never closes (its own search space is
-exhausted before its `support` target is met), everything depending on it
-stays skipped, and the generation loop can reach a stale state with a
-predicate still short of its target — a way of failing to reach full closure
-that didn't exist before this ordering was introduced.
+indefinitely: if a dependency never closes (no more bindings satisfy its
+body before its `support` target is met), everything depending on it stays
+skipped, and the generation loop can reach a stale state with a predicate
+still short of its target — a way of failing to reach full closure that
+didn't exist before this ordering was introduced.
 
 ## Term mapping / namespace
 
@@ -150,8 +150,9 @@ a query or triple is built.
 
 A temporary named graph (`engine/generator.create_searchspace`) holding every
 candidate triple for a predicate: the cartesian product of its profile's domain
-× range. Rule-body queries run against this searchspace (plus the real graph)
-to find candidate variable bindings, which are then filtered down to a
+× range. `engine/edb.py` (`check_triples_from_rule`) runs rule-body queries
+against this searchspace (plus the real graph) to find candidate variable
+bindings for extensional predicates, which are then filtered down to a
 profile-valid subset before being committed as real triples. Always cleared
 after use.
 

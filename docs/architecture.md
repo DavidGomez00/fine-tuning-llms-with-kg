@@ -63,16 +63,16 @@ Blue nodes are named graphs in the database (keyed by the URIs in each config's
    dependent rule's body predicates; for recursive rules — head predicate
    also in the body — every non-recursive rule for that head counts as a
    dependency too). More restrictive rules are generated first, so a looser
-   rule can't consume search-space triples a stricter same-head rule still
-   needs. This still holds under the "complete rules" assumption
-   (`check_uninferrable_preds`'s upfront check, that every intensional
-   predicate has *some* path back to extensional predicates, is unaffected —
-   it never consults the dependency graph) — but it does mean *runtime*
-   closure is now coupled to it: if a dependency rule itself never closes
-   (its search space runs dry before its `support` target is met), every
-   rule gated on it stays skipped indefinitely, and generation can reach a
-   stale state with a structurally-derivable predicate still short of its
-   target frequency.
+   rule can't consume bindings/budget (the head predicate's remaining
+   `frequency`/`support`) a stricter same-head rule still needs. This still
+   holds under the "complete rules" assumption (`check_uninferrable_preds`'s
+   upfront check, that every intensional predicate has *some* path back to
+   extensional predicates, is unaffected — it never consults the dependency
+   graph) — but it does mean *runtime* closure is now coupled to it: if a
+   dependency rule itself never closes (no more bindings satisfy its body
+   before its `support` target is met), every rule gated on it stays skipped
+   indefinitely, and generation can reach a stale state with a
+   structurally-derivable predicate still short of its target frequency.
 
 ## Components
 
@@ -131,11 +131,14 @@ flowchart TD
   Nothing outside this module talks to `SPARQLWrapper` directly for reads/writes.
 - **`engine/metrics.py`** — `GraphMetrics`/`PredicateProfile`: the topological
   descriptors extracted from the source graph.
-- **`engine/generator.py`** — shared triple-generation primitives used by both
-  EDB and IDB generation: building a "searchspace" (cartesian product of a
-  predicate's domain × range), checking whether a candidate assignment keeps
-  the remaining profile realizable (`is_assignment_solvable`), and applying a
-  single rule to produce new triples (`apply_rule`).
+- **`engine/generator.py`** — shared triple-generation primitives.
+  `create_searchspace` (cartesian product of a predicate's domain × range) is
+  used only by `engine/edb.py`, to find candidate bindings for extensional
+  predicates. `apply_rule` — applying a single rule to produce new triples,
+  querying only the real graph for bindings, checking whether a candidate
+  assignment keeps the remaining profile realizable
+  (`is_assignment_solvable`) — is shared by `engine/idb.py` and
+  `engine/completion.py`.
 - **`engine/edb.py`** / **`engine/idb.py`** — see "Data flow" above.
 - **`engine/completion.py`** — see "Data flow" above.
 - **`cli/main.py`** — the experiment entry point (`run_synthetic_graph_experiment`).

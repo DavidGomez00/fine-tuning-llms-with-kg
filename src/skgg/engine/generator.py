@@ -110,7 +110,7 @@ def create_searchspace(
     endpoint (rather than SPARQL `INSERT DATA`) so hundreds of thousands of candidate
     triples can be materialized in seconds. The caller is responsible for deleting
     `searchspace_uri` again once candidates have been selected from it (see
-    `apply_rule`).
+    `engine/edb.py`'s `check_triples_from_rule`).
 
     Args:
         client: An instantiated and configured SPARQLWrapper client.

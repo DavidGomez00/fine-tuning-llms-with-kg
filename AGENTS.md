@@ -69,7 +69,7 @@ src/skgg/
     metrics.py          # GraphMetrics / PredicateProfile: topological descriptors (domain/range frequency per predicate)
     edb.py               # Builds the Extensional DB: selects/generates triples satisfying rule bodies + profile constraints
     idb.py                # Builds the Intensional DB: iteratively applies rules over the EDB, tracking closure of rules/predicates
-    generator.py           # Lower-level triple generation/binding logic shared by edb.py/idb.py (search space construction, novelty/validity filtering)
+    generator.py           # Lower-level triple generation/binding logic shared by edb.py/idb.py/completion.py: search space construction (edb.py only) plus rule application (apply_rule, queries the real graph directly)
     completion.py          # complete_graph: forward-chains rules over a base graph assuming rule bodies are fully grounded
 ```
 
