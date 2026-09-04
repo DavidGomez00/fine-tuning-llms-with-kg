@@ -1,7 +1,7 @@
 # EDB generation
 
 How `engine/edb.py`'s `generate_edb` turns predicate profiles + Horn rules into
-the ground triples of the Extensional Database (EDB) — the seed the IDB
+the ground triples of the Extensional Database (EDB), the seed the IDB
 (`engine/idb.py`) later grows into the synthetic graph. See
 [`concepts.md`](concepts.md) for EDB/IDB, predicate profile, closure and
 searchspace definitions used throughout, and
@@ -11,22 +11,22 @@ pipeline.
 ## Goal and constraints
 
 `generate_edb` never invents predicates from scratch: it materializes ground
-triples only for **extensional predicates** —
-`profiles.keys() - {every rule's head predicate}` — i.e. predicates a rule
-never derives, whether because they only ever occur in a rule *body* or
-because they don't appear in the rule set at all. Every other predicate
-(**intensional**) is left for `engine/idb.py` to derive later by forward-chaining.
+triples only for **extensional predicates** (`profiles.keys() - {every rule'shead predicate}`),
+i.e., predicates a rule never derives, whether because they only ever occur
+in a rule *body* or because they don't appear in the rule set at all. Every
+other predicate (**intensional**) is left for `engine/idb.py` to derive 
+later by forward-chaining.
 
 For each extensional predicate, the EDB must reproduce, exactly, the
 `PredicateProfile` extracted from the source graph: the same `frequency`
-(triple count), and the same `domain`/`range` degree distributions (how many
+(triple count), and the same `domain`/`range` degree distributions (i.e., how many
 triples each subject/object appears in). A triple is only ever added if its
 subject still has domain budget left and its object still has range budget
 left for that predicate.
 
 That alone would let us fabricate triples predicate-by-predicate,
 independently. But rule bodies join multiple predicates on shared variables
-(e.g. `t1(X,Y) ← p(Z,X) ∧ q(Z,Y)`), and the synthetic graph completion depends
+(e.g. `t(X,Y) ← p(Z,X) ∧ q(Z,Y)`), and the synthetic graph completion depends
 on those joins actually having matching bindings once it applies the rules.
 So EDB generation has to pick *correlated* triples across predicates that
 co-occur in a rule body, not just triples that are individually profile-valid.
@@ -35,11 +35,11 @@ Step 2 below.
 
 ## Restrictiveness and the extensional dependency graph
 
-A rule body is **more restrictive** the more atoms with (currently open)
-extensional predicates it has — more atoms means more join constraints,
+A rule body is **more restrictive** the more atoms with open
+extensional predicates it has. More atoms means more join constraints,
 so fewer candidate triples satisfy it. Ties are broken by support: given equal
-extensional-atom counts, the rule with *lower* support is more restrictive
-(it has fewer witnessing bindings to find).
+extensional-atom counts, the rule with *lower* support is more restrictive, since
+it has fewer witnessing bindings to find.
 
 If two rules share an extensional predicate and one is more restrictive, the
 less restrictive one must wait: satisfying it first could greedily consume
@@ -50,7 +50,8 @@ one, and Step 2 (below) only ever considers a rule once everything it depends
 on has already been processed.
 
 This dependency graph is built once, over **all** rules (not just the ones
-that end up relevant to EDB generation), by `core.rules.get_extensional_dependencies`:
+that end up relevant to EDB generation), by `core.rules.get_extensional_dependencies`.
+(It is noted in the backlog that this may impact execution times):
 
 1. Compute `intensional_preds` = every rule's head predicate.
 2. Sort all rule IDs ascending by the number of *extensional* atoms in their
